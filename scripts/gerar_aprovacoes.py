@@ -104,28 +104,67 @@ def formatar_periodo(datas):
 
 def gdrive_id_para_url(filepath):
     """
-    Lê o Google Drive File ID dos metadados macOS (xattr) e retorna URL de embed.
-    Funciona com Google Drive for Desktop (modo streaming ou downloaded).
+    Tenta obter URL de embed do Google Drive por dois métodos:
+    1. xattr com.google.drivefs.item-id (automático, quando disponível)
+    2. xattr com.google.cloudsync.itemid (versões antigas do Drive)
+    Retorna URL ou None se nenhum método funcionar.
     """
+    for xattr_key in ['com.google.drivefs.item-id', 'com.google.cloudsync.itemid']:
+        try:
+            result = subprocess.run(
+                ['xattr', '-p', xattr_key, str(filepath)],
+                capture_output=True, text=True, timeout=5
+            )
+            file_id = result.stdout.strip()
+            if file_id:
+                return f"https://drive.google.com/uc?export=view&id={file_id}"
+        except Exception:
+            pass
+    return None
+
+def ler_links_md(pasta_artes):
+    """
+    Lê o arquivo _links.md na pasta _Artes/YYYY-MM/ como fallback.
+    Formato aceito (uma linha por arte):
+        25-03: https://drive.google.com/file/d/XXXXX/view
+        26-03: https://drive.google.com/uc?export=view&id=XXXXX
+    Retorna dict { 'DD-MM': 'url_embed' }
+    """
+    links_file = pasta_artes / '_links.md'
+    if not links_file.exists():
+        return {}
+
+    links = {}
     try:
-        result = subprocess.run(
-            ['xattr', '-p', 'com.google.drivefs.item-id', str(filepath)],
-            capture_output=True, text=True, timeout=5
-        )
-        file_id = result.stdout.strip()
-        if file_id:
-            return f"https://drive.google.com/uc?export=view&id={file_id}"
+        with open(links_file, 'r', encoding='utf-8') as f:
+            for linha in f:
+                linha = linha.strip()
+                if ':' not in linha or linha.startswith('#'):
+                    continue
+                chave, url = linha.split(':', 1)
+                chave = chave.strip().lower()
+                url = url.strip()
+                if not url:
+                    continue
+                # Converte /file/d/ID/view → uc?export=view&id=ID
+                m = re.search(r'/file/d/([a-zA-Z0-9_\-]+)', url)
+                if m:
+                    url = f"https://drive.google.com/uc?export=view&id={m.group(1)}"
+                links[chave] = url
     except Exception:
         pass
-    return None
+
+    return links
 
 def encontrar_arte(data, pasta_estrategia):
     """
     Procura arte para um post em 04_Estratégia/_Artes/YYYY-MM/
-    Aceita arquivos nomeados como:
-      - DD-MM.jpg / DD-MM.png
-      - DD-MM-1.jpg (múltiplos posts no mesmo dia)
-    Retorna URL de embed do Google Drive ou None.
+
+    Ordem de prioridade:
+    1. xattr do Google Drive no arquivo local (automático)
+    2. _links.md na pasta _Artes/YYYY-MM/ (fallback manual)
+
+    Nomenclatura aceita: DD-MM.jpg, DD-MM.png, DD-MM-1.jpg
     """
     pasta_artes = pasta_estrategia / '_Artes' / data.strftime('%Y-%m')
 
@@ -135,22 +174,25 @@ def encontrar_arte(data, pasta_estrategia):
     prefixo = data.strftime('%d-%m')
     extensoes = {'.jpg', '.jpeg', '.png', '.webp'}
 
-    # Tenta DD-MM.ext primeiro, depois DD-MM-1.ext
+    # 1. Tenta via arquivo local + xattr
     candidatos = []
     for f in pasta_artes.iterdir():
-        nome = f.name.lower()
-        if f.suffix.lower() in extensoes:
-            if nome.startswith(prefixo):
-                candidatos.append(f)
+        if f.suffix.lower() in extensoes and f.name.lower().startswith(prefixo):
+            candidatos.append(f)
 
-    if not candidatos:
-        return None
+    if candidatos:
+        candidatos.sort(key=lambda x: x.name)
+        url = gdrive_id_para_url(candidatos[0])
+        if url:
+            return url
+        print(f"    ⚠️  Arquivo encontrado para {data.strftime('%d/%m')} mas xattr não disponível — tentando _links.md")
 
-    # Ordena para pegar o primeiro (DD-MM.jpg antes de DD-MM-1.jpg)
-    candidatos.sort(key=lambda x: x.name)
-    arquivo = candidatos[0]
+    # 2. Fallback: _links.md
+    links = ler_links_md(pasta_artes)
+    if prefixo in links:
+        return links[prefixo]
 
-    return gdrive_id_para_url(arquivo)
+    return None
 
 
 # ─── PARSER DO .MD ──────────────────────────────────────────────────────────
