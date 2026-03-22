@@ -713,7 +713,7 @@ def main():
     parser.add_argument('--cliente', help='Nome do cliente (parcial aceito)')
     parser.add_argument('--semana', help='Segunda-feira da semana (YYYY-MM-DD)')
     parser.add_argument('--mes', help='Gerar mês completo (YYYY-MM)')
-    parser.add_argument('--base-url', default='https://forster-filmes.netlify.app',
+    parser.add_argument('--base-url', default='https://forster-aprovacoes.netlify.app',
                         help='URL base do site Netlify')
     args = parser.parse_args()
 
