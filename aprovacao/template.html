@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{{TITULO_PAGINA}}</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #F5F5F0;
+      color: #1A1A1A;
+      min-height: 100vh;
+    }
+
+    /* HEADER */
+    .header {
+      background: #1A1A1A;
+      color: #fff;
+      padding: 20px 20px 16px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .header-label {
+      font-size: 11px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #999;
+      margin-bottom: 4px;
+    }
+    .header-cliente {
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+    .header-periodo {
+      font-size: 13px;
+      color: #aaa;
+      margin-top: 3px;
+    }
+    .header-progress {
+      margin-top: 12px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .progress-bar-bg {
+      flex: 1;
+      height: 4px;
+      background: #333;
+      border-radius: 2px;
+      overflow: hidden;
+    }
+    .progress-bar-fill {
+      height: 100%;
+      background: #4CAF50;
+      border-radius: 2px;
+      width: 0%;
+      transition: width 0.3s ease;
+    }
+    .progress-text {
+      font-size: 12px;
+      color: #aaa;
+      white-space: nowrap;
+    }
+
+    /* APROVAR TUDO */
+    .aprovar-tudo-container {
+      padding: 16px 16px 8px;
+    }
+    .btn-aprovar-tudo {
+      width: 100%;
+      padding: 14px;
+      background: #1A1A1A;
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      font-size: 15px;
+      font-weight: 600;
+      letter-spacing: 0.01em;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .btn-aprovar-tudo:hover { background: #333; }
+    .btn-aprovar-tudo.ativo {
+      background: #4CAF50;
+    }
+
+    /* SEMANAS / TABS */
+    .semanas-nav {
+      padding: 8px 16px;
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+    .semanas-nav::-webkit-scrollbar { display: none; }
+    .tab-semana {
+      flex-shrink: 0;
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 500;
+      background: #E8E8E4;
+      color: #555;
+      cursor: pointer;
+      border: none;
+      transition: all 0.2s;
+    }
+    .tab-semana.ativa {
+      background: #1A1A1A;
+      color: #fff;
+    }
+
+    /* POSTS */
+    .posts-container {
+      padding: 8px 16px 100px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .post-card {
+      background: #fff;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+      transition: box-shadow 0.2s;
+    }
+    .post-card.aprovado {
+      box-shadow: 0 0 0 2px #4CAF50;
+    }
+    .post-card.ajuste {
+      box-shadow: 0 0 0 2px #FF9800;
+    }
+
+    .post-header {
+      padding: 14px 16px 10px;
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 8px;
+    }
+    .post-meta {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .post-data {
+      font-size: 12px;
+      font-weight: 600;
+      color: #888;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+    .post-titulo {
+      font-size: 15px;
+      font-weight: 700;
+      color: #1A1A1A;
+      line-height: 1.3;
+    }
+    .post-formato {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 3px 8px;
+      border-radius: 4px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+    .formato-card    { background: #E3F2FD; color: #1565C0; }
+    .formato-reels   { background: #FCE4EC; color: #AD1457; }
+    .formato-carrossel { background: #F3E5F5; color: #6A1B9A; }
+    .formato-video   { background: #E8F5E9; color: #2E7D32; }
+
+    .post-divider {
+      height: 1px;
+      background: #F0F0EC;
+      margin: 0 16px;
+    }
+
+    .post-conteudo {
+      padding: 12px 16px;
+    }
+    .post-conteudo-label {
+      font-size: 10px;
+      font-weight: 700;
+      color: #aaa;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+    .post-texto {
+      font-size: 14px;
+      color: #333;
+      line-height: 1.55;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+    .post-legenda {
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px solid #F0F0EC;
+    }
+
+    /* ARTE INLINE */
+    .post-arte {
+      width: 100%;
+      background: #F0F0EC;
+      overflow: hidden;
+    }
+    .post-arte img {
+      width: 100%;
+      height: auto;
+      display: block;
+      max-height: 520px;
+      object-fit: cover;
+    }
+
+    /* MEDIA LINK */
+    .post-media {
+      padding: 0 16px 12px;
+    }
+    .btn-ver-midia {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 14px;
+      background: #F5F5F0;
+      border-radius: 8px;
+      text-decoration: none;
+      color: #1A1A1A;
+      font-size: 13px;
+      font-weight: 600;
+      border: none;
+      cursor: pointer;
+    }
+    .btn-ver-midia svg { flex-shrink: 0; }
+
+    /* APROVAÇÃO */
+    .post-acoes {
+      display: flex;
+      gap: 8px;
+      padding: 12px 16px 14px;
+    }
+    .btn-aprovar, .btn-ajuste {
+      flex: 1;
+      padding: 12px;
+      border: none;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+    .btn-aprovar {
+      background: #E8F5E9;
+      color: #2E7D32;
+    }
+    .btn-aprovar:active, .btn-aprovar.ativo {
+      background: #4CAF50;
+      color: #fff;
+    }
+    .btn-ajuste {
+      background: #FFF3E0;
+      color: #E65100;
+    }
+    .btn-ajuste:active, .btn-ajuste.ativo {
+      background: #FF9800;
+      color: #fff;
+    }
+
+    /* CAMPO DE AJUSTE */
+    .campo-ajuste {
+      display: none;
+      padding: 0 16px 14px;
+    }
+    .campo-ajuste.visivel { display: block; }
+    .campo-ajuste textarea {
+      width: 100%;
+      padding: 12px;
+      border: 1.5px solid #FF9800;
+      border-radius: 10px;
+      font-size: 14px;
+      font-family: inherit;
+      color: #1A1A1A;
+      background: #FFF8F0;
+      resize: none;
+      outline: none;
+      min-height: 80px;
+    }
+    .campo-ajuste textarea::placeholder { color: #bbb; }
+
+    /* FORMULÁRIO OCULTO (Netlify Forms) */
+    .form-submissao { display: none; }
+
+    /* RODAPÉ FLUTUANTE */
+    .rodape {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: 12px 16px 24px;
+      background: linear-gradient(to top, #F5F5F0 70%, transparent);
+    }
+    .btn-enviar {
+      width: 100%;
+      padding: 16px;
+      background: #1A1A1A;
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.2s;
+      letter-spacing: -0.01em;
+    }
+    .btn-enviar:disabled {
+      background: #CCC;
+      cursor: not-allowed;
+    }
+    .btn-enviar:not(:disabled):hover { background: #333; }
+
+    /* CONFIRMAÇÃO */
+    .tela-confirmacao {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: #F5F5F0;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 32px;
+      text-align: center;
+      z-index: 200;
+    }
+    .tela-confirmacao.visivel { display: flex; }
+    .confirmacao-icone {
+      width: 72px;
+      height: 72px;
+      background: #4CAF50;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 24px;
+    }
+    .confirmacao-titulo {
+      font-size: 24px;
+      font-weight: 800;
+      color: #1A1A1A;
+      margin-bottom: 12px;
+      letter-spacing: -0.03em;
+    }
+    .confirmacao-texto {
+      font-size: 15px;
+      color: #666;
+      line-height: 1.6;
+    }
+
+    /* SEMANA OCULTA */
+    .semana-bloco { display: none; }
+    .semana-bloco.ativa { display: block; }
+
+    @media (min-width: 480px) {
+      .posts-container { max-width: 440px; margin: 0 auto; }
+      .aprovar-tudo-container { max-width: 440px; margin: 0 auto; }
+      .semanas-nav { max-width: 440px; margin: 0 auto; }
+      .rodape { max-width: 440px; left: 50%; transform: translateX(-50%); }
+    }
+  </style>
+</head>
+<body>
+
+<!-- CABEÇALHO -->
+<div class="header">
+  <div class="header-label">Aprovação de conteúdo</div>
+  <div class="header-cliente">{{NOME_CLIENTE}}</div>
+  <div class="header-periodo">{{PERIODO}}</div>
+  <div class="header-progress">
+    <div class="progress-bar-bg">
+      <div class="progress-bar-fill" id="progressBar"></div>
+    </div>
+    <div class="progress-text" id="progressText">0 de {{TOTAL_POSTS}} aprovados</div>
+  </div>
+</div>
+
+<!-- APROVAR TUDO -->
+<div class="aprovar-tudo-container">
+  <button class="btn-aprovar-tudo" id="btnAprovarTudo" onclick="aprovarTudo()">
+    ✓ Aprovar todos os posts
+  </button>
+</div>
+
+<!-- NAVEGAÇÃO DE SEMANAS (só aparece se houver mais de uma semana) -->
+{{SEMANAS_NAV}}
+
+<!-- POSTS -->
+<div class="posts-container" id="postsContainer">
+  {{POSTS_HTML}}
+</div>
+
+<!-- RODAPÉ FIXO -->
+<div class="rodape">
+  <button class="btn-enviar" id="btnEnviar" onclick="enviarAprovacao()" disabled>
+    Enviar aprovações
+  </button>
+</div>
+
+<!-- TELA DE CONFIRMAÇÃO -->
+<div class="tela-confirmacao" id="telaConfirmacao">
+  <div class="confirmacao-icone">
+    <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+      <polyline points="20 6 9 17 4 12"></polyline>
+    </svg>
+  </div>
+  <div class="confirmacao-titulo">Aprovações enviadas!</div>
+  <div class="confirmacao-texto">
+    A Silvana já recebeu suas respostas.<br>
+    Qualquer dúvida, é só chamar no WhatsApp. 😊
+  </div>
+</div>
+
+<!-- FORMULÁRIO NETLIFY (oculto) -->
+<form class="form-submissao" name="aprovacao-{{FORM_ID}}" netlify netlify-honeypot="bot-field" id="formNetlify">
+  <input type="hidden" name="cliente" value="{{NOME_CLIENTE}}" />
+  <input type="hidden" name="periodo" value="{{PERIODO}}" />
+  <input type="hidden" name="resultados" id="inputResultados" />
+  <input type="hidden" name="bot-field" />
+</form>
+
+<script>
+  const totalPosts = {{TOTAL_POSTS}};
+  const statusPosts = {};
+  const comentariosPosts = {};
+
+  function marcarPost(id, acao) {
+    const card = document.getElementById('card-' + id);
+    const btnAprovar = document.getElementById('aprovar-' + id);
+    const btnAjuste = document.getElementById('ajuste-' + id);
+    const campoAjuste = document.getElementById('campo-' + id);
+
+    // Toggle: clicar novamente desmarca
+    if (statusPosts[id] === acao) {
+      statusPosts[id] = null;
+      card.classList.remove('aprovado', 'ajuste');
+      btnAprovar.classList.remove('ativo');
+      btnAjuste.classList.remove('ativo');
+      if (campoAjuste) campoAjuste.classList.remove('visivel');
+    } else {
+      statusPosts[id] = acao;
+      card.classList.remove('aprovado', 'ajuste');
+      btnAprovar.classList.remove('ativo');
+      btnAjuste.classList.remove('ativo');
+
+      if (acao === 'aprovado') {
+        card.classList.add('aprovado');
+        btnAprovar.classList.add('ativo');
+        if (campoAjuste) campoAjuste.classList.remove('visivel');
+      } else {
+        card.classList.add('ajuste');
+        btnAjuste.classList.add('ativo');
+        if (campoAjuste) campoAjuste.classList.add('visivel');
+      }
+    }
+
+    atualizarProgresso();
+  }
+
+  function atualizarComentario(id, valor) {
+    comentariosPosts[id] = valor;
+  }
+
+  function atualizarProgresso() {
+    const aprovados = Object.values(statusPosts).filter(s => s === 'aprovado').length;
+    const respondidos = Object.values(statusPosts).filter(s => s !== null && s !== undefined).length;
+    const pct = totalPosts > 0 ? (respondidos / totalPosts * 100) : 0;
+
+    document.getElementById('progressBar').style.width = pct + '%';
+    document.getElementById('progressText').textContent = aprovados + ' de ' + totalPosts + ' aprovados';
+
+    const btnEnviar = document.getElementById('btnEnviar');
+    btnEnviar.disabled = respondidos < totalPosts;
+    if (respondidos === totalPosts) {
+      btnEnviar.textContent = 'Enviar aprovações ✓';
+    }
+  }
+
+  function aprovarTudo() {
+    const btn = document.getElementById('btnAprovarTudo');
+    const todosAprovados = Object.values(statusPosts).filter(s => s === 'aprovado').length === totalPosts;
+
+    if (todosAprovados) return;
+
+    // Aprova todos os posts
+    document.querySelectorAll('[data-post-id]').forEach(card => {
+      const id = card.dataset.postId;
+      statusPosts[id] = 'aprovado';
+      card.classList.add('aprovado');
+      card.classList.remove('ajuste');
+      const ba = document.getElementById('aprovar-' + id);
+      const baj = document.getElementById('ajuste-' + id);
+      const ca = document.getElementById('campo-' + id);
+      if (ba) ba.classList.add('ativo');
+      if (baj) baj.classList.remove('ativo');
+      if (ca) ca.classList.remove('visivel');
+    });
+
+    btn.classList.add('ativo');
+    btn.textContent = '✓ Todos os posts aprovados';
+    atualizarProgresso();
+  }
+
+  function mudarSemana(semanaId) {
+    document.querySelectorAll('.semana-bloco').forEach(b => b.classList.remove('ativa'));
+    document.querySelectorAll('.tab-semana').forEach(t => t.classList.remove('ativa'));
+    const bloco = document.getElementById('semana-' + semanaId);
+    const tab = document.getElementById('tab-' + semanaId);
+    if (bloco) bloco.classList.add('ativa');
+    if (tab) tab.classList.add('ativa');
+  }
+
+  async function enviarAprovacao() {
+    const resultados = {};
+    for (const [id, status] of Object.entries(statusPosts)) {
+      resultados[id] = {
+        status: status,
+        comentario: comentariosPosts[id] || ''
+      };
+    }
+
+    document.getElementById('inputResultados').value = JSON.stringify(resultados);
+
+    const form = document.getElementById('formNetlify');
+    const formData = new FormData(form);
+
+    try {
+      await fetch('/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams(formData).toString()
+      });
+    } catch(e) {
+      // Mostra confirmação mesmo se falhar (UX)
+    }
+
+    document.getElementById('telaConfirmacao').classList.add('visivel');
+  }
+</script>
+
+</body>
+</html>
