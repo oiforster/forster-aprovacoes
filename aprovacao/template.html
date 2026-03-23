@@ -235,6 +235,34 @@
       display: block;
     }
 
+    /* YOUTUBE FACADE — thumbnail + botão play */
+    .youtube-facade {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 9 / 16;
+      background: #000;
+      cursor: pointer;
+      overflow: hidden;
+    }
+    .youtube-facade img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    .yt-play-btn {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+      filter: drop-shadow(0 2px 8px rgba(0,0,0,0.4));
+      transition: transform 0.15s;
+    }
+    .youtube-facade:active .yt-play-btn {
+      transform: translate(-50%, -50%) scale(0.92);
+    }
+
     /* CARROSSEL — estilo Instagram */
     .carrossel-wrapper {
       position: relative;

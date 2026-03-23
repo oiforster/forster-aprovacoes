@@ -2,7 +2,15 @@
 """
 Forster Filmes — Upload de Reels para YouTube
 Lê vídeos de 06_Entregas/YYYY-MM*/Videos/ e faz upload como não-listados.
-Salva os IDs em _youtube.md na mesma pasta para o gerador de aprovações usar.
+Sobe a capa (se existir) como thumbnail customizada.
+Salva os IDs em _youtube.md na mesma pasta.
+
+Nomenclatura esperada:
+    Vídeo: REEL 01 – Nome do Vídeo.mov   (ou .mp4 / .m4v)
+    Capa:  REEL 01 – Nome do Vídeo (capa).jpg
+
+Entrada no .md da Silvana:
+    **Vídeo:** REEL 01 – Nome do Vídeo
 
 Uso:
   python3 subir_reels.py                     # mês atual, todos os clientes
@@ -26,12 +34,15 @@ try:
     from google.oauth2.credentials import Credentials
 except ImportError:
     print("❌  Dependências não instaladas. Rode:")
-    print("    pip3 install google-api-python-client google-auth-oauthlib --break-system-packages")
+    print("    pip3 install --user google-api-python-client google-auth-oauthlib")
     sys.exit(1)
 
 # ─── CONFIGURAÇÃO ─────────────────────────────────────────────────────────────
 
-SCOPES = ['https://www.googleapis.com/auth/youtube.upload']
+SCOPES = [
+    'https://www.googleapis.com/auth/youtube.upload',
+    'https://www.googleapis.com/auth/youtube',          # necessário para thumbnail
+]
 
 CREDENTIALS_FILE = Path(__file__).parent / 'youtube_credentials.json'
 TOKEN_FILE       = Path(__file__).parent / 'youtube_token.json'
@@ -63,17 +74,11 @@ def encontrar_pasta_agencia():
             return entry
     raise FileNotFoundError("Pasta Agência não encontrada")
 
-# ─── AUTENTICAÇÃO YOUTUBE ──────────────────────────────────────────────────────
+# ─── AUTENTICAÇÃO ─────────────────────────────────────────────────────────────
 
 def autenticar_youtube():
-    """
-    Autentica via OAuth 2.0.
-    Na primeira vez: abre o browser para autorização e salva o token.
-    Nas próximas: usa o token salvo (renova automaticamente se expirado).
-    """
     if not CREDENTIALS_FILE.exists():
-        print(f"❌  Arquivo de credenciais não encontrado: {CREDENTIALS_FILE}")
-        print("    Baixe o JSON do Google Cloud Console e salve em scripts/youtube_credentials.json")
+        print(f"❌  Credenciais não encontradas: {CREDENTIALS_FILE}")
         sys.exit(1)
 
     creds = None
@@ -84,6 +89,9 @@ def autenticar_youtube():
         if creds and creds.expired and creds.refresh_token:
             creds.refresh(Request())
         else:
+            # Remove token antigo (pode ter escopos insuficientes)
+            if TOKEN_FILE.exists():
+                TOKEN_FILE.unlink()
             flow = InstalledAppFlow.from_client_secrets_file(str(CREDENTIALS_FILE), SCOPES)
             creds = flow.run_local_server(port=0)
         with open(TOKEN_FILE, 'w') as f:
@@ -94,7 +102,7 @@ def autenticar_youtube():
 # ─── _youtube.md ──────────────────────────────────────────────────────────────
 
 def ler_youtube_md(pasta_videos):
-    """Lê _youtube.md → dict { 'DD-MM': 'VIDEO_ID' }."""
+    """Lê _youtube.md → dict { 'REEL 01 – Nome': 'VIDEO_ID' }."""
     arquivo = pasta_videos / '_youtube.md'
     if not arquivo.exists():
         return {}
@@ -102,18 +110,19 @@ def ler_youtube_md(pasta_videos):
     with open(arquivo, 'r', encoding='utf-8') as f:
         for linha in f:
             linha = linha.strip()
-            if ':' not in linha or linha.startswith('#'):
+            if not linha or linha.startswith('#'):
                 continue
-            chave, url = linha.split(':', 1)
-            chave = chave.strip().lower()
-            url   = url.strip()
+            idx = linha.find(': http')
+            if idx == -1:
+                continue
+            chave = linha[:idx].strip()
+            url   = linha[idx+2:].strip()
             m = re.search(r'(?:youtu\.be/|[?&]v=)([a-zA-Z0-9_\-]{11})', url)
             if m:
                 ids[chave] = m.group(1)
     return ids
 
 def salvar_youtube_md(pasta_videos, ids_dict):
-    """Grava/atualiza _youtube.md."""
     arquivo = pasta_videos / '_youtube.md'
     linhas  = ['# YouTube IDs dos Reels — gerado automaticamente\n']
     for chave in sorted(ids_dict.keys()):
@@ -123,13 +132,13 @@ def salvar_youtube_md(pasta_videos, ids_dict):
 
 # ─── UPLOAD ───────────────────────────────────────────────────────────────────
 
-def fazer_upload(youtube, video_path, titulo, cliente):
-    """Faz upload do vídeo como não-listado e retorna o video ID."""
+def fazer_upload(youtube, video_path, reel_nome, cliente):
+    """Faz upload do vídeo como não-listado. Retorna video ID."""
     body = {
         'snippet': {
-            'title': titulo,
+            'title': f"{reel_nome} — {cliente}",
             'description': f'Aprovação de conteúdo — {cliente} — Forster Filmes',
-            'categoryId': '22',  # People & Blogs
+            'categoryId': '22',
         },
         'status': {
             'privacyStatus': 'unlisted',
@@ -141,10 +150,10 @@ def fazer_upload(youtube, video_path, titulo, cliente):
         str(video_path),
         mimetype='video/*',
         resumable=True,
-        chunksize=4 * 1024 * 1024  # 4 MB por chunk
+        chunksize=4 * 1024 * 1024
     )
 
-    req      = youtube.videos().insert(part='snippet,status', body=body, media_body=media)
+    req = youtube.videos().insert(part='snippet,status', body=body, media_body=media)
     response = None
     while response is None:
         status, response = req.next_chunk()
@@ -154,7 +163,18 @@ def fazer_upload(youtube, video_path, titulo, cliente):
     print(f"      ✅ Upload concluído                ")
     return response['id']
 
-# ─── PROCESSAMENTO POR CLIENTE ────────────────────────────────────────────────
+def subir_thumbnail(youtube, video_id, capa_path):
+    """Sobe a imagem de capa como thumbnail do vídeo."""
+    try:
+        youtube.thumbnails().set(
+            videoId=video_id,
+            media_body=MediaFileUpload(str(capa_path), mimetype='image/jpeg')
+        ).execute()
+        print(f"      🖼️  Capa enviada")
+    except Exception as e:
+        print(f"      ⚠️  Capa não enviada: {e}")
+
+# ─── PROCESSAMENTO ────────────────────────────────────────────────────────────
 
 def processar_cliente(youtube, cliente, ano_mes, agencia_path):
     pasta_cliente = agencia_path / '_Clientes' / 'Clientes Recorrentes' / cliente
@@ -170,7 +190,6 @@ def processar_cliente(youtube, cliente, ano_mes, agencia_path):
     if not pasta_entregas.exists():
         return
 
-    # Encontra pasta do mês
     pasta_mes = None
     for entry in pasta_entregas.iterdir():
         if entry.is_dir() and entry.name.startswith(ano_mes):
@@ -183,35 +202,48 @@ def processar_cliente(youtube, cliente, ano_mes, agencia_path):
     if not pasta_videos.exists():
         return
 
-    extensoes = {'.mp4', '.mov', '.m4v'}
+    # Encontra vídeos com padrão "REEL NN – Nome.mov"
+    extensoes_video = {'.mov', '.mp4', '.m4v'}
     videos = sorted([
         f for f in pasta_videos.iterdir()
-        if f.suffix.lower() in extensoes and re.match(r'^\d{2}-\d{2}', f.name)
+        if f.suffix.lower() in extensoes_video
+        and '(capa)' not in f.name.lower()
+        and re.match(r'^REEL\s+\d+', f.name, re.IGNORECASE)
     ])
+
     if not videos:
         return
 
     print(f"\n🔷 {cliente}")
-    ids = ler_youtube_md(pasta_videos)
+    ids  = ler_youtube_md(pasta_videos)
     novos = False
 
     for video in videos:
-        prefixo = video.stem[:5]  # DD-MM
+        reel_nome = video.stem  # "REEL 01 – Nome do Vídeo"
 
-        if prefixo in ids:
-            print(f"  ✓ {video.name} — já enviado (youtu.be/{ids[prefixo]})")
+        if reel_nome in ids:
+            print(f"  ✓ {video.name} — já enviado (youtu.be/{ids[reel_nome]})")
             continue
 
-        titulo = f"{cliente} — Reel {prefixo[0:2]}/{prefixo[3:5]}"
         print(f"  📤 Enviando {video.name} ...")
-
         try:
-            video_id = fazer_upload(youtube, video, titulo, cliente)
-            ids[prefixo] = video_id
+            video_id = fazer_upload(youtube, video, reel_nome, cliente)
+            ids[reel_nome] = video_id
             novos = True
             print(f"      🔗 https://youtu.be/{video_id}")
+
+            # Sobe capa se existir: "REEL 01 – Nome do Vídeo (capa).jpg"
+            capa = pasta_videos / f"{reel_nome} (capa).jpg"
+            if not capa.exists():
+                # tenta .png
+                capa = pasta_videos / f"{reel_nome} (capa).png"
+            if capa.exists():
+                subir_thumbnail(youtube, video_id, capa)
+            else:
+                print(f"      ℹ️  Sem capa — YouTube vai gerar thumbnail automática")
+
         except Exception as e:
-            print(f"      ❌ Erro no upload: {e}")
+            print(f"      ❌ Erro: {e}")
 
     if novos:
         salvar_youtube_md(pasta_videos, ids)
@@ -221,8 +253,8 @@ def processar_cliente(youtube, cliente, ano_mes, agencia_path):
 
 def main():
     parser = argparse.ArgumentParser(description='Sobe Reels para YouTube como não-listados.')
-    parser.add_argument('--cliente', type=str, default=None, help='Nome parcial do cliente')
-    parser.add_argument('--mes',     type=str, default=None, help='Mês no formato YYYY-MM')
+    parser.add_argument('--cliente', type=str, default=None)
+    parser.add_argument('--mes',     type=str, default=None)
     args = parser.parse_args()
 
     ano_mes      = args.mes or date.today().strftime('%Y-%m')
@@ -233,7 +265,7 @@ def main():
 
     print("🔐 Autenticando com YouTube...")
     youtube = autenticar_youtube()
-    print("✅ Autenticado")
+    print("✅ Autenticado\n")
 
     clientes = CLIENTES_RECORRENTES
     if args.cliente:

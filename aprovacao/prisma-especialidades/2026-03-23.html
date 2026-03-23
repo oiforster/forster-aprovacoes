@@ -235,6 +235,34 @@
       display: block;
     }
 
+    /* YOUTUBE FACADE — thumbnail + botão play */
+    .youtube-facade {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 9 / 16;
+      background: #000;
+      cursor: pointer;
+      overflow: hidden;
+    }
+    .youtube-facade img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    .yt-play-btn {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+      filter: drop-shadow(0 2px 8px rgba(0,0,0,0.4));
+      transition: transform 0.15s;
+    }
+    .youtube-facade:active .yt-play-btn {
+      transform: translate(-50%, -50%) scale(0.92);
+    }
+
     /* CARROSSEL — estilo Instagram */
     .carrossel-wrapper {
       position: relative;
@@ -665,23 +693,8 @@
       <span class="post-formato formato-card">Card</span>
     </div>
     
-    <div class="post-arte">
-      <div class="youtube-wrapper">
-        <iframe
-          src="https://www.youtube.com/embed/FyOpqlE_bh8?rel=0&modestbranding=1&playsinline=1"
-          frameborder="0"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-          allowfullscreen
-          loading="lazy"
-        ></iframe>
-      </div>
-    </div>
     <div class="post-divider"></div>
     
-    <div class="post-conteudo">
-      <div class="post-conteudo-label">Texto</div>
-      <div class="post-texto">Em 12 dias, abrimos as portas.</div>
-    </div>
     <div class="post-conteudo" style="padding-top:0">
       <div class="post-conteudo-label">Legenda</div>
       <div class="post-texto">A contagem regressiva começou.<br>Em 12 dias, uma nova forma de cuidar da saúde chega a Novo Hamburgo.<br>Você vai querer conhecer. 🗓️<br>---<br>### FASE 2 — REVELAÇÃO DA MARCA (29/03–02/04)<br>---</div>

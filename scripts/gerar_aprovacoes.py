@@ -208,18 +208,27 @@ def ler_links_md(pasta_artes):
 
     return links
 
-def ler_youtube_id(pasta_videos, prefixo):
-    """Lê _youtube.md e retorna o video ID para DD-MM, ou None."""
+def ler_youtube_id(pasta_videos, reel_nome):
+    """
+    Lê _youtube.md e retorna o video ID para o nome do reel, ou None.
+    Chave no arquivo: "REEL 01 – Nome do Vídeo: https://youtu.be/ID"
+    """
     arquivo = pasta_videos / '_youtube.md'
     if not arquivo.exists():
         return None
+    reel_lower = reel_nome.strip().lower()
     with open(arquivo, 'r', encoding='utf-8') as f:
         for linha in f:
             linha = linha.strip()
-            if ':' not in linha or linha.startswith('#'):
+            if not linha or linha.startswith('#'):
                 continue
-            chave, url = linha.split(':', 1)
-            if chave.strip().lower() == prefixo.lower():
+            # Divide somente no último ':' que precede a URL
+            idx = linha.find(': http')
+            if idx == -1:
+                continue
+            chave = linha[:idx].strip().lower()
+            url   = linha[idx+2:].strip()
+            if chave == reel_lower:
                 m = re.search(r'(?:youtu\.be/|[?&]v=)([a-zA-Z0-9_\-]{11})', url)
                 if m:
                     return m.group(1)
@@ -258,61 +267,56 @@ def encontrar_arte(data, pasta_estrategia):
         list  → lista de URLs para carrossel
         None  → sem arte
     """
-    # Caminho principal: 06_Entregas/YYYY-MM*/Posts_Fixos/
+    prefixo   = data.strftime('%d-%m')
+    extensoes = {'.jpg', '.jpeg', '.png', '.webp'}
+
+    # Pasta de artes: Posts_Fixos/ em 06_Entregas, ou _Artes/ como fallback
     pasta_cliente = pasta_estrategia.parent
     pasta_posts_fixos, _ = encontrar_pasta_entrega(data, pasta_cliente)
 
     if pasta_posts_fixos and pasta_posts_fixos.exists():
         pasta_artes = pasta_posts_fixos
     else:
-        # Fallback: estrutura antiga em 04_Estratégia/_Artes/YYYY-MM/
         pasta_artes = pasta_estrategia / '_Artes' / data.strftime('%Y-%m')
 
     if not pasta_artes.exists():
         return None
 
-    prefixo = data.strftime('%d-%m')
-    extensoes = {'.jpg', '.jpeg', '.png', '.webp'}
-
-    # 1. Tenta via arquivo local + xattr
     candidatos = sorted(
         [f for f in pasta_artes.iterdir()
-         if f.suffix.lower() in extensoes and f.name.lower().startswith(prefixo)],
+         if f.suffix.lower() in extensoes
+         and f.name.lower().startswith(prefixo)
+         and '(capa)' not in f.name.lower()],   # ignora capas de reel
         key=lambda x: x.name
     )
 
-    if candidatos:
-        # Distingue slides de carrossel (DD-MM_N.ext) de imagem única (DD-MM.ext)
-        slides = [f for f in candidatos
-                  if re.match(rf'^{re.escape(prefixo)}_\d+\.', f.name.lower())]
+    if not candidatos:
+        return None
 
-        if slides:
-            # Carrossel via xattr
-            urls = []
-            for slide in slides:
-                url = gdrive_id_para_url(slide)
-                if url:
-                    urls.append(url)
-                else:
-                    urls = []
-                    break
-            if urls:
-                return urls
-        else:
-            # Imagem única via xattr
-            url = gdrive_id_para_url(candidatos[0])
+    # Distingue imagem única (DD-MM.jpg) de carrossel (DD-MM_1.jpg, DD-MM_2.jpg...)
+    slides = [f for f in candidatos
+              if re.match(rf'^{re.escape(prefixo)}_\d+\.', f.name.lower())]
+
+    if slides:
+        urls = []
+        for slide in slides:
+            url = gdrive_id_para_url(slide)
             if url:
-                return url
+                urls.append(url)
+            else:
+                urls = []
+                break
+        if urls:
+            return urls
+    else:
+        url = gdrive_id_para_url(candidatos[0])
+        if url:
+            return url
 
-        print(f"    ⚠️  Arquivo encontrado para {data.strftime('%d/%m')} mas xattr não disponível — tentando _links.md")
-
-    # 2. Fallback: _links.md
+    print(f"    ⚠️  Arquivo encontrado para {data.strftime('%d/%m')} mas xattr não disponível — tentando _links.md")
     links = ler_links_md(pasta_artes)
     if prefixo in links:
-        result = links[prefixo]
-        if isinstance(result, list):
-            return result   # carrossel
-        return result       # imagem única
+        return links[prefixo]
 
     return None
 
@@ -502,7 +506,7 @@ def parse_conteudo_mensal(arquivo_path, datas_semana=None, pasta_estrategia=None
         texto_secao = secoes_conteudo.get(data, '')
 
         # Extrair texto do card, legenda e media_link da seção
-        texto_card, legenda, slides, media_link = extrair_partes_post(texto_secao)
+        texto_card, legenda, slides, media_link, reel_nome = extrair_partes_post(texto_secao)
 
         post_id = f"{data.strftime('%Y%m%d')}-{slugify(info['titulo'])[:30]}"
 
@@ -514,15 +518,15 @@ def parse_conteudo_mensal(arquivo_path, datas_semana=None, pasta_estrategia=None
             arte_url = encontrar_arte(data, pasta_estrategia)
             if arte_url:
                 print(f"    🖼️  Arte encontrada para {data.strftime('%d/%m')}")
-            # Busca YouTube ID na pasta Videos/_youtube.md
+            # Busca YouTube ID pelo nome do reel (campo **Vídeo:** no .md)
             _, pasta_videos = encontrar_pasta_entrega(data, pasta_estrategia.parent)
-            if pasta_videos and pasta_videos.exists():
-                prefixo = data.strftime('%d-%m')
-                youtube_id = ler_youtube_id(pasta_videos, prefixo)
+            if pasta_videos and pasta_videos.exists() and reel_nome:
+                youtube_id = ler_youtube_id(pasta_videos, reel_nome)
                 if youtube_id:
-                    print(f"    🎬  Reel YouTube encontrado para {data.strftime('%d/%m')}")
-                for ext in ['.mp4', '.mov', '.m4v']:
-                    candidato = pasta_videos / f"{prefixo}{ext}"
+                    print(f"    🎬  Reel '{reel_nome}' encontrado para {data.strftime('%d/%m')}")
+                # Caminho local do vídeo (para upload futuro)
+                for ext in ['.mov', '.mp4', '.m4v']:
+                    candidato = pasta_videos / f"{reel_nome}{ext}"
                     if candidato.exists():
                         video_path = str(candidato)
                         break
@@ -539,6 +543,7 @@ def parse_conteudo_mensal(arquivo_path, datas_semana=None, pasta_estrategia=None
             'slides': slides,
             'media_link': media_link,
             'arte_url': arte_url,
+            'reel_nome':  reel_nome,    # nome do arquivo de vídeo (ex: REEL 01 – Nome)
             'youtube_id': youtube_id,   # ID do YouTube para embed (Reels)
             'video_path': video_path,   # caminho local do Reel (para upload)
         })
@@ -552,14 +557,16 @@ def extrair_partes_post(texto_secao):
     - legenda: legenda do post
     - slides: lista de slides (para carrosseis)
     - media_link: link para mídia (Drive, YouTube, etc.)
+    - reel_nome: nome do arquivo de vídeo (ex: "REEL 01 – Nome do Vídeo")
     """
     texto_card = ''
-    legenda = ''
-    slides = []
+    legenda    = ''
+    slides     = []
     media_link = ''
+    reel_nome  = ''
 
     if not texto_secao:
-        return texto_card, legenda, slides, media_link
+        return texto_card, legenda, slides, media_link, reel_nome
 
     linhas = texto_secao.split('\n')
     modo = None
@@ -574,6 +581,13 @@ def extrair_partes_post(texto_secao):
             m = re.search(r'https?://\S+', linha)
             if m:
                 media_link = m.group(0).rstrip(')')
+
+        # Detecta campo Vídeo/Reel
+        if re.match(r'\*\*(vídeo|video|reel)\*\*\s*:', linha_lower) or re.match(r'\*\*(vídeo|video|reel):', linha_lower):
+            m = re.search(r':\s*(.+)', linha)
+            if m:
+                reel_nome = m.group(1).strip()
+            continue
 
         # Detecta início de seção
         if re.match(r'\*\*texto do card', linha_lower) or re.match(r'\*\*texto:', linha_lower):
@@ -618,9 +632,9 @@ def extrair_partes_post(texto_secao):
 
     # Remove marcadores markdown do texto
     texto_card = limpar_markdown(texto_card)
-    legenda = limpar_markdown(legenda)
+    legenda    = limpar_markdown(legenda)
 
-    return texto_card, legenda, slides, media_link
+    return texto_card, legenda, slides, media_link, reel_nome
 
 def _flush_buffer(modo, buffer, slides, set_card, set_legenda):
     pass  # Helper interno
@@ -655,7 +669,7 @@ def gerar_html_post(post):
     # Conteúdo principal
     # Quando há arte (imagem ou carrossel), o texto do card/slides já está
     # visível na própria arte — mostra só a legenda para imitar o Instagram.
-    tem_arte = bool(post.get('arte_url'))
+    tem_arte = bool(post.get('arte_url') or post.get('youtube_id'))
     html_conteudo = ''
 
     if not tem_arte and post['texto_card']:
@@ -702,22 +716,44 @@ def gerar_html_post(post):
       <div class="post-texto" style="color:#aaa;font-style:italic">Conteúdo detalhado não disponível neste arquivo.</div>
     </div>'''
 
-    # Embed YouTube (Reels) — prioridade sobre arte estática
+    # Embed YouTube (Reels) — facade com thumbnail + play → fullscreen ao tocar
     html_arte = ''
     if post.get('youtube_id'):
-        yt_id = post['youtube_id']
+        yt_id  = post['youtube_id']
+        ytf_id = f"ytf-{post_id}"
         html_arte = f'''
     <div class="post-arte">
-      <div class="youtube-wrapper">
-        <iframe
-          src="https://www.youtube.com/embed/{yt_id}?rel=0&modestbranding=1&playsinline=1"
-          frameborder="0"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-          allowfullscreen
-          loading="lazy"
-        ></iframe>
+      <div class="youtube-facade" id="{ytf_id}" onclick="abrirReel('{yt_id}','{ytf_id}')">
+        <img
+          src="https://img.youtube.com/vi/{yt_id}/maxresdefault.jpg"
+          onerror="this.src='https://img.youtube.com/vi/{yt_id}/hqdefault.jpg'"
+          alt="Reel — {escape_html(post['titulo'])}"
+        />
+        <div class="yt-play-btn">
+          <svg viewBox="0 0 68 48" width="68" height="48">
+            <path d="M66.5 7.7a8.5 8.5 0 0 0-6-6C56 0 34 0 34 0S12 0 7.5 1.7a8.5 8.5 0 0 0-6 6C0 14.3 0 24 0 24s0 9.7 1.5 16.3a8.5 8.5 0 0 0 6 6C12 48 34 48 34 48s22 0 26.5-1.7a8.5 8.5 0 0 0 6-6C68 33.7 68 24 68 24s0-9.7-1.5-16.3z" fill="rgba(0,0,0,0.7)"/>
+            <path d="M45 24 27 14v20z" fill="white"/>
+          </svg>
+        </div>
       </div>
-    </div>'''
+    </div>
+    <script>(function(){{
+      window.abrirReel = window.abrirReel || function(ytId, facadeId) {{
+        var facade = document.getElementById(facadeId);
+        var wrap = document.createElement('div');
+        wrap.className = 'youtube-wrapper';
+        var ifr = document.createElement('iframe');
+        ifr.src = 'https://www.youtube.com/embed/' + ytId + '?autoplay=1&rel=0&modestbranding=1&playsinline=0';
+        ifr.setAttribute('allow','accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen');
+        ifr.setAttribute('allowfullscreen','');
+        ifr.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;border:none;';
+        wrap.appendChild(ifr);
+        facade.parentNode.replaceChild(wrap, facade);
+        var el = wrap;
+        if (el.requestFullscreen) el.requestFullscreen();
+        else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
+      }};
+    }})();</script>'''
 
     # Arte inline (imagem única ou carrossel) — só se não há YouTube
     arte = post.get('arte_url') if not html_arte else None
