@@ -117,7 +117,7 @@ def gdrive_id_para_url(filepath):
             )
             file_id = result.stdout.strip()
             if file_id:
-                return f"https://drive.google.com/uc?export=view&id={file_id}"
+                return f"https://lh3.googleusercontent.com/d/{file_id}"
         except Exception:
             pass
     return None
@@ -146,10 +146,15 @@ def ler_links_md(pasta_artes):
                 url = url.strip()
                 if not url:
                     continue
-                # Converte /file/d/ID/view → uc?export=view&id=ID
+                # Converte /file/d/ID/view → lh3.googleusercontent.com/d/ID
                 m = re.search(r'/file/d/([a-zA-Z0-9_\-]+)', url)
                 if m:
-                    url = f"https://drive.google.com/uc?export=view&id={m.group(1)}"
+                    url = f"https://lh3.googleusercontent.com/d/{m.group(1)}"
+                # Converte uc?export=view&id=ID → lh3.googleusercontent.com/d/ID
+                elif 'uc?export=view&id=' in url:
+                    m2 = re.search(r'id=([a-zA-Z0-9_\-]+)', url)
+                    if m2:
+                        url = f"https://lh3.googleusercontent.com/d/{m2.group(1)}"
                 links[chave] = url
     except Exception:
         pass
