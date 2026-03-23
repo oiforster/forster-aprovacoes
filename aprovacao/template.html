@@ -628,6 +628,9 @@
     }
 
     </style>
+  <!-- EmailJS SDK -->
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+  <script>emailjs.init({ publicKey: '-xrMYz7vRGvZg8ZOY' });</script>
 </head>
 <body>
 
@@ -715,6 +718,20 @@
   const whatsappGrupo = '{{WHATSAPP_GRUPO}}';  // link do grupo (ex: https://chat.whatsapp.com/XXX)
   const postsMeta = {{POSTS_META_JSON}};
   const postsOrdem = {{POSTS_ORDEM_JSON}};
+  
+  function enviarEmailSilencioso(mensagem) {
+    try {
+      emailjs.send('service_a00b37r', 'template_lyk4lff', {
+        title: 'Aprovações — ' + nomeCliente + ' — ' + periodo,
+        name: nomeCliente,
+        message: mensagem,
+        email: ''
+      });
+    } catch(e) {
+      // silencioso — não interrompe o fluxo
+    }
+  }
+
   const statusPosts = {};
   const comentariosPosts = {};
 
@@ -836,6 +853,9 @@
     }
 
     const mensagem = linhas.join('\n');
+
+    // Disparo silencioso do email de redundância
+    enviarEmailSilencioso(mensagem);
 
     if (whatsappGrupo) {
       // Mostra modal com a mensagem para o cliente copiar e abrir o grupo
