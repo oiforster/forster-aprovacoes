@@ -594,12 +594,32 @@
       <span class="post-formato formato-card">Card</span>
     </div>
     
+    <div class="post-arte">
+      <div class="carrossel-wrapper" id="carr-20260327-eu-sempre-quis-construir-um-lu">
+        <div class="carrossel-track"><div class="carrossel-slide"><img src="https://lh3.googleusercontent.com/d/19An_I9Hr7x13rSl9tl9YLg59A0euAM7d" loading="lazy" onerror="this.closest('.carrossel-slide').style.display='none'" /></div><div class="carrossel-slide"><img src="https://lh3.googleusercontent.com/d/1vxhhPHZK3o_BaPTIKZI2KIwOptk1beYT" loading="lazy" onerror="this.closest('.carrossel-slide').style.display='none'" /></div><div class="carrossel-slide"><img src="https://lh3.googleusercontent.com/d/1dAPfLGEId_-KmAI9G_V-NlBHQ4VKDSwh" loading="lazy" onerror="this.closest('.carrossel-slide').style.display='none'" /></div><div class="carrossel-slide"><img src="https://lh3.googleusercontent.com/d/1IZN2SBBzLFGdM9hz27Y4SEiGyVdeH9Bc" loading="lazy" onerror="this.closest('.carrossel-slide').style.display='none'" /></div><div class="carrossel-slide"><img src="https://lh3.googleusercontent.com/d/1SvZPAzB40B7A4WB5yrbNlhNARk24NXBM" loading="lazy" onerror="this.closest('.carrossel-slide').style.display='none'" /></div><div class="carrossel-slide"><img src="https://lh3.googleusercontent.com/d/1hTGz_tpzXqh6qyAXQwEGB_PpIe7CRbKg" loading="lazy" onerror="this.closest('.carrossel-slide').style.display='none'" /></div><div class="carrossel-slide"><img src="https://lh3.googleusercontent.com/d/1OarOqAeWVTJQhzvWq0o8fdTMqIMh_DYv" loading="lazy" onerror="this.closest('.carrossel-slide').style.display='none'" /></div></div>
+        <div class="carrossel-counter">1 / 7</div>
+        <button class="carrossel-prev" onclick="carrosselNav('carr-20260327-eu-sempre-quis-construir-um-lu',-1)" aria-label="Anterior">&#8249;</button>
+        <button class="carrossel-next" onclick="carrosselNav('carr-20260327-eu-sempre-quis-construir-um-lu', 1)" aria-label="Próximo">&#8250;</button>
+      </div>
+      <div class="carrossel-dots" id="dots-carr-20260327-eu-sempre-quis-construir-um-lu"><span class="carrossel-dot ativa"></span><span class="carrossel-dot"></span><span class="carrossel-dot"></span><span class="carrossel-dot"></span><span class="carrossel-dot"></span><span class="carrossel-dot"></span><span class="carrossel-dot"></span></div>
+    </div>
+    <script>(function(){
+      var track = document.querySelector('#carr-20260327-eu-sempre-quis-construir-um-lu .carrossel-track');
+      var counter = document.querySelector('#carr-20260327-eu-sempre-quis-construir-um-lu .carrossel-counter');
+      var dots = document.querySelectorAll('#dots-carr-20260327-eu-sempre-quis-construir-um-lu .carrossel-dot');
+      var total = 7;
+      track.addEventListener('scroll', function() {
+        var idx = Math.round(track.scrollLeft / track.offsetWidth);
+        counter.textContent = (idx + 1) + ' / ' + total;
+        dots.forEach(function(d, i) { d.classList.toggle('ativa', i === idx); });
+      });
+    })();
+    window.carrosselNav = window.carrosselNav || function(id, dir) {
+      var t = document.querySelector('#' + id + ' .carrossel-track');
+      t.scrollBy({ left: dir * t.offsetWidth, behavior: 'smooth' });
+    };</script>
     <div class="post-divider"></div>
     
-    <div class="post-conteudo">
-      <div class="post-conteudo-label">Texto</div>
-      <div class="post-texto">&quot;Eu sempre quis construir um lugar onde o paciente viesse primeiro.&quot;<br>— Dra. Juliana</div>
-    </div>
     <div class="post-conteudo" style="padding-top:0">
       <div class="post-conteudo-label">Legenda</div>
       <div class="post-texto">Depois de anos na oftalmologia, a Dra. Juliana percebeu que o cuidado com a saúde das pessoas podia — e devia — ser diferente.<br>Mais acolhedor. Mais completo. Mais acessível.<br>O que ela sempre quis construir está prestes a abrir as portas.<br>---</div>

@@ -109,7 +109,11 @@ def gdrive_id_para_url(filepath, _tentativas=2):
     a leitura para acionar o download e tenta de novo.
     Retorna URL ou None.
     """
-    xattr_keys = ['com.google.drivefs.item-id', 'com.google.cloudsync.itemid']
+    xattr_keys = [
+        'com.google.drivefs.item-id#S',   # macOS Drive File Stream (mais comum)
+        'com.google.drivefs.item-id',      # variante sem sufixo
+        'com.google.cloudsync.itemid',     # versões antigas do Drive
+    ]
 
     for tentativa in range(_tentativas):
         for xattr_key in xattr_keys:
