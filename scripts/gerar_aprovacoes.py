@@ -1066,16 +1066,17 @@ def gerar_para_cliente_reels(cliente, ano_mes, agencia_path, base_url, output_di
             num_str = str(i + 1).zfill(2)
             titulo  = reel_nome
         posts.append({
-            'id':         f'reel-{num_str}',
-            'formato':    'Reels',
-            'titulo':     titulo,
-            'youtube_id': yt_id,
-            'texto_card': '',
-            'slides':     [],
-            'legenda':    '',
-            'media_link': '',
-            'data':       data_entrega,
-            'arte_url':   None,
+            'id':           f'reel-{num_str}',
+            'formato':      'Reels',
+            'titulo':       titulo,
+            'youtube_id':   yt_id,
+            'texto_card':   '',
+            'slides':       [],
+            'legenda':      '',
+            'media_link':   '',
+            'data':         data_entrega,
+            'data_display': formatar_data_display(data_entrega),
+            'arte_url':     None,
         })
 
     print(f"  ✅ {len(posts)} vídeo(s) encontrado(s) via _youtube.md")
