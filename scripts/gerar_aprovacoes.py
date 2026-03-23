@@ -56,6 +56,23 @@ WHATSAPP_CLIENTES: dict = {
     # "Baviera Tecnologia": "5548YYYYYYYYY",
 }
 
+# Link do grupo de WhatsApp por cliente.
+# Quando preenchido, o cliente copia a mensagem e abre o grupo ao enviar.
+# Para obter o link: abrir o grupo no WhatsApp → Info do grupo → Convidar via link.
+# Sem entrada = fallback para o número da Silvana (ex: Óticas Casa Marco).
+WHATSAPP_GRUPOS: dict = {
+    "Vanessa Mainardi":        "https://chat.whatsapp.com/D80G1eJ03P3GT3HAGVWSya?mode=gi_t",
+    "Fyber Show Piscinas":     "https://chat.whatsapp.com/KAl7gVNbcSGC0Lm3fBgaaN?mode=gi_t",
+    "Prisma Especialidades":   "https://chat.whatsapp.com/IjFPBeEKvJeAiaZBpl5xpq?mode=gi_t",
+    "Colégio Luterano Redentor": "https://chat.whatsapp.com/Jj5DNDKgn5gJV1tTNLwJos?mode=gi_t",
+    "Micheline Twigger":       "https://chat.whatsapp.com/K9vzDC6RY4g1qZ1ItJBqUh?mode=gi_t",
+    "Catarata Center":         "https://chat.whatsapp.com/IaRIEEaIpynDy8NURSxGTW?mode=gi_t",
+    "Joele Lerípio":           "https://wa.me/message/O6NXY5T2OHTZO1",
+    "Baviera Tecnologia":      "https://wa.me/message/O6NXY5T2OHTZO1",  # ⚠️ mesmo link que Joele — confirmar
+    "Martina Schneider":       "https://chat.whatsapp.com/KcVaxvUYouHGQ9aGkAa3Uk?mode=gi_t",
+    # "Óticas Casa Marco" → sem grupo, vai para o número da Silvana
+}
+
 # Caminho de saída (pasta do repositório)
 OUTPUT_DIR = Path(__file__).parent.parent / 'aprovacao'
 
@@ -953,6 +970,8 @@ def gerar_pagina_aprovacao(cliente, posts, periodo_label, semana_inicio, form_id
     html = html.replace('{{SEMANAS_NAV}}', semanas_nav_html)
     html = html.replace('{{FORM_ID}}', form_id)
     html = html.replace('{{WHATSAPP_SILVANA}}', whatsapp_numero)
+    whatsapp_grupo = WHATSAPP_GRUPOS.get(cliente, '')
+    html = html.replace('{{WHATSAPP_GRUPO}}', whatsapp_grupo)
     html = html.replace('{{NOME_CLIENTE_JSON}}', json.dumps(cliente, ensure_ascii=False))
     html = html.replace('{{PERIODO_JSON}}', json.dumps(periodo_label, ensure_ascii=False))
     html = html.replace('{{POSTS_META_JSON}}', json.dumps(posts_meta_dict, ensure_ascii=False))
