@@ -1,7 +1,7 @@
 # Guia de Aprovações — Silvana
 
 Sistema de aprovação de conteúdo da Forster Filmes.
-Última atualização: março de 2026.
+Última atualização: março de 2026 — email de redundância adicionado.
 
 ---
 
@@ -159,6 +159,21 @@ Ao tocar na capa do vídeo, um player abre por cima da página (tela cheia, prop
 | Martina Schneider | Grupo WhatsApp |
 | Catarata Center | Grupo WhatsApp |
 | Baviera Tecnologia | WhatsApp do Samuel (direto) |
+
+---
+
+## Email de redundância automático
+
+Quando o cliente clica **"Enviar aprovações"**, além da mensagem do WhatsApp, um email é disparado automaticamente para `oiforster@gmail.com`. O cliente não vê isso — acontece em background.
+
+**Para que serve:** garantia de que a Forster Filmes recebe o registro das aprovações mesmo que o cliente esqueça de mandar a mensagem no grupo de WhatsApp.
+
+**O que chega no email:**
+- Assunto: `Aprovações — [Cliente] — [Período]`
+- Remetente aparece como o nome do cliente
+- Resumo completo com ✅ aprovados e ⚠️ ajustes, incluindo as observações do cliente
+
+**Não é necessário nenhuma ação da Silvana** — o sistema cuida disso automaticamente. Se a mensagem do WhatsApp chegar normalmente, o email é só um backup. Se não chegar, o email já está na caixa de entrada.
 
 ---
 

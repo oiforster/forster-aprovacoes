@@ -4,7 +4,7 @@
 **Criado em:** março de 2026  
 **Repositório:** https://github.com/oiforster/forster-aprovacoes  
 **Site:** https://oiforster.github.io/forster-aprovacoes  
-**Última atualização:** março de 2026
+**Última atualização:** março de 2026 — EmailJS adicionado como redundância de notificação
 
 ---
 
@@ -49,6 +49,11 @@ Obsidian (.md)              Google Drive (Posts_Fixos/ + Videos/)
                  │
                  ▼
         Mensagem formatada → WhatsApp da Silvana (ou grupo)
+                 │
+                 ├── (automático, silencioso)
+                 ▼
+        EmailJS → oiforster@gmail.com
+        (redundância — dispara mesmo se o cliente não mandar no WhatsApp)
 ```
 
 ---
@@ -226,6 +231,35 @@ Template HTML base. Substituições feitas pelo `gerar_aprovacoes.py`:
 - Após clicar "Enviar aprovações": `localStorage.setItem('aprovacao:' + pathname, '1')`
 - Na próxima visita: mostra tela "Tudo certo por aqui! Você já enviou suas aprovações desta semana."
 - Impede que o cliente envie em duplicata por acidente
+
+**Notificação automática por email (EmailJS):**
+
+Ao clicar "Enviar aprovações", além da mensagem do WhatsApp, o sistema dispara silenciosamente um email de redundância via EmailJS. O cliente não vê esse disparo — acontece em background.
+
+| Campo | Valor |
+|-------|-------|
+| Provedor | EmailJS (plano gratuito — 200 req/mês) |
+| Service ID | `service_a00b37r` |
+| Template ID | `template_lyk4lff` |
+| Public Key | `-xrMYz7vRGvZg8ZOY` |
+| Destino | `oiforster@gmail.com` |
+| SDK | `cdn.jsdelivr.net/npm/@emailjs/browser@4` |
+
+Variáveis enviadas ao template:
+
+| Variável | Conteúdo |
+|----------|---------|
+| `title` | "Aprovações — [Cliente] — [Período]" |
+| `name` | Nome do cliente |
+| `message` | Resumo completo com ✅/⚠️ e observações |
+| `email` | Vazio (não requer reply-to) |
+
+Implementação em `template.html`:
+- Linha 631–633: SDK carregado e inicializado com a public key
+- Linha 722–730: função `enviarEmailSilencioso()` — erros são silenciosos (não interrompem o fluxo)
+- Linha 857–858: chamada disparada dentro de `enviarAprovacao()`, antes de qualquer tela aparecer
+
+**Finalidade:** garante que a Forster Filmes receba o registro das aprovações mesmo que o cliente esqueça de enviar a mensagem no grupo de WhatsApp.
 
 **Retorno via WhatsApp por cliente:**
 
