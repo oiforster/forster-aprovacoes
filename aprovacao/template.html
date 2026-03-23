@@ -207,18 +207,75 @@
       border-top: 1px solid #F0F0EC;
     }
 
-    /* ARTE INLINE */
+    /* ARTE INLINE — imagem única */
     .post-arte {
       width: 100%;
       background: #F0F0EC;
       overflow: hidden;
     }
-    .post-arte img {
+    .post-arte > img {
       width: 100%;
       height: auto;
       display: block;
       max-height: 520px;
       object-fit: cover;
+    }
+
+    /* CARROSSEL — estilo Instagram */
+    .carrossel-wrapper {
+      position: relative;
+      width: 100%;
+      background: #000;
+      overflow: hidden;
+    }
+    .carrossel-track {
+      display: flex;
+      overflow-x: scroll;
+      scroll-snap-type: x mandatory;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+      scroll-behavior: smooth;
+    }
+    .carrossel-track::-webkit-scrollbar { display: none; }
+    .carrossel-slide {
+      min-width: 100%;
+      scroll-snap-align: start;
+    }
+    .carrossel-slide img {
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      object-fit: contain;
+      display: block;
+      background: #000;
+    }
+    .carrossel-counter {
+      position: absolute;
+      top: 10px;
+      right: 12px;
+      background: rgba(0,0,0,0.55);
+      color: #fff;
+      font-size: 12px;
+      font-weight: 600;
+      padding: 3px 9px;
+      border-radius: 20px;
+      letter-spacing: 0.03em;
+    }
+    .carrossel-dots {
+      display: flex;
+      justify-content: center;
+      gap: 6px;
+      padding: 9px 0 5px;
+      background: #F0F0EC;
+    }
+    .carrossel-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #C8C8C2;
+      transition: background 0.2s;
+    }
+    .carrossel-dot.ativa {
+      background: #3897f0;
     }
 
     /* MEDIA LINK */

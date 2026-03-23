@@ -122,19 +122,37 @@ def gdrive_id_para_url(filepath):
             pass
     return None
 
+def normalizar_url_gdrive(url):
+    """Converte qualquer URL do Drive para lh3.googleusercontent.com/d/ID."""
+    m = re.search(r'/file/d/([a-zA-Z0-9_\-]+)', url)
+    if m:
+        return f"https://lh3.googleusercontent.com/d/{m.group(1)}"
+    m2 = re.search(r'[?&]id=([a-zA-Z0-9_\-]+)', url)
+    if m2:
+        return f"https://lh3.googleusercontent.com/d/{m2.group(1)}"
+    return url  # devolve intacta se não reconhecer o padrão
+
 def ler_links_md(pasta_artes):
     """
     Lê o arquivo _links.md na pasta _Artes/YYYY-MM/ como fallback.
-    Formato aceito (uma linha por arte):
-        25-03: https://drive.google.com/file/d/XXXXX/view
-        26-03: https://drive.google.com/uc?export=view&id=XXXXX
-    Retorna dict { 'DD-MM': 'url_embed' }
+
+    Formatos aceitos:
+        Imagem única:
+            25-03: https://drive.google.com/file/d/XXXXX/view
+        Carrossel (até N slides):
+            25-03_1: https://drive.google.com/file/d/ID1/view
+            25-03_2: https://drive.google.com/file/d/ID2/view
+            25-03_3: https://drive.google.com/file/d/ID3/view
+
+    Retorna dict:
+        { 'DD-MM': 'url' }           → imagem única
+        { 'DD-MM': ['url1','url2'] } → carrossel
     """
     links_file = pasta_artes / '_links.md'
     if not links_file.exists():
         return {}
 
-    links = {}
+    raw = {}
     try:
         with open(links_file, 'r', encoding='utf-8') as f:
             for linha in f:
@@ -146,18 +164,26 @@ def ler_links_md(pasta_artes):
                 url = url.strip()
                 if not url:
                     continue
-                # Converte /file/d/ID/view → lh3.googleusercontent.com/d/ID
-                m = re.search(r'/file/d/([a-zA-Z0-9_\-]+)', url)
-                if m:
-                    url = f"https://lh3.googleusercontent.com/d/{m.group(1)}"
-                # Converte uc?export=view&id=ID → lh3.googleusercontent.com/d/ID
-                elif 'uc?export=view&id=' in url:
-                    m2 = re.search(r'id=([a-zA-Z0-9_\-]+)', url)
-                    if m2:
-                        url = f"https://lh3.googleusercontent.com/d/{m2.group(1)}"
-                links[chave] = url
+                raw[chave] = normalizar_url_gdrive(url)
     except Exception:
         pass
+
+    # Agrupa slides de carrossel: '25-03_1', '25-03_2' → '25-03': [url1, url2]
+    links = {}
+    carrosseis = {}  # { 'DD-MM': { 1: url, 2: url, ... } }
+
+    for chave, url in raw.items():
+        m = re.match(r'^(\d{2}-\d{2})_(\d+)$', chave)
+        if m:
+            base = m.group(1)
+            idx = int(m.group(2))
+            carrosseis.setdefault(base, {})[idx] = url
+        else:
+            links[chave] = url
+
+    for base, slides_dict in carrosseis.items():
+        max_idx = max(slides_dict.keys())
+        links[base] = [slides_dict.get(i, '') for i in range(1, max_idx + 1)]
 
     return links
 
@@ -169,7 +195,14 @@ def encontrar_arte(data, pasta_estrategia):
     1. xattr do Google Drive no arquivo local (automático)
     2. _links.md na pasta _Artes/YYYY-MM/ (fallback manual)
 
-    Nomenclatura aceita: DD-MM.jpg, DD-MM.png, DD-MM-1.jpg
+    Nomenclatura:
+        Imagem única:  DD-MM.jpg
+        Carrossel:     DD-MM_1.jpg, DD-MM_2.jpg, DD-MM_3.jpg ...
+
+    Retorna:
+        str   → URL de imagem única
+        list  → lista de URLs para carrossel
+        None  → sem arte
     """
     pasta_artes = pasta_estrategia / '_Artes' / data.strftime('%Y-%m')
 
@@ -180,22 +213,44 @@ def encontrar_arte(data, pasta_estrategia):
     extensoes = {'.jpg', '.jpeg', '.png', '.webp'}
 
     # 1. Tenta via arquivo local + xattr
-    candidatos = []
-    for f in pasta_artes.iterdir():
-        if f.suffix.lower() in extensoes and f.name.lower().startswith(prefixo):
-            candidatos.append(f)
+    candidatos = sorted(
+        [f for f in pasta_artes.iterdir()
+         if f.suffix.lower() in extensoes and f.name.lower().startswith(prefixo)],
+        key=lambda x: x.name
+    )
 
     if candidatos:
-        candidatos.sort(key=lambda x: x.name)
-        url = gdrive_id_para_url(candidatos[0])
-        if url:
-            return url
+        # Distingue slides de carrossel (DD-MM_N.ext) de imagem única (DD-MM.ext)
+        slides = [f for f in candidatos
+                  if re.match(rf'^{re.escape(prefixo)}_\d+\.', f.name.lower())]
+
+        if slides:
+            # Carrossel via xattr
+            urls = []
+            for slide in slides:
+                url = gdrive_id_para_url(slide)
+                if url:
+                    urls.append(url)
+                else:
+                    urls = []
+                    break
+            if urls:
+                return urls
+        else:
+            # Imagem única via xattr
+            url = gdrive_id_para_url(candidatos[0])
+            if url:
+                return url
+
         print(f"    ⚠️  Arquivo encontrado para {data.strftime('%d/%m')} mas xattr não disponível — tentando _links.md")
 
     # 2. Fallback: _links.md
     links = ler_links_md(pasta_artes)
     if prefixo in links:
-        return links[prefixo]
+        result = links[prefixo]
+        if isinstance(result, list):
+            return result   # carrossel
+        return result       # imagem única
 
     return None
 
@@ -566,13 +621,47 @@ def gerar_html_post(post):
       <div class="post-texto" style="color:#aaa;font-style:italic">Conteúdo detalhado não disponível neste arquivo.</div>
     </div>'''
 
-    # Arte inline (imagem do Drive)
+    # Arte inline (imagem única ou carrossel)
     html_arte = ''
-    if post.get('arte_url'):
-        html_arte = f'''
+    arte = post.get('arte_url')
+    if arte:
+        if isinstance(arte, list) and len(arte) > 1:
+            # Carrossel estilo Instagram
+            total = len(arte)
+            c_id = f"carr-{post_id}"
+            slides_html = ''
+            for url in arte:
+                slides_html += f'''<div class="carrossel-slide"><img src="{url}" loading="lazy" onerror="this.closest('.carrossel-slide').style.display='none'" /></div>'''
+            dots_html = ''.join(
+                f'<span class="carrossel-dot{" ativa" if i == 0 else ""}"></span>'
+                for i in range(total)
+            )
+            html_arte = f'''
+    <div class="post-arte">
+      <div class="carrossel-wrapper" id="{c_id}">
+        <div class="carrossel-track">{slides_html}</div>
+        <div class="carrossel-counter">1 / {total}</div>
+      </div>
+      <div class="carrossel-dots" id="dots-{c_id}">{dots_html}</div>
+    </div>
+    <script>(function(){{
+      var track = document.querySelector('#{c_id} .carrossel-track');
+      var counter = document.querySelector('#{c_id} .carrossel-counter');
+      var dots = document.querySelectorAll('#dots-{c_id} .carrossel-dot');
+      var total = {total};
+      track.addEventListener('scroll', function() {{
+        var idx = Math.round(track.scrollLeft / track.offsetWidth);
+        counter.textContent = (idx + 1) + ' / ' + total;
+        dots.forEach(function(d, i) {{ d.classList.toggle('ativa', i === idx); }});
+      }});
+    }})();</script>'''
+        else:
+            # Imagem única (ou lista de 1 elemento)
+            url = arte[0] if isinstance(arte, list) else arte
+            html_arte = f'''
     <div class="post-arte">
       <img
-        src="{post['arte_url']}"
+        src="{url}"
         alt="Arte — {escape_html(post['titulo'])}"
         loading="lazy"
         onerror="this.parentElement.style.display='none'"
