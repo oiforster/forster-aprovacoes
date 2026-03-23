@@ -572,6 +572,7 @@ def extrair_partes_post(texto_secao):
     modo = None
     buffer = []
     slide_atual = None
+    aguardando_reel = False
 
     for linha in linhas:
         linha_lower = linha.lower().strip()
@@ -582,11 +583,24 @@ def extrair_partes_post(texto_secao):
             if m:
                 media_link = m.group(0).rstrip(')')
 
+        # Se estávamos aguardando o nome do reel na linha seguinte
+        if aguardando_reel:
+            if linha.strip() and not linha.startswith('**'):
+                reel_nome = linha.strip()
+                aguardando_reel = False
+                continue
+            elif not linha.strip():
+                continue  # linha em branco — continua aguardando
+
         # Detecta campo Vídeo/Reel
-        if re.match(r'\*\*(vídeo|video|reel)\*\*\s*:', linha_lower) or re.match(r'\*\*(vídeo|video|reel):', linha_lower):
+        # Suporta: "**Vídeo:** REEL 01" na mesma linha ou "**Vídeo:**\nREEL 01" em linha seguinte
+        if re.match(r'\*\*(vídeo|video|reel)\b', linha_lower):
             m = re.search(r':\s*(.+)', linha)
-            if m:
-                reel_nome = m.group(1).strip()
+            valor = m.group(1).strip().strip('*').strip() if m else ''
+            if valor:
+                reel_nome = valor
+            else:
+                aguardando_reel = True
             continue
 
         # Detecta início de seção

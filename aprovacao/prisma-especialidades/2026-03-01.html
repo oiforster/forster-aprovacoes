@@ -693,6 +693,38 @@
       <span class="post-formato formato-card">Card</span>
     </div>
     
+    <div class="post-arte">
+      <div class="youtube-facade" id="ytf-20260328-em-12-dias-abrimos-as-portas-c" onclick="abrirReel('yjkHNpIlEsA','ytf-20260328-em-12-dias-abrimos-as-portas-c')">
+        <img
+          src="https://img.youtube.com/vi/yjkHNpIlEsA/maxresdefault.jpg"
+          onerror="this.src='https://img.youtube.com/vi/yjkHNpIlEsA/hqdefault.jpg'"
+          alt="Reel — &quot;Em 12 dias, abrimos as portas.&quot; — Contagem regressiva"
+        />
+        <div class="yt-play-btn">
+          <svg viewBox="0 0 68 48" width="68" height="48">
+            <path d="M66.5 7.7a8.5 8.5 0 0 0-6-6C56 0 34 0 34 0S12 0 7.5 1.7a8.5 8.5 0 0 0-6 6C0 14.3 0 24 0 24s0 9.7 1.5 16.3a8.5 8.5 0 0 0 6 6C12 48 34 48 34 48s22 0 26.5-1.7a8.5 8.5 0 0 0 6-6C68 33.7 68 24 68 24s0-9.7-1.5-16.3z" fill="rgba(0,0,0,0.7)"/>
+            <path d="M45 24 27 14v20z" fill="white"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+    <script>(function(){
+      window.abrirReel = window.abrirReel || function(ytId, facadeId) {
+        var facade = document.getElementById(facadeId);
+        var wrap = document.createElement('div');
+        wrap.className = 'youtube-wrapper';
+        var ifr = document.createElement('iframe');
+        ifr.src = 'https://www.youtube.com/embed/' + ytId + '?autoplay=1&rel=0&modestbranding=1&playsinline=0';
+        ifr.setAttribute('allow','accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen');
+        ifr.setAttribute('allowfullscreen','');
+        ifr.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;border:none;';
+        wrap.appendChild(ifr);
+        facade.parentNode.replaceChild(wrap, facade);
+        var el = wrap;
+        if (el.requestFullscreen) el.requestFullscreen();
+        else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
+      };
+    })();</script>
     <div class="post-divider"></div>
     
     <div class="post-conteudo" style="padding-top:0">
