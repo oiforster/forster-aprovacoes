@@ -763,22 +763,37 @@ def gerar_html_post(post):
     </div>
     <script>(function(){{
       window.abrirReel = window.abrirReel || function(ytId, facadeId) {{
-        // Mobile: abre direto no app do YouTube (evita problema de autoplay no iframe)
-        if ('ontouchstart' in window || navigator.maxTouchPoints > 0) {{
-          window.open('https://youtu.be/' + ytId, '_blank');
-          return;
+        // Overlay fullscreen dentro do site (mobile e desktop)
+        var overlay = document.getElementById('yt-overlay');
+        if (!overlay) {{
+          overlay = document.createElement('div');
+          overlay.id = 'yt-overlay';
+          overlay.style.cssText = 'position:fixed;inset:0;background:#000;z-index:500;display:none;flex-direction:column;align-items:center;justify-content:center;';
+
+          var closeBtn = document.createElement('button');
+          closeBtn.innerHTML = '&#10005;';
+          closeBtn.style.cssText = 'position:absolute;top:16px;right:16px;z-index:10;background:rgba(255,255,255,0.15);color:#fff;border:none;border-radius:50%;width:44px;height:44px;font-size:20px;cursor:pointer;line-height:1;';
+          closeBtn.setAttribute('aria-label', 'Fechar vídeo');
+          closeBtn.onclick = function() {{
+            overlay.style.display = 'none';
+            var ifr = document.getElementById('yt-iframe');
+            if (ifr) ifr.src = '';
+          }};
+
+          var ifr = document.createElement('iframe');
+          ifr.id = 'yt-iframe';
+          ifr.style.cssText = 'width:100%;height:100%;border:none;';
+          ifr.setAttribute('allow','accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen');
+          ifr.setAttribute('allowfullscreen','');
+
+          overlay.appendChild(closeBtn);
+          overlay.appendChild(ifr);
+          document.body.appendChild(overlay);
         }}
-        // Desktop: substitui facade por iframe inline 9:16, sem fullscreen
-        var facade = document.getElementById(facadeId);
-        var wrap = document.createElement('div');
-        wrap.className = 'youtube-wrapper';
-        var ifr = document.createElement('iframe');
+
+        var ifr = document.getElementById('yt-iframe');
         ifr.src = 'https://www.youtube.com/embed/' + ytId + '?autoplay=1&rel=0&modestbranding=1&playsinline=1';
-        ifr.setAttribute('allow','accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen');
-        ifr.setAttribute('allowfullscreen','');
-        ifr.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;border:none;';
-        wrap.appendChild(ifr);
-        facade.parentNode.replaceChild(wrap, facade);
+        overlay.style.display = 'flex';
       }};
     }})();</script>'''
 
