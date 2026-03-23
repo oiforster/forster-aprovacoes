@@ -5,7 +5,7 @@
 #  Duplo clique para rodar.
 # ─────────────────────────────────────────────────────────────
 
-REPO="$HOME/Library/CloudStorage/GoogleDrive-oiforster@gmail.com/Meu Drive/Forster Filmes/CLAUDE_COWORK/Agência/_Interno/forster-aprovacoes"
+REPO="$(cd "$(dirname "$0")" && pwd)"
 SCRIPTS="$REPO/scripts"
 
 clear
