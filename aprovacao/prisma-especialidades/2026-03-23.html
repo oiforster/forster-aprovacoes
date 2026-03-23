@@ -471,6 +471,21 @@
     }
     .btn-enviar:not(:disabled):hover { background: #333; }
 
+    /* JÁ APROVADA (persiste via localStorage) */
+    .tela-ja-aprovada {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: #F5F5F0;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 32px;
+      text-align: center;
+      z-index: 300;
+    }
+    .tela-ja-aprovada.visivel { display: flex; }
+
     /* CONFIRMAÇÃO */
     .tela-confirmacao {
       display: none;
@@ -847,6 +862,21 @@
   </button>
 </div>
 
+<!-- TELA JÁ APROVADA -->
+<div class="tela-ja-aprovada" id="telaJaAprovada">
+  <div class="confirmacao-icone" style="background:#1A1A1A">
+    <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+      <polyline points="20 6 9 17 4 12"></polyline>
+    </svg>
+  </div>
+  <div class="confirmacao-titulo">Tudo certo por aqui!</div>
+  <div class="confirmacao-texto">
+    Você já enviou suas aprovações desta semana.<br>
+    Quando houver novos conteúdos para revisar,<br>
+    a Silvana vai te enviar um novo link. 🙌
+  </div>
+</div>
+
 <!-- TELA DE CONFIRMAÇÃO -->
 <div class="tela-confirmacao" id="telaConfirmacao">
   <div class="confirmacao-icone">
@@ -862,10 +892,23 @@
 </div>
 
 <script>
+  // Verifica se já aprovou antes (persiste entre refreshes)
+  (function() {
+    try {
+      if (localStorage.getItem('aprovacao:' + location.pathname) === '1') {
+        document.addEventListener('DOMContentLoaded', function() {
+          var t = document.getElementById('telaJaAprovada');
+          if (t) t.classList.add('visivel');
+        });
+      }
+    } catch(e) {}
+  })();
+
   const totalPosts = 5;
   const nomeCliente = "Prisma Especialidades";
   const periodo = "23 a 29 de março";
   const whatsappNumero = '5551980603512';
+  const whatsappGrupo = '{{WHATSAPP_GRUPO}}';  // link do grupo (ex: https://chat.whatsapp.com/XXX)
   const postsMeta = {"20260325-uma-nova-fase-esta-chegando-te": {"data": "25/03", "titulo": "\"Uma nova fase está chegando.\" — Teaser de abertura"}, "20260326-saude-da-familia-nao-deveria-s": {"data": "26/03", "titulo": "\"Saúde da família não deveria ser tão complicada.\" — A dor e o problema"}, "20260327-eu-sempre-quis-construir-um-lu": {"data": "27/03", "titulo": "\"Eu sempre quis construir um lugar diferente.\" — Dra. Juliana, tom pessoal"}, "20260328-em-12-dias-abrimos-as-portas-c": {"data": "28/03", "titulo": "\"Em 12 dias, abrimos as portas.\" — Contagem regressiva"}, "20260329-nasce-a-prisma-especialidades-": {"data": "29/03", "titulo": "\"Nasce a Prisma Especialidades.\" — Revelação oficial com logo"}};
   const postsOrdem = ["20260325-uma-nova-fase-esta-chegando-te", "20260326-saude-da-familia-nao-deveria-s", "20260327-eu-sempre-quis-construir-um-lu", "20260328-em-12-dias-abrimos-as-portas-c", "20260329-nasce-a-prisma-especialidades-"];
   const statusPosts = {};
@@ -989,8 +1032,18 @@
     }
 
     const mensagem = linhas.join('\n');
-    const url = 'https://wa.me/' + whatsappNumero + '?text=' + encodeURIComponent(mensagem);
-    window.open(url, '_blank');
+
+    if (whatsappGrupo) {
+      // Copia mensagem e abre o grupo
+      navigator.clipboard.writeText(mensagem).catch(function() {});
+      window.open(whatsappGrupo, '_blank');
+    } else {
+      // Fallback: abre conversa direta com a Silvana
+      window.open('https://wa.me/' + whatsappNumero + '?text=' + encodeURIComponent(mensagem), '_blank');
+    }
+
+    // Grava aprovação no localStorage para travar a página
+    try { localStorage.setItem('aprovacao:' + location.pathname, '1'); } catch(e) {}
 
     document.getElementById('telaConfirmacao').classList.add('visivel');
   }
