@@ -125,8 +125,7 @@ echo "   Pontuais"
 PONTUAL_NUM=11
 declare -a PONTUAL_NOMES
 if[ -n "$PONTUAIS_LISTA" ]; then
-  while IFS= read -r nome; do
-    [ -z "$nome" ] && continue
+  while IFS= read -r nome; do[ -z "$nome" ] && continue
     printf "  %2d.  %s\n" "$PONTUAL_NUM" "$nome"
     PONTUAL_NOMES+=("$nome")
     ((PONTUAL_NUM++))
@@ -154,7 +153,7 @@ case "$CLIENTE_INPUT" in
   10) CLIENTE="Baviera Tecnologia" ;;
   *)
     # Verifica se é um número dentro da faixa de pontuais
-    if [[ "$CLIENTE_INPUT" =~ ^[0-9]+$ ]] &&[ "$CLIENTE_INPUT" -ge 11 ]; then
+    if [[ "$CLIENTE_INPUT" =~ ^[0-9]+$ ]] && [ "$CLIENTE_INPUT" -ge 11 ]; then
       IDX=$(( CLIENTE_INPUT - 11 ))
       if[ "$IDX" -lt "${#PONTUAL_NOMES[@]}" ]; then
         CLIENTE="${PONTUAL_NOMES[$IDX]}"
@@ -203,7 +202,7 @@ python3 "$SCRIPTS/subir_reels.py" "${ARGS_BASE[@]}"
 YOUTUBE_STATUS=$?
 echo ""
 
-if [ $YOUTUBE_STATUS -ne 0 ]; then
+if[ $YOUTUBE_STATUS -ne 0 ]; then
   echo "  ❌ Erro no upload ao YouTube."
   echo ""
   read -p "  Continuar gerando a página mesmo assim? (s/N): " CONTINUAR_YT
@@ -227,7 +226,7 @@ python3 "$SCRIPTS/gerar_entrega_videos.py" "${ARGS_VIDEOS[@]}"
 GERAR_STATUS=$?
 echo ""
 
-if [ $GERAR_STATUS -ne 0 ]; then
+if[ $GERAR_STATUS -ne 0 ]; then
   echo "  ❌ Erro ao gerar página."
   read -p "Pressione Enter para fechar..."
   exit 1
