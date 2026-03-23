@@ -1001,6 +1001,104 @@ Você pode aprovar cada post ou pedir ajuste com um toque. Se preferir, tem um b
 
 Qualquer dúvida, é só chamar! 🙌"""
 
+# ─── ENTREGA PONTUAL (sem calendário editorial) ───────────────────────────────
+
+def encontrar_youtube_md_pontual(cliente, ano_mes, agencia_path):
+    """Busca _youtube.md nas pastas de entrega de um cliente pontual."""
+    for subfolder in ['Clientes Pontuais', 'Clientes Recorrentes']:
+        base = agencia_path / '_Clientes' / subfolder
+        if not base.exists():
+            continue
+        pasta_cliente = None
+        for entry in base.iterdir():
+            if entry.is_dir() and slugify(entry.name) == slugify(cliente):
+                pasta_cliente = entry
+                break
+        if not pasta_cliente:
+            continue
+        # Busca recursiva por _youtube.md em pastas que contenham ano_mes
+        for entry in pasta_cliente.iterdir():
+            if not entry.is_dir():
+                continue
+            if ano_mes[:7] in entry.name:  # ex: "2026-03"
+                for youtube_md in entry.rglob('_youtube.md'):
+                    return youtube_md
+    return None
+
+def gerar_para_cliente_reels(cliente, ano_mes, agencia_path, base_url, output_dir):
+    """Gera página de aprovação a partir de _youtube.md (clientes pontuais)."""
+    youtube_md = encontrar_youtube_md_pontual(cliente, ano_mes, agencia_path)
+    if not youtube_md:
+        print(f"  ⚠️  Sem _youtube.md para {cliente} em {ano_mes}.")
+        return None, None
+
+    # Lê IDs do _youtube.md
+    ids = {}
+    with open(youtube_md, 'r', encoding='utf-8') as f:
+        for linha in f:
+            linha = linha.strip()
+            if not linha or linha.startswith('#'):
+                continue
+            idx = linha.find(': http')
+            if idx == -1:
+                continue
+            chave = linha[:idx].strip()
+            url = linha[idx + 2:].strip()
+            m = re.search(r'(?:youtu\.be/|[?&]v=)([a-zA-Z0-9_\-]{11})', url)
+            if m:
+                ids[chave] = m.group(1)
+
+    if not ids:
+        print(f"  ⚠️  _youtube.md vazio para {cliente}.")
+        return None, None
+
+    # Converte para o formato de posts que gerar_pagina_aprovacao espera
+    ano, mes = int(ano_mes[:4]), int(ano_mes[5:7])
+    data_entrega = date(ano, mes, 1)
+    posts = []
+    for i, (reel_nome, yt_id) in enumerate(sorted(ids.items())):
+        # Extrai número e título: "REEL 01 – Título" → id="reel-01", titulo="Título"
+        m_num = re.match(r'^REEL\s+(\d+)\s*[–\-]\s*(.+)$', reel_nome, re.IGNORECASE)
+        if m_num:
+            num_str = m_num.group(1).zfill(2)
+            titulo  = m_num.group(2).strip()
+        else:
+            num_str = str(i + 1).zfill(2)
+            titulo  = reel_nome
+        posts.append({
+            'id':         f'reel-{num_str}',
+            'formato':    'Reels',
+            'titulo':     titulo,
+            'youtube_id': yt_id,
+            'texto_card': '',
+            'slides':     [],
+            'legenda':    '',
+            'media_link': '',
+            'data':       data_entrega,
+            'arte_url':   None,
+        })
+
+    print(f"  ✅ {len(posts)} vídeo(s) encontrado(s) via _youtube.md")
+
+    # Monta metadados da página
+    slug_cliente  = slugify(cliente)
+    periodo_label = f"{MESES_PT[mes].capitalize()} de {ano}"
+    form_id       = f"{slug_cliente}-{ano_mes}"
+    whatsapp      = WHATSAPP_GRUPOS.get(cliente) or f"https://wa.me/{WHATSAPP_CLIENTES.get(cliente, WHATSAPP_SILVANA_DEFAULT)}"
+
+    html = gerar_pagina_aprovacao(cliente, posts, periodo_label, data_entrega, form_id, whatsapp)
+
+    # Salva em aprovacao/{slug}/YYYY-MM.html
+    pasta_saida = output_dir / slug_cliente
+    pasta_saida.mkdir(parents=True, exist_ok=True)
+    caminho_saida = pasta_saida / f"{ano_mes}.html"
+    with open(caminho_saida, 'w', encoding='utf-8') as f:
+        f.write(html)
+    print(f"  💾 {caminho_saida}")
+
+    url = f"{base_url}/aprovacao/{slug_cliente}/{ano_mes}.html"
+    return caminho_saida, url
+
 # ─── FUNÇÃO PRINCIPAL ────────────────────────────────────────────────────────
 
 def gerar_para_cliente(cliente, datas_semana, agencia_path, base_url, output_dir, modo_mes=False):
@@ -1149,6 +1247,12 @@ def main():
             cliente, datas_semana, agencia_path,
             args.base_url, OUTPUT_DIR, modo_mes
         )
+        # Fallback para clientes pontuais sem calendário editorial
+        if not caminho:
+            ano_mes_fallback = datas_semana[0].strftime('%Y-%m')
+            caminho, mensagem = gerar_para_cliente_reels(
+                cliente, ano_mes_fallback, agencia_path, args.base_url, OUTPUT_DIR
+            )
         if caminho:
             resultados.append({
                 'cliente': cliente,
