@@ -68,10 +68,16 @@ def slugify(texto):
     return texto.lower().replace(' ', '-')
 
 def encontrar_pasta_agencia():
-    base = Path('/Users/samuelforster/Library/CloudStorage/GoogleDrive-oiforster@gmail.com/Meu Drive/Forster Filmes/CLAUDE_COWORK')
-    for entry in base.iterdir():
-        if 'Ag' in entry.name:
-            return entry
+    # Synology Drive — fonte de verdade ativa
+    synology = Path('/Users/samuelforster/Library/CloudStorage/SynologyDrive-Agencia')
+    if synology.exists():
+        return synology
+    # Fallback: Google Drive (legado)
+    gdrive = Path('/Users/samuelforster/Library/CloudStorage/GoogleDrive-oiforster@gmail.com/Meu Drive/Forster Filmes/CLAUDE_COWORK')
+    if gdrive.exists():
+        for entry in gdrive.iterdir():
+            if 'Ag' in entry.name:
+                return entry
     raise FileNotFoundError("Pasta Agência não encontrada")
 
 # ─── AUTENTICAÇÃO ─────────────────────────────────────────────────────────────

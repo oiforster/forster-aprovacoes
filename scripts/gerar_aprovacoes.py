@@ -24,14 +24,22 @@ from pathlib import Path
 
 # Caminho base (detecta NFD automaticamente)
 def encontrar_pasta_agencia():
-    base = Path('/Users/samuelforster/Library/CloudStorage/GoogleDrive-oiforster@gmail.com/Meu Drive/Forster Filmes/CLAUDE_COWORK')
-    if not base.exists():
-        # Fallback para ambiente de desenvolvimento
-        base = Path('/sessions/elegant-jolly-galileo/mnt')
-    for entry in base.iterdir():
-        if 'Ag' in entry.name:
-            return entry
-    raise FileNotFoundError(f"Pasta Agência não encontrada em {base}")
+    # Synology Drive — fonte de verdade ativa
+    synology = Path('/Users/samuelforster/Library/CloudStorage/SynologyDrive-Agencia')
+    if synology.exists():
+        return synology
+    # Fallback: Google Drive (legado) ou ambiente de desenvolvimento
+    for base in [
+        Path('/Users/samuelforster/Library/CloudStorage/GoogleDrive-oiforster@gmail.com/Meu Drive/Forster Filmes/CLAUDE_COWORK'),
+        Path('/sessions/laughing-nifty-franklin/mnt/SynologyDrive-Agencia'),
+    ]:
+        if base.exists():
+            for entry in base.iterdir():
+                if 'Ag' in entry.name:
+                    return entry
+            if (base / '_Clientes').exists():
+                return base
+    raise FileNotFoundError("Pasta Agência não encontrada")
 
 CLIENTES_RECORRENTES = [
     "Óticas Casa Marco",

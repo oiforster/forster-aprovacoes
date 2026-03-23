@@ -16,7 +16,8 @@ clear
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo " ⬇️  SINCRONIZANDO COM A EQUIPE (GitHub)..."
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-git pull origin main
+git add *.command 2>/dev/null
+git pull --rebase origin main
 echo ""
 
 # ── DEPENDÊNCIAS ─────────────────────────────────────
@@ -52,7 +53,7 @@ if faltando:
 DEPEOF
 
 DEP_STATUS=$?
-if[ $DEP_STATUS -ne 0 ]; then
+if [ $DEP_STATUS -ne 0 ]; then
   read -p "Pressione Enter para fechar..."
   exit 1
 fi
@@ -186,10 +187,7 @@ if [ -n "$MES_INPUT" ]; then
   ARGS_BASE+=(--mes "$MES_INPUT")
 fi
 
-ARGS_VIDEOS=("${ARGS_BASE[@]}" --sem-contexto)
-if [ "$PONTUAL" = true ]; then
-  ARGS_VIDEOS+=(--pontual)
-fi
+ARGS_VIDEOS=("${ARGS_BASE[@]}")
 
 # ════════════════════════════════════════════════════
 # ETAPA 1 — UPLOAD YOUTUBE
@@ -223,7 +221,7 @@ echo "  ETAPA 2/3 — Gerando página de aprovação..."
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo ""
 
-python3 "$SCRIPTS/gerar_entrega_videos.py" "${ARGS_VIDEOS[@]}"
+python3 "$SCRIPTS/gerar_aprovacoes.py" "${ARGS_VIDEOS[@]}"
 GERAR_STATUS=$?
 echo ""
 
