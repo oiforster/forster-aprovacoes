@@ -46,6 +46,16 @@ CLIENTES_RECORRENTES = [
     "Baviera Tecnologia",
 ]
 
+# ─── WHATSAPP ─────────────────────────────────────────────────────────────────
+# Número da Silvana com código de país (sem + e sem espaços).
+# Exemplo: "5548999999999"  → +55 (Brasil) 48 (DDD) 999999999
+WHATSAPP_SILVANA_DEFAULT = "5548XXXXXXXXX"  # ← preencher com o número real
+
+# Override por cliente (caso a Silvana use números diferentes por projeto)
+WHATSAPP_CLIENTES: dict = {
+    # "Baviera Tecnologia": "5548YYYYYYYYY",
+}
+
 # Caminho de saída (pasta do repositório)
 OUTPUT_DIR = Path(__file__).parent.parent / 'aprovacao'
 
@@ -869,7 +879,7 @@ def escape_html(texto):
             .replace('"', '&quot;')
             .replace('\n', '<br>'))
 
-def gerar_pagina_aprovacao(cliente, posts, periodo_label, semana_inicio, form_id):
+def gerar_pagina_aprovacao(cliente, posts, periodo_label, semana_inicio, form_id, whatsapp_numero=''):
     """Gera o HTML completo de uma página de aprovação."""
     template_path = Path(__file__).parent.parent / 'aprovacao' / 'template.html'
     with open(template_path, 'r', encoding='utf-8') as f:
@@ -908,6 +918,16 @@ def gerar_pagina_aprovacao(cliente, posts, periodo_label, semana_inicio, form_id
         for post in posts:
             posts_html += gerar_html_post(post)
 
+    # Metadados dos posts para o JS (geração da mensagem WhatsApp)
+    posts_meta_dict = {}
+    posts_ordem_list = []
+    for post in sorted(posts, key=lambda p: p['data']):
+        posts_meta_dict[post['id']] = {
+            'data': post['data'].strftime('%d/%m'),
+            'titulo': post['titulo'],
+        }
+        posts_ordem_list.append(post['id'])
+
     # Substituir placeholders
     html = template
     html = html.replace('{{TITULO_PAGINA}}', f'Aprovação — {cliente}')
@@ -917,6 +937,11 @@ def gerar_pagina_aprovacao(cliente, posts, periodo_label, semana_inicio, form_id
     html = html.replace('{{POSTS_HTML}}', posts_html)
     html = html.replace('{{SEMANAS_NAV}}', semanas_nav_html)
     html = html.replace('{{FORM_ID}}', form_id)
+    html = html.replace('{{WHATSAPP_SILVANA}}', whatsapp_numero)
+    html = html.replace('{{NOME_CLIENTE_JSON}}', json.dumps(cliente, ensure_ascii=False))
+    html = html.replace('{{PERIODO_JSON}}', json.dumps(periodo_label, ensure_ascii=False))
+    html = html.replace('{{POSTS_META_JSON}}', json.dumps(posts_meta_dict, ensure_ascii=False))
+    html = html.replace('{{POSTS_ORDEM_JSON}}', json.dumps(posts_ordem_list, ensure_ascii=False))
 
     return html
 
@@ -979,8 +1004,11 @@ def gerar_para_cliente(cliente, datas_semana, agencia_path, base_url, output_dir
     else:
         periodo_label = formatar_periodo(datas_semana)
 
+    # Número WhatsApp da Silvana para este cliente
+    whatsapp = WHATSAPP_CLIENTES.get(cliente, WHATSAPP_SILVANA_DEFAULT)
+
     # Gerar HTML
-    html = gerar_pagina_aprovacao(cliente, todos_posts, periodo_label, datas_semana[0], form_id)
+    html = gerar_pagina_aprovacao(cliente, todos_posts, periodo_label, datas_semana[0], form_id, whatsapp)
 
     # Salvar arquivo
     pasta_cliente = output_dir / slug_cliente
