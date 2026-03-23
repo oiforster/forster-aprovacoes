@@ -969,9 +969,21 @@ def gerar_pagina_aprovacao(cliente, posts, periodo_label, semana_inicio, form_id
         }
         posts_ordem_list.append(post['id'])
 
+    # Open Graph — thumbnail do primeiro vídeo/reel para preview no WhatsApp
+    primeiro_yt = next((p['youtube_id'] for p in posts if p.get('youtube_id')), None)
+    og_image = (
+        f"https://img.youtube.com/vi/{primeiro_yt}/maxresdefault.jpg"
+        if primeiro_yt else ''
+    )
+    og_title       = f"Aprovação — {cliente} — {periodo_label}"
+    og_description = f"Acesse para aprovar ou pedir ajuste nos vídeos de {periodo_label}."
+
     # Substituir placeholders
     html = template
     html = html.replace('{{TITULO_PAGINA}}', f'Aprovação — {cliente}')
+    html = html.replace('{{OG_TITLE}}',       og_title)
+    html = html.replace('{{OG_DESCRIPTION}}', og_description)
+    html = html.replace('{{OG_IMAGE}}',       og_image)
     html = html.replace('{{NOME_CLIENTE}}', cliente)
     html = html.replace('{{PERIODO}}', periodo_label)
     html = html.replace('{{TOTAL_POSTS}}', str(len(posts)))
