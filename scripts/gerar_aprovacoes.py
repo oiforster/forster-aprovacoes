@@ -67,8 +67,8 @@ WHATSAPP_GRUPOS: dict = {
     "Colégio Luterano Redentor": "https://chat.whatsapp.com/Jj5DNDKgn5gJV1tTNLwJos?mode=gi_t",
     "Micheline Twigger":       "https://chat.whatsapp.com/K9vzDC6RY4g1qZ1ItJBqUh?mode=gi_t",
     "Catarata Center":         "https://chat.whatsapp.com/IaRIEEaIpynDy8NURSxGTW?mode=gi_t",
-    "Joele Lerípio":           "https://wa.me/message/O6NXY5T2OHTZO1",
-    "Baviera Tecnologia":      "https://wa.me/message/O6NXY5T2OHTZO1",  # ⚠️ mesmo link que Joele — confirmar
+    "Joele Lerípio":           "https://wa.me/message/O6NXY5T2OHTZO1",  # contato direto Samuel
+    "Baviera Tecnologia":      "https://wa.me/message/O6NXY5T2OHTZO1",  # contato direto Samuel
     "Martina Schneider":       "https://chat.whatsapp.com/KcVaxvUYouHGQ9aGkAa3Uk?mode=gi_t",
     # "Óticas Casa Marco" → sem grupo, vai para o número da Silvana
 }
