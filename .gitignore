@@ -2,3 +2,5 @@
 **/.DS_Store
 __pycache__/
 *.pyc
+scripts/youtube_credentials.json
+scripts/youtube_token.json
