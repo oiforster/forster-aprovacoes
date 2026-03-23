@@ -1071,6 +1071,8 @@ def main():
     parser.add_argument('--cliente', help='Nome do cliente (parcial aceito)')
     parser.add_argument('--semana', help='Segunda-feira da semana (YYYY-MM-DD)')
     parser.add_argument('--mes', help='Gerar mês completo (YYYY-MM)')
+    parser.add_argument('--inicio', help='Início do período personalizado (YYYY-MM-DD)')
+    parser.add_argument('--fim', help='Fim do período personalizado (YYYY-MM-DD)')
     parser.add_argument('--base-url', default='https://oiforster.github.io/forster-aprovacoes',
                         help='URL base do site Netlify')
     args = parser.parse_args()
@@ -1085,7 +1087,16 @@ def main():
 
     # Determinar período
     modo_mes = False
-    if args.mes:
+    if args.inicio and args.fim:
+        d_ini = datetime.strptime(args.inicio, '%Y-%m-%d').date()
+        d_fim = datetime.strptime(args.fim, '%Y-%m-%d').date()
+        if d_fim < d_ini:
+            print(f"❌ Data de fim ({args.fim}) é anterior à data de início ({args.inicio}).")
+            sys.exit(1)
+        from datetime import timedelta as td
+        datas_semana = [d_ini + td(days=i) for i in range((d_fim - d_ini).days + 1)]
+        print(f"📅 Período personalizado: {formatar_periodo(datas_semana)}")
+    elif args.mes:
         ano, mes = map(int, args.mes.split('-'))
         # Todas as datas do mês
         import calendar

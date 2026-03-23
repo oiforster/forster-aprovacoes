@@ -52,6 +52,63 @@ echo "Qual mês? (deixe em branco para o mês atual)"
 read -p "  YYYY-MM (ex: 2026-04) ou Enter: " MES_INPUT
 echo ""
 
+# ── QUAL PERÍODO? ────────────────────────────────────
+echo "Qual período para aprovação?"
+echo ""
+echo "   1. Próxima semana (padrão)"
+echo "   2. Semana atual"
+echo "   3. Período personalizado"
+echo ""
+read -p "  Escolha (1/2/3) ou Enter para padrão: " PERIODO_OPCAO
+echo ""
+
+PERIODO_INICIO=""
+PERIODO_FIM=""
+
+case "$PERIODO_OPCAO" in
+  2)
+    # Semana atual: segunda-feira desta semana
+    SEGUNDA_ATUAL=$(python3 -c "
+from datetime import date, timedelta
+hoje = date.today()
+segunda = hoje - timedelta(days=hoje.weekday())
+domingo = segunda + timedelta(days=6)
+print(segunda.strftime('%Y-%m-%d'), domingo.strftime('%Y-%m-%d'))
+")
+    PERIODO_INICIO=$(echo $SEGUNDA_ATUAL | awk '{print $1}')
+    PERIODO_FIM=$(echo $SEGUNDA_ATUAL | awk '{print $2}')
+    echo "  📅 Semana atual: $PERIODO_INICIO a $PERIODO_FIM"
+    echo ""
+    ;;
+  3)
+    read -p "  Data de início (DD/MM/AAAA ou AAAA-MM-DD): " INI_INPUT
+    read -p "  Data de fim    (DD/MM/AAAA ou AAAA-MM-DD): " FIM_INPUT
+    # Normaliza para YYYY-MM-DD se vier em DD/MM/AAAA
+    PERIODO_INICIO=$(python3 -c "
+s=''
+if '/' in s:
+    d,m,a = s.split('/')
+    print(f'{a}-{m.zfill(2)}-{d.zfill(2)}')
+else:
+    print(s)
+" 2>/dev/null || echo "$INI_INPUT")
+    PERIODO_FIM=$(python3 -c "
+s=''
+if '/' in s:
+    d,m,a = s.split('/')
+    print(f'{a}-{m.zfill(2)}-{d.zfill(2)}')
+else:
+    print(s)
+" 2>/dev/null || echo "$FIM_INPUT")
+    echo "  📅 Período: $PERIODO_INICIO a $PERIODO_FIM"
+    echo ""
+    ;;
+  *)
+    echo "  📅 Próxima semana (padrão)"
+    echo ""
+    ;;
+esac
+
 # Monta array de argumentos (trata espaços corretamente)
 ARGS=()
 if [ -n "$CLIENTE" ]; then
@@ -59,6 +116,9 @@ if [ -n "$CLIENTE" ]; then
 fi
 if [ -n "$MES_INPUT" ]; then
   ARGS+=(--mes "$MES_INPUT")
+fi
+if [ -n "$PERIODO_INICIO" ] && [ -n "$PERIODO_FIM" ]; then
+  ARGS+=(--inicio "$PERIODO_INICIO" --fim "$PERIODO_FIM")
 fi
 
 # ════════════════════════════════════════════════════
