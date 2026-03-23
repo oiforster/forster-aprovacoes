@@ -16,8 +16,8 @@ clear
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo " ⬇️  SINCRONIZANDO COM A EQUIPE (GitHub)..."
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-git add *.command 2>/dev/null
-git pull --rebase origin main
+git fetch origin main
+git reset --hard origin/main
 echo ""
 
 # ── DEPENDÊNCIAS ─────────────────────────────────────

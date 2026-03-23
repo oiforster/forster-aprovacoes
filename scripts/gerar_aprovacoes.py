@@ -359,21 +359,21 @@ def encontrar_arte(data, pasta_estrategia):
 # ─── PARSER DO .MD ──────────────────────────────────────────────────────────
 
 def encontrar_arquivo_mensal(cliente, ano_mes, agencia_path):
-    """Encontra o arquivo YYYY-MM — Conteúdo Mensal [Cliente].md"""
-    pasta = agencia_path / '_Clientes' / 'Clientes Recorrentes' / cliente / '04_Estratégia'
-    if not pasta.exists():
-        # Tenta sem acento
-        for entry in (agencia_path / '_Clientes' / 'Clientes Recorrentes').iterdir():
-            if slugify(entry.name) == slugify(cliente):
-                pasta = entry / '04_Estratégia'
-                break
-
-    if not pasta.exists():
-        return None
-
-    for arquivo in pasta.iterdir():
-        if arquivo.suffix == '.md' and ano_mes in arquivo.name and 'Conte' in arquivo.name:
-            return arquivo
+    """Encontra o arquivo YYYY-MM — Conteúdo Mensal [Cliente].md em Recorrentes ou Pontuais."""
+    for subfolder in ['Clientes Recorrentes', 'Clientes Pontuais']:
+        base = agencia_path / '_Clientes' / subfolder
+        if not base.exists():
+            continue
+        pasta = base / cliente / '04_Estratégia'
+        if not pasta.exists():
+            for entry in base.iterdir():
+                if slugify(entry.name) == slugify(cliente):
+                    pasta = entry / '04_Estratégia'
+                    break
+        if pasta.exists():
+            for arquivo in pasta.iterdir():
+                if arquivo.suffix == '.md' and ano_mes in arquivo.name and 'Conte' in arquivo.name:
+                    return arquivo
     return None
 
 def parse_data_linha(texto):
@@ -1121,12 +1121,20 @@ def main():
         datas_semana = semana_para_datas(segunda)
         print(f"📅 Próxima semana: {formatar_periodo(datas_semana)}")
 
-    # Determinar clientes
+    # Determinar clientes — busca em Recorrentes e Pontuais
     if args.cliente:
         clientes = [c for c in CLIENTES_RECORRENTES if args.cliente.lower() in c.lower()]
         if not clientes:
+            # Busca dinâmica em Clientes Pontuais
+            pontuais_base = agencia_path / '_Clientes' / 'Clientes Pontuais'
+            if pontuais_base.exists():
+                for entry in pontuais_base.iterdir():
+                    if entry.is_dir() and args.cliente.lower() in entry.name.lower():
+                        clientes.append(entry.name)
+        if not clientes:
+            todos = list(CLIENTES_RECORRENTES)
             print(f"❌ Cliente '{args.cliente}' não encontrado.")
-            print(f"   Clientes disponíveis: {', '.join(CLIENTES_RECORRENTES)}")
+            print(f"   Clientes disponíveis: {', '.join(todos)}")
             sys.exit(1)
     else:
         clientes = CLIENTES_RECORRENTES

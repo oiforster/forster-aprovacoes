@@ -182,14 +182,22 @@ def subir_thumbnail(youtube, video_id, capa_path):
 
 # ─── PROCESSAMENTO ────────────────────────────────────────────────────────────
 
+def encontrar_pasta_cliente(cliente, agencia_path):
+    """Busca a pasta do cliente em Recorrentes e depois em Pontuais."""
+    for subfolder in ['Clientes Recorrentes', 'Clientes Pontuais']:
+        pasta = agencia_path / '_Clientes' / subfolder / cliente
+        if pasta.exists():
+            return pasta
+        base = agencia_path / '_Clientes' / subfolder
+        if base.exists():
+            for entry in base.iterdir():
+                if slugify(entry.name) == slugify(cliente):
+                    return entry
+    return None
+
 def processar_cliente(youtube, cliente, ano_mes, agencia_path):
-    pasta_cliente = agencia_path / '_Clientes' / 'Clientes Recorrentes' / cliente
-    if not pasta_cliente.exists():
-        for entry in (agencia_path / '_Clientes' / 'Clientes Recorrentes').iterdir():
-            if slugify(entry.name) == slugify(cliente):
-                pasta_cliente = entry
-                break
-    if not pasta_cliente.exists():
+    pasta_cliente = encontrar_pasta_cliente(cliente, agencia_path)
+    if not pasta_cliente:
         return
 
     pasta_entregas = pasta_cliente / '06_Entregas'
