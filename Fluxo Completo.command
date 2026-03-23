@@ -52,14 +52,13 @@ echo "Qual mês? (deixe em branco para o mês atual)"
 read -p "  YYYY-MM (ex: 2026-04) ou Enter: " MES_INPUT
 echo ""
 
-MES_ARG=""
-if [ -n "$MES_INPUT" ]; then
-  MES_ARG="--mes $MES_INPUT"
-fi
-
-CLIENTE_ARG=""
+# Monta array de argumentos (trata espaços corretamente)
+ARGS=()
 if [ -n "$CLIENTE" ]; then
-  CLIENTE_ARG="--cliente \"$CLIENTE\""
+  ARGS+=(--cliente "$CLIENTE")
+fi
+if [ -n "$MES_INPUT" ]; then
+  ARGS+=(--mes "$MES_INPUT")
 fi
 
 # ════════════════════════════════════════════════════
@@ -70,7 +69,7 @@ echo "  ETAPA 1/4 — Validando arquivos..."
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo ""
 
-eval python3 "$SCRIPTS/validar_arquivos.py" $CLIENTE_ARG $MES_ARG
+python3 "$SCRIPTS/validar_arquivos.py" "${ARGS[@]}"
 VALIDACAO_STATUS=$?
 echo ""
 
@@ -79,18 +78,18 @@ if [ $VALIDACAO_STATUS -ne 0 ]; then
   echo "  ❌ Foram encontrados erros nos arquivos."
   echo ""
   echo "  Corrija os problemas acima e rode novamente."
-  echo "  Os erros marcados com ❌ impedem o funcionamento"
-  echo "  correto das páginas de aprovação."
+  echo "  Os erros ❌ impedem o funcionamento correto"
+  echo "  das páginas de aprovação."
   echo ""
   read -p "  Continuar mesmo assim? (s/N): " FORCAR
   echo ""
   if [[ ! "$FORCAR" =~ ^[Ss]$ ]]; then
-    echo "  Operação cancelada. Corrija os erros e tente novamente."
+    echo "  Operação cancelada."
     echo ""
     read -p "Pressione Enter para fechar..."
     exit 1
   fi
-  echo "  ⚠️  Continuando com erros (você escolheu forçar)."
+  echo "  ⚠️  Continuando com erros."
   echo ""
 fi
 
@@ -102,7 +101,7 @@ echo "  ETAPA 2/4 — Subindo Reels ao YouTube..."
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo ""
 
-eval python3 "$SCRIPTS/subir_reels.py" $CLIENTE_ARG $MES_ARG
+python3 "$SCRIPTS/subir_reels.py" "${ARGS[@]}"
 YOUTUBE_STATUS=$?
 echo ""
 
@@ -126,7 +125,7 @@ echo "  ETAPA 3/4 — Gerando páginas de aprovação..."
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo ""
 
-eval python3 "$SCRIPTS/gerar_aprovacoes.py" $CLIENTE_ARG $MES_ARG
+python3 "$SCRIPTS/gerar_aprovacoes.py" "${ARGS[@]}"
 GERAR_STATUS=$?
 echo ""
 
@@ -148,7 +147,6 @@ echo ""
 
 if [[ "$PUBLICAR" =~ ^[Nn]$ ]]; then
   echo "  Páginas geradas mas não publicadas."
-  echo "  Rode este arquivo novamente para publicar."
 else
   echo "  Publicando..."
   cd "$REPO"
@@ -169,7 +167,7 @@ fi
 
 echo ""
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-echo "  Fluxo concluído. Copie a mensagem acima"
+echo "  Fluxo concluído! Copie a mensagem acima"
 echo "  e envie no WhatsApp do cliente."
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo ""
