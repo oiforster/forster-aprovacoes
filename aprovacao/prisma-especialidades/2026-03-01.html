@@ -116,10 +116,10 @@
 
     /* POSTS */
     .posts-container {
-      padding: 8px 16px 100px;
+      padding: 16px 16px 100px;
       display: flex;
       flex-direction: column;
-      gap: 16px;
+      gap: 28px;
     }
 
     .post-card {
@@ -213,11 +213,54 @@
       background: #000;
       overflow: hidden;
     }
+
+    /* PLAYER YOUTUBE — proporção 9:16 (Reel vertical) */
+    .youtube-wrapper {
+      position: relative;
+      width: 100%;
+      padding-bottom: 177.78%; /* 16/9 invertido */
+      height: 0;
+      background: #000;
+    }
+    .youtube-wrapper iframe {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      border: none;
+    }
     .post-arte > img {
       width: 100%;
       aspect-ratio: 3 / 4;
       object-fit: contain;
       display: block;
+    }
+
+    /* YOUTUBE FACADE — thumbnail + botão play */
+    .youtube-facade {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 9 / 16;
+      background: #000;
+      cursor: pointer;
+      overflow: hidden;
+    }
+    .youtube-facade img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    .yt-play-btn {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+      filter: drop-shadow(0 2px 8px rgba(0,0,0,0.4));
+      transition: transform 0.15s;
+    }
+    .youtube-facade:active .yt-play-btn {
+      transform: translate(-50%, -50%) scale(0.92);
     }
 
     /* CARROSSEL — estilo Instagram */
@@ -652,10 +695,6 @@
     
     <div class="post-divider"></div>
     
-    <div class="post-conteudo">
-      <div class="post-conteudo-label">Texto</div>
-      <div class="post-texto">Em 12 dias, abrimos as portas.</div>
-    </div>
     <div class="post-conteudo" style="padding-top:0">
       <div class="post-conteudo-label">Legenda</div>
       <div class="post-texto">A contagem regressiva começou.<br>Em 12 dias, uma nova forma de cuidar da saúde chega a Novo Hamburgo.<br>Você vai querer conhecer. 🗓️<br>---<br>### FASE 2 — REVELAÇÃO DA MARCA (29/03–02/04)<br>---</div>
