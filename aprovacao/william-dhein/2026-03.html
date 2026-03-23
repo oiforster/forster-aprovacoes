@@ -636,7 +636,7 @@
 
 <!-- CABEÇALHO -->
 <div class="header">
-  <div class="header-label">Aprovação de conteúdo</div>
+  <div class="header-label">Aprovação de vídeos</div>
   <div class="header-cliente">William Dhein</div>
   <div class="header-periodo">Março de 2026</div>
   <div class="header-progress">
@@ -650,7 +650,7 @@
 <!-- APROVAR TUDO -->
 <div class="aprovar-tudo-container">
   <button class="btn-aprovar-tudo" id="btnAprovarTudo" onclick="aprovarTudo()">
-    ✓ Aprovar todos os posts
+    ✓ Aprovar todos os vídeos
   </button>
 </div>
 
@@ -663,7 +663,7 @@
   <div class="post-card" id="card-reel-01" data-post-id="reel-01">
     <div class="post-header">
       <div class="post-meta">
-        <div class="post-data">01/03 (dom)</div>
+        <div class="post-data">REEL 01</div>
         <div class="post-titulo">Quem é o Dr. William</div>
       </div>
       <span class="post-formato formato-reels">Reels</span>
@@ -748,7 +748,7 @@
   <div class="post-card" id="card-reel-02" data-post-id="reel-02">
     <div class="post-header">
       <div class="post-meta">
-        <div class="post-data">01/03 (dom)</div>
+        <div class="post-data">REEL 02</div>
         <div class="post-titulo">O que é Osteopatia</div>
       </div>
       <span class="post-formato formato-reels">Reels</span>
@@ -833,7 +833,7 @@
   <div class="post-card" id="card-reel-03" data-post-id="reel-03">
     <div class="post-header">
       <div class="post-meta">
-        <div class="post-data">01/03 (dom)</div>
+        <div class="post-data">REEL 03</div>
         <div class="post-titulo">Fisioterapia e Especialidades</div>
       </div>
       <span class="post-formato formato-reels">Reels</span>
@@ -918,7 +918,7 @@
   <div class="post-card" id="card-reel-04" data-post-id="reel-04">
     <div class="post-header">
       <div class="post-meta">
-        <div class="post-data">01/03 (dom)</div>
+        <div class="post-data">REEL 04</div>
         <div class="post-titulo">Como Funcionam os Atendimentos</div>
       </div>
       <span class="post-formato formato-reels">Reels</span>
@@ -1056,7 +1056,7 @@
   const periodo = "Março de 2026";
   const whatsappNumero = 'https://wa.me/5551980603512';
   const whatsappGrupo = '';  // link do grupo (ex: https://chat.whatsapp.com/XXX)
-  const postsMeta = {"reel-01": {"data": "01/03", "titulo": "Quem é o Dr. William"}, "reel-02": {"data": "01/03", "titulo": "O que é Osteopatia"}, "reel-03": {"data": "01/03", "titulo": "Fisioterapia e Especialidades"}, "reel-04": {"data": "01/03", "titulo": "Como Funcionam os Atendimentos"}};
+  const postsMeta = {"reel-01": {"data": "REEL 01", "titulo": "Quem é o Dr. William"}, "reel-02": {"data": "REEL 02", "titulo": "O que é Osteopatia"}, "reel-03": {"data": "REEL 03", "titulo": "Fisioterapia e Especialidades"}, "reel-04": {"data": "REEL 04", "titulo": "Como Funcionam os Atendimentos"}};
   const postsOrdem = ["reel-01", "reel-02", "reel-03", "reel-04"];
   
   function enviarEmailSilencioso(mensagem) {
@@ -1163,7 +1163,7 @@
     });
 
     btn.classList.add('ativo');
-    btn.textContent = '✓ Todos os posts aprovados';
+    btn.textContent = '✓ Todos os vídeos aprovados';
     atualizarProgresso();
   }
 
