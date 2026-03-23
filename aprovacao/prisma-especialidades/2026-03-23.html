@@ -513,12 +513,16 @@
       <span class="post-formato formato-card">Card</span>
     </div>
     
+    <div class="post-arte">
+      <img
+        src="https://lh3.googleusercontent.com/d/12X58Z0Yb_ummWRkSdgaKaPKsXrOcKB8t"
+        alt="Arte — &quot;Uma nova fase está chegando.&quot; — Teaser de abertura"
+        loading="lazy"
+        onerror="this.parentElement.style.display='none'"
+      />
+    </div>
     <div class="post-divider"></div>
     
-    <div class="post-conteudo">
-      <div class="post-conteudo-label">Texto</div>
-      <div class="post-texto">Uma nova fase está chegando.</div>
-    </div>
     <div class="post-conteudo" style="padding-top:0">
       <div class="post-conteudo-label">Legenda</div>
       <div class="post-texto">Algo diferente está sendo construído para você e sua família.<br>Nos próximos dias, contamos tudo.<br>Fique de olho. 👁️<br>---</div>
@@ -549,11 +553,32 @@
       <span class="post-formato formato-carrossel">Carrossel</span>
     </div>
     
+    <div class="post-arte">
+      <div class="carrossel-wrapper" id="carr-20260326-saude-da-familia-nao-deveria-s">
+        <div class="carrossel-track"><div class="carrossel-slide"><img src="https://lh3.googleusercontent.com/d/1sxoOkxiuz-4ok2KlaxUbXJrc5Ou8t0HO" loading="lazy" onerror="this.closest('.carrossel-slide').style.display='none'" /></div><div class="carrossel-slide"><img src="https://lh3.googleusercontent.com/d/1X_s6Kg2OGXbOhk-umdIimy4LL17L1xxE" loading="lazy" onerror="this.closest('.carrossel-slide').style.display='none'" /></div><div class="carrossel-slide"><img src="https://lh3.googleusercontent.com/d/1GyOtbw1W9S5BLw3TQcy8a3TdqTM6H1Z4" loading="lazy" onerror="this.closest('.carrossel-slide').style.display='none'" /></div><div class="carrossel-slide"><img src="https://lh3.googleusercontent.com/d/1m0hrAUY7K6zSfF7BNU-4mhFhd7b9sOdk" loading="lazy" onerror="this.closest('.carrossel-slide').style.display='none'" /></div><div class="carrossel-slide"><img src="https://lh3.googleusercontent.com/d/1twB0hzxUdkk8qIfF7wPAFCtBqjq6l1AL" loading="lazy" onerror="this.closest('.carrossel-slide').style.display='none'" /></div><div class="carrossel-slide"><img src="https://lh3.googleusercontent.com/d/1NucrbdGyqv-lM-Xfq-c1sGZ_1Zkl2_FA" loading="lazy" onerror="this.closest('.carrossel-slide').style.display='none'" /></div></div>
+        <div class="carrossel-counter">1 / 6</div>
+        <button class="carrossel-prev" onclick="carrosselNav('carr-20260326-saude-da-familia-nao-deveria-s',-1)" aria-label="Anterior">&#8249;</button>
+        <button class="carrossel-next" onclick="carrosselNav('carr-20260326-saude-da-familia-nao-deveria-s', 1)" aria-label="Próximo">&#8250;</button>
+      </div>
+      <div class="carrossel-dots" id="dots-carr-20260326-saude-da-familia-nao-deveria-s"><span class="carrossel-dot ativa"></span><span class="carrossel-dot"></span><span class="carrossel-dot"></span><span class="carrossel-dot"></span><span class="carrossel-dot"></span><span class="carrossel-dot"></span></div>
+    </div>
+    <script>(function(){
+      var track = document.querySelector('#carr-20260326-saude-da-familia-nao-deveria-s .carrossel-track');
+      var counter = document.querySelector('#carr-20260326-saude-da-familia-nao-deveria-s .carrossel-counter');
+      var dots = document.querySelectorAll('#dots-carr-20260326-saude-da-familia-nao-deveria-s .carrossel-dot');
+      var total = 6;
+      track.addEventListener('scroll', function() {
+        var idx = Math.round(track.scrollLeft / track.offsetWidth);
+        counter.textContent = (idx + 1) + ' / ' + total;
+        dots.forEach(function(d, i) { d.classList.toggle('ativa', i === idx); });
+      });
+    })();
+    window.carrosselNav = window.carrosselNav || function(id, dir) {
+      var t = document.querySelector('#' + id + ' .carrossel-track');
+      t.scrollBy({ left: dir * t.offsetWidth, behavior: 'smooth' });
+    };</script>
     <div class="post-divider"></div>
     
-    <div class="post-conteudo">
-      <div class="post-conteudo-label" style="margin-top:0px">Slide 1</div><div class="post-texto">Saúde da família não deveria ser tão complicada.</div><div class="post-conteudo-label" style="margin-top:8px">Slide 2</div><div class="post-texto">Uma consulta aqui. Um exame lá. Um encaminhamento acolá.<br>Cada especialidade numa clínica diferente.</div><div class="post-conteudo-label" style="margin-top:8px">Slide 3</div><div class="post-texto">Enquanto isso, a fila de espera aumenta.<br>E a saúde continua esperando.</div><div class="post-conteudo-label" style="margin-top:8px">Slide 4</div><div class="post-texto">Saúde de qualidade parece privilégio —<br>mas não precisa ser assim.</div>
-    </div>
     <div class="post-conteudo" style="padding-top:0">
       <div class="post-conteudo-label">Legenda</div>
       <div class="post-texto">Se você já passou por isso — consultar num lugar, fazer exame em outro, esperar semanas por um encaminhamento —, sabe o quanto isso cansa.<br>Cuidar da saúde da família não deveria ser tão difícil.<br>Muito em breve, uma novidade em Novo Hamburgo. 🔜<br>---</div>
@@ -584,12 +609,32 @@
       <span class="post-formato formato-card">Card</span>
     </div>
     
+    <div class="post-arte">
+      <div class="carrossel-wrapper" id="carr-20260327-eu-sempre-quis-construir-um-lu">
+        <div class="carrossel-track"><div class="carrossel-slide"><img src="https://lh3.googleusercontent.com/d/19An_I9Hr7x13rSl9tl9YLg59A0euAM7d" loading="lazy" onerror="this.closest('.carrossel-slide').style.display='none'" /></div><div class="carrossel-slide"><img src="https://lh3.googleusercontent.com/d/1vxhhPHZK3o_BaPTIKZI2KIwOptk1beYT" loading="lazy" onerror="this.closest('.carrossel-slide').style.display='none'" /></div><div class="carrossel-slide"><img src="https://lh3.googleusercontent.com/d/1dAPfLGEId_-KmAI9G_V-NlBHQ4VKDSwh" loading="lazy" onerror="this.closest('.carrossel-slide').style.display='none'" /></div><div class="carrossel-slide"><img src="https://lh3.googleusercontent.com/d/1IZN2SBBzLFGdM9hz27Y4SEiGyVdeH9Bc" loading="lazy" onerror="this.closest('.carrossel-slide').style.display='none'" /></div><div class="carrossel-slide"><img src="https://lh3.googleusercontent.com/d/1SvZPAzB40B7A4WB5yrbNlhNARk24NXBM" loading="lazy" onerror="this.closest('.carrossel-slide').style.display='none'" /></div><div class="carrossel-slide"><img src="https://lh3.googleusercontent.com/d/1hTGz_tpzXqh6qyAXQwEGB_PpIe7CRbKg" loading="lazy" onerror="this.closest('.carrossel-slide').style.display='none'" /></div><div class="carrossel-slide"><img src="https://lh3.googleusercontent.com/d/1OarOqAeWVTJQhzvWq0o8fdTMqIMh_DYv" loading="lazy" onerror="this.closest('.carrossel-slide').style.display='none'" /></div></div>
+        <div class="carrossel-counter">1 / 7</div>
+        <button class="carrossel-prev" onclick="carrosselNav('carr-20260327-eu-sempre-quis-construir-um-lu',-1)" aria-label="Anterior">&#8249;</button>
+        <button class="carrossel-next" onclick="carrosselNav('carr-20260327-eu-sempre-quis-construir-um-lu', 1)" aria-label="Próximo">&#8250;</button>
+      </div>
+      <div class="carrossel-dots" id="dots-carr-20260327-eu-sempre-quis-construir-um-lu"><span class="carrossel-dot ativa"></span><span class="carrossel-dot"></span><span class="carrossel-dot"></span><span class="carrossel-dot"></span><span class="carrossel-dot"></span><span class="carrossel-dot"></span><span class="carrossel-dot"></span></div>
+    </div>
+    <script>(function(){
+      var track = document.querySelector('#carr-20260327-eu-sempre-quis-construir-um-lu .carrossel-track');
+      var counter = document.querySelector('#carr-20260327-eu-sempre-quis-construir-um-lu .carrossel-counter');
+      var dots = document.querySelectorAll('#dots-carr-20260327-eu-sempre-quis-construir-um-lu .carrossel-dot');
+      var total = 7;
+      track.addEventListener('scroll', function() {
+        var idx = Math.round(track.scrollLeft / track.offsetWidth);
+        counter.textContent = (idx + 1) + ' / ' + total;
+        dots.forEach(function(d, i) { d.classList.toggle('ativa', i === idx); });
+      });
+    })();
+    window.carrosselNav = window.carrosselNav || function(id, dir) {
+      var t = document.querySelector('#' + id + ' .carrossel-track');
+      t.scrollBy({ left: dir * t.offsetWidth, behavior: 'smooth' });
+    };</script>
     <div class="post-divider"></div>
     
-    <div class="post-conteudo">
-      <div class="post-conteudo-label">Texto</div>
-      <div class="post-texto">&quot;Eu sempre quis construir um lugar onde o paciente viesse primeiro.&quot;<br>— Dra. Juliana</div>
-    </div>
     <div class="post-conteudo" style="padding-top:0">
       <div class="post-conteudo-label">Legenda</div>
       <div class="post-texto">Depois de anos na oftalmologia, a Dra. Juliana percebeu que o cuidado com a saúde das pessoas podia — e devia — ser diferente.<br>Mais acolhedor. Mais completo. Mais acessível.<br>O que ela sempre quis construir está prestes a abrir as portas.<br>---</div>
