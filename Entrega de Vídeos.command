@@ -52,7 +52,7 @@ if faltando:
 DEPEOF
 
 DEP_STATUS=$?
-if [ $DEP_STATUS -ne 0 ]; then
+if[ $DEP_STATUS -ne 0 ]; then
   read -p "Pressione Enter para fechar..."
   exit 1
 fi
@@ -124,8 +124,9 @@ echo "   Pontuais"
 # Exibe pontuais numerados a partir de 11
 PONTUAL_NUM=11
 declare -a PONTUAL_NOMES
-if[ -n "$PONTUAIS_LISTA" ]; then
-  while IFS= read -r nome; do[ -z "$nome" ] && continue
+if [ -n "$PONTUAIS_LISTA" ]; then
+  while IFS= read -r nome; do
+    [ -z "$nome" ] && continue
     printf "  %2d.  %s\n" "$PONTUAL_NUM" "$nome"
     PONTUAL_NOMES+=("$nome")
     ((PONTUAL_NUM++))
@@ -155,7 +156,7 @@ case "$CLIENTE_INPUT" in
     # Verifica se é um número dentro da faixa de pontuais
     if [[ "$CLIENTE_INPUT" =~ ^[0-9]+$ ]] && [ "$CLIENTE_INPUT" -ge 11 ]; then
       IDX=$(( CLIENTE_INPUT - 11 ))
-      if[ "$IDX" -lt "${#PONTUAL_NOMES[@]}" ]; then
+      if [ "$IDX" -lt "${#PONTUAL_NOMES[@]}" ]; then
         CLIENTE="${PONTUAL_NOMES[$IDX]}"
         PONTUAL=true
       else
@@ -181,7 +182,7 @@ echo ""
 
 # ── MONTA ARGUMENTOS ─────────────────────────────────
 ARGS_BASE=(--cliente "$CLIENTE")
-if[ -n "$MES_INPUT" ]; then
+if [ -n "$MES_INPUT" ]; then
   ARGS_BASE+=(--mes "$MES_INPUT")
 fi
 
@@ -202,7 +203,7 @@ python3 "$SCRIPTS/subir_reels.py" "${ARGS_BASE[@]}"
 YOUTUBE_STATUS=$?
 echo ""
 
-if[ $YOUTUBE_STATUS -ne 0 ]; then
+if [ $YOUTUBE_STATUS -ne 0 ]; then
   echo "  ❌ Erro no upload ao YouTube."
   echo ""
   read -p "  Continuar gerando a página mesmo assim? (s/N): " CONTINUAR_YT
@@ -226,7 +227,7 @@ python3 "$SCRIPTS/gerar_entrega_videos.py" "${ARGS_VIDEOS[@]}"
 GERAR_STATUS=$?
 echo ""
 
-if[ $GERAR_STATUS -ne 0 ]; then
+if [ $GERAR_STATUS -ne 0 ]; then
   echo "  ❌ Erro ao gerar página."
   read -p "Pressione Enter para fechar..."
   exit 1
