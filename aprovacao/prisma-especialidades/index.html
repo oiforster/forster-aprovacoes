@@ -533,7 +533,101 @@
       .semanas-nav { max-width: 440px; margin: 0 auto; }
       .rodape { max-width: 440px; left: 50%; transform: translateX(-50%); }
     }
-  </style>
+  
+    /* MODAL MENSAGEM WHATSAPP */
+    .modal-mensagem {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.55);
+      z-index: 400;
+      align-items: flex-end;
+      justify-content: center;
+      padding-bottom: 0;
+    }
+    .modal-mensagem.visivel { display: flex; }
+    .modal-mensagem-inner {
+      background: #fff;
+      border-radius: 20px 20px 0 0;
+      padding: 28px 24px 40px;
+      width: 100%;
+      max-width: 540px;
+      max-height: 85vh;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      animation: slideUp 0.25s ease;
+    }
+    @keyframes slideUp {
+      from { transform: translateY(60px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+    .modal-mensagem-titulo {
+      font-size: 17px;
+      font-weight: 700;
+      color: #1a1a1a;
+      text-align: center;
+    }
+    .modal-mensagem-instrucao {
+      font-size: 14px;
+      color: #666;
+      text-align: center;
+      line-height: 1.5;
+    }
+    .modal-mensagem-texto {
+      background: #f5f5f0;
+      border-radius: 12px;
+      padding: 16px;
+      font-size: 14px;
+      color: #333;
+      line-height: 1.6;
+      white-space: pre-wrap;
+      font-family: inherit;
+      border: none;
+      resize: none;
+      width: 100%;
+      box-sizing: border-box;
+      min-height: 120px;
+    }
+    .modal-btn-copiar {
+      background: #25D366;
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      padding: 16px;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      width: 100%;
+      transition: background 0.2s;
+    }
+    .modal-btn-copiar:active { background: #1ebe5a; }
+    .modal-btn-copiar.copiado { background: #1ebe5a; }
+    .modal-btn-wpp {
+      background: #fff;
+      color: #128C7E;
+      border: 2px solid #128C7E;
+      border-radius: 12px;
+      padding: 14px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      width: 100%;
+      transition: background 0.2s;
+    }
+    .modal-btn-wpp:active { background: #f0faf9; }
+    .modal-btn-fechar {
+      background: none;
+      border: none;
+      color: #999;
+      font-size: 14px;
+      cursor: pointer;
+      text-align: center;
+      padding: 4px;
+    }
+
+    </style>
 </head>
 <body>
 
@@ -541,12 +635,12 @@
 <div class="header">
   <div class="header-label">Aprovação de conteúdo</div>
   <div class="header-cliente">Prisma Especialidades</div>
-  <div class="header-periodo">23 a 29 de março</div>
+  <div class="header-periodo">30/03 a 5/04</div>
   <div class="header-progress">
     <div class="progress-bar-bg">
       <div class="progress-bar-fill" id="progressBar"></div>
     </div>
-    <div class="progress-text" id="progressText">0 de 5 aprovados</div>
+    <div class="progress-text" id="progressText">0 de 7 aprovados</div>
   </div>
 </div>
 
@@ -563,261 +657,50 @@
 <!-- POSTS -->
 <div class="posts-container" id="postsContainer">
   
-  <div class="post-card" id="card-20260325-uma-nova-fase-esta-chegando-te" data-post-id="20260325-uma-nova-fase-esta-chegando-te">
+  <div class="post-card" id="card-20260330-um-centro-medico-pensado-para-" data-post-id="20260330-um-centro-medico-pensado-para-">
     <div class="post-header">
       <div class="post-meta">
-        <div class="post-data">25/03 (qua)</div>
-        <div class="post-titulo">&quot;Uma nova fase está chegando.&quot; — Teaser de abertura</div>
-      </div>
-      <span class="post-formato formato-card">Card</span>
-    </div>
-    
-    <div class="post-arte">
-      <img
-        src="https://lh3.googleusercontent.com/d/12X58Z0Yb_ummWRkSdgaKaPKsXrOcKB8t"
-        alt="Arte — &quot;Uma nova fase está chegando.&quot; — Teaser de abertura"
-        loading="lazy"
-        onerror="this.parentElement.style.display='none'"
-      />
-    </div>
-    <div class="post-divider"></div>
-    
-    <div class="post-conteudo" style="padding-top:0">
-      <div class="post-conteudo-label">Legenda</div>
-      <div class="post-texto">Algo diferente está sendo construído para você e sua família.<br>Nos próximos dias, contamos tudo.<br>Fique de olho. 👁️<br>---</div>
-    </div>
-    
-    <div class="post-acoes">
-      <button class="btn-aprovar" id="aprovar-20260325-uma-nova-fase-esta-chegando-te" onclick="marcarPost('20260325-uma-nova-fase-esta-chegando-te', 'aprovado')">
-        ✓ Aprovar
-      </button>
-      <button class="btn-ajuste" id="ajuste-20260325-uma-nova-fase-esta-chegando-te" onclick="marcarPost('20260325-uma-nova-fase-esta-chegando-te', 'ajuste')">
-        ✗ Pedir ajuste
-      </button>
-    </div>
-    <div class="campo-ajuste" id="campo-20260325-uma-nova-fase-esta-chegando-te">
-      <textarea
-        id="obs-20260325-uma-nova-fase-esta-chegando-te"
-        placeholder="O que você gostaria de ajustar neste post?"
-        oninput="atualizarComentario('20260325-uma-nova-fase-esta-chegando-te', this.value)"
-        rows="3"
-      ></textarea>
-      <button class="btn-confirmar-obs" id="btnobs-20260325-uma-nova-fase-esta-chegando-te" onclick="confirmarObs('20260325-uma-nova-fase-esta-chegando-te')">
-        Registrar observação
-      </button>
-    </div>
-  </div>
-  <div class="post-card" id="card-20260326-saude-da-familia-nao-deveria-s" data-post-id="20260326-saude-da-familia-nao-deveria-s">
-    <div class="post-header">
-      <div class="post-meta">
-        <div class="post-data">26/03 (qui)</div>
-        <div class="post-titulo">&quot;Saúde da família não deveria ser tão complicada.&quot; — A dor e o problema</div>
+        <div class="post-data">30/03 (seg)</div>
+        <div class="post-titulo">&quot;Um centro médico pensado para cuidar de você e de quem você ama.&quot; — O conceito</div>
       </div>
       <span class="post-formato formato-carrossel">Carrossel</span>
     </div>
     
-    <div class="post-arte">
-      <div class="carrossel-wrapper" id="carr-20260326-saude-da-familia-nao-deveria-s">
-        <div class="carrossel-track"><div class="carrossel-slide"><img src="https://lh3.googleusercontent.com/d/1sxoOkxiuz-4ok2KlaxUbXJrc5Ou8t0HO" loading="lazy" onerror="this.closest('.carrossel-slide').style.display='none'" /></div><div class="carrossel-slide"><img src="https://lh3.googleusercontent.com/d/1X_s6Kg2OGXbOhk-umdIimy4LL17L1xxE" loading="lazy" onerror="this.closest('.carrossel-slide').style.display='none'" /></div><div class="carrossel-slide"><img src="https://lh3.googleusercontent.com/d/1GyOtbw1W9S5BLw3TQcy8a3TdqTM6H1Z4" loading="lazy" onerror="this.closest('.carrossel-slide').style.display='none'" /></div><div class="carrossel-slide"><img src="https://lh3.googleusercontent.com/d/1m0hrAUY7K6zSfF7BNU-4mhFhd7b9sOdk" loading="lazy" onerror="this.closest('.carrossel-slide').style.display='none'" /></div><div class="carrossel-slide"><img src="https://lh3.googleusercontent.com/d/1twB0hzxUdkk8qIfF7wPAFCtBqjq6l1AL" loading="lazy" onerror="this.closest('.carrossel-slide').style.display='none'" /></div><div class="carrossel-slide"><img src="https://lh3.googleusercontent.com/d/1NucrbdGyqv-lM-Xfq-c1sGZ_1Zkl2_FA" loading="lazy" onerror="this.closest('.carrossel-slide').style.display='none'" /></div></div>
-        <div class="carrossel-counter">1 / 6</div>
-        <button class="carrossel-prev" onclick="carrosselNav('carr-20260326-saude-da-familia-nao-deveria-s',-1)" aria-label="Anterior">&#8249;</button>
-        <button class="carrossel-next" onclick="carrosselNav('carr-20260326-saude-da-familia-nao-deveria-s', 1)" aria-label="Próximo">&#8250;</button>
-      </div>
-      <div class="carrossel-dots" id="dots-carr-20260326-saude-da-familia-nao-deveria-s"><span class="carrossel-dot ativa"></span><span class="carrossel-dot"></span><span class="carrossel-dot"></span><span class="carrossel-dot"></span><span class="carrossel-dot"></span><span class="carrossel-dot"></span></div>
-    </div>
-    <script>(function(){
-      var track = document.querySelector('#carr-20260326-saude-da-familia-nao-deveria-s .carrossel-track');
-      var counter = document.querySelector('#carr-20260326-saude-da-familia-nao-deveria-s .carrossel-counter');
-      var dots = document.querySelectorAll('#dots-carr-20260326-saude-da-familia-nao-deveria-s .carrossel-dot');
-      var total = 6;
-      track.addEventListener('scroll', function() {
-        var idx = Math.round(track.scrollLeft / track.offsetWidth);
-        counter.textContent = (idx + 1) + ' / ' + total;
-        dots.forEach(function(d, i) { d.classList.toggle('ativa', i === idx); });
-      });
-    })();
-    window.carrosselNav = window.carrosselNav || function(id, dir) {
-      var t = document.querySelector('#' + id + ' .carrossel-track');
-      t.scrollBy({ left: dir * t.offsetWidth, behavior: 'smooth' });
-    };</script>
     <div class="post-divider"></div>
     
+    <div class="post-conteudo">
+      <div class="post-conteudo-label" style="margin-top:0px">Slide 1</div><div class="post-texto">Um centro médico pensado para cuidar de você<br>e de quem você ama.</div><div class="post-conteudo-label" style="margin-top:8px">Slide 2</div><div class="post-texto">A Prisma Especialidades nasce com um propósito claro:<br>ser o centro de saúde da família de Novo Hamburgo.</div><div class="post-conteudo-label" style="margin-top:8px">Slide 3</div><div class="post-texto">Múltiplas especialidades.<br>Um só endereço.<br>Sem precisar correr de clínica em clínica.</div><div class="post-conteudo-label" style="margin-top:8px">Slide 4</div><div class="post-texto">Com médicos que têm tempo para ouvir,<br>examinar e cuidar de verdade.</div><div class="post-conteudo-label" style="margin-top:8px">Slide 5</div><div class="post-texto">Porque saúde de qualidade não é luxo.<br>É o mínimo que você merece.</div>
+    </div>
     <div class="post-conteudo" style="padding-top:0">
       <div class="post-conteudo-label">Legenda</div>
-      <div class="post-texto">Se você já passou por isso — consultar num lugar, fazer exame em outro, esperar semanas por um encaminhamento —, sabe o quanto isso cansa.<br>Cuidar da saúde da família não deveria ser tão difícil.<br>Muito em breve, uma novidade em Novo Hamburgo. 🔜<br>---</div>
+      <div class="post-texto">A Prisma Especialidades foi criada para ser diferente — não apenas mais uma clínica popular.<br>Aqui, qualidade e acessibilidade não são opostos. São o ponto de partida.<br>Abertura em 09 de abril. Fica com a gente até lá. 🌿<br>---</div>
     </div>
     
     <div class="post-acoes">
-      <button class="btn-aprovar" id="aprovar-20260326-saude-da-familia-nao-deveria-s" onclick="marcarPost('20260326-saude-da-familia-nao-deveria-s', 'aprovado')">
+      <button class="btn-aprovar" id="aprovar-20260330-um-centro-medico-pensado-para-" onclick="marcarPost('20260330-um-centro-medico-pensado-para-', 'aprovado')">
         ✓ Aprovar
       </button>
-      <button class="btn-ajuste" id="ajuste-20260326-saude-da-familia-nao-deveria-s" onclick="marcarPost('20260326-saude-da-familia-nao-deveria-s', 'ajuste')">
+      <button class="btn-ajuste" id="ajuste-20260330-um-centro-medico-pensado-para-" onclick="marcarPost('20260330-um-centro-medico-pensado-para-', 'ajuste')">
         ✗ Pedir ajuste
       </button>
     </div>
-    <div class="campo-ajuste" id="campo-20260326-saude-da-familia-nao-deveria-s">
+    <div class="campo-ajuste" id="campo-20260330-um-centro-medico-pensado-para-">
       <textarea
-        id="obs-20260326-saude-da-familia-nao-deveria-s"
+        id="obs-20260330-um-centro-medico-pensado-para-"
         placeholder="O que você gostaria de ajustar neste post?"
-        oninput="atualizarComentario('20260326-saude-da-familia-nao-deveria-s', this.value)"
+        oninput="atualizarComentario('20260330-um-centro-medico-pensado-para-', this.value)"
         rows="3"
       ></textarea>
-      <button class="btn-confirmar-obs" id="btnobs-20260326-saude-da-familia-nao-deveria-s" onclick="confirmarObs('20260326-saude-da-familia-nao-deveria-s')">
+      <button class="btn-confirmar-obs" id="btnobs-20260330-um-centro-medico-pensado-para-" onclick="confirmarObs('20260330-um-centro-medico-pensado-para-')">
         Registrar observação
       </button>
     </div>
   </div>
-  <div class="post-card" id="card-20260327-eu-sempre-quis-construir-um-lu" data-post-id="20260327-eu-sempre-quis-construir-um-lu">
+  <div class="post-card" id="card-20260331-popular-com-qualidade-e-possiv" data-post-id="20260331-popular-com-qualidade-e-possiv">
     <div class="post-header">
       <div class="post-meta">
-        <div class="post-data">27/03 (sex)</div>
-        <div class="post-titulo">&quot;Eu sempre quis construir um lugar diferente.&quot; — Dra. Juliana, tom pessoal</div>
-      </div>
-      <span class="post-formato formato-card">Card</span>
-    </div>
-    
-    <div class="post-arte">
-      <div class="carrossel-wrapper" id="carr-20260327-eu-sempre-quis-construir-um-lu">
-        <div class="carrossel-track"><div class="carrossel-slide"><img src="https://lh3.googleusercontent.com/d/19An_I9Hr7x13rSl9tl9YLg59A0euAM7d" loading="lazy" onerror="this.closest('.carrossel-slide').style.display='none'" /></div><div class="carrossel-slide"><img src="https://lh3.googleusercontent.com/d/1vxhhPHZK3o_BaPTIKZI2KIwOptk1beYT" loading="lazy" onerror="this.closest('.carrossel-slide').style.display='none'" /></div><div class="carrossel-slide"><img src="https://lh3.googleusercontent.com/d/1dAPfLGEId_-KmAI9G_V-NlBHQ4VKDSwh" loading="lazy" onerror="this.closest('.carrossel-slide').style.display='none'" /></div><div class="carrossel-slide"><img src="https://lh3.googleusercontent.com/d/1IZN2SBBzLFGdM9hz27Y4SEiGyVdeH9Bc" loading="lazy" onerror="this.closest('.carrossel-slide').style.display='none'" /></div><div class="carrossel-slide"><img src="https://lh3.googleusercontent.com/d/1SvZPAzB40B7A4WB5yrbNlhNARk24NXBM" loading="lazy" onerror="this.closest('.carrossel-slide').style.display='none'" /></div><div class="carrossel-slide"><img src="https://lh3.googleusercontent.com/d/1hTGz_tpzXqh6qyAXQwEGB_PpIe7CRbKg" loading="lazy" onerror="this.closest('.carrossel-slide').style.display='none'" /></div><div class="carrossel-slide"><img src="https://lh3.googleusercontent.com/d/1OarOqAeWVTJQhzvWq0o8fdTMqIMh_DYv" loading="lazy" onerror="this.closest('.carrossel-slide').style.display='none'" /></div></div>
-        <div class="carrossel-counter">1 / 7</div>
-        <button class="carrossel-prev" onclick="carrosselNav('carr-20260327-eu-sempre-quis-construir-um-lu',-1)" aria-label="Anterior">&#8249;</button>
-        <button class="carrossel-next" onclick="carrosselNav('carr-20260327-eu-sempre-quis-construir-um-lu', 1)" aria-label="Próximo">&#8250;</button>
-      </div>
-      <div class="carrossel-dots" id="dots-carr-20260327-eu-sempre-quis-construir-um-lu"><span class="carrossel-dot ativa"></span><span class="carrossel-dot"></span><span class="carrossel-dot"></span><span class="carrossel-dot"></span><span class="carrossel-dot"></span><span class="carrossel-dot"></span><span class="carrossel-dot"></span></div>
-    </div>
-    <script>(function(){
-      var track = document.querySelector('#carr-20260327-eu-sempre-quis-construir-um-lu .carrossel-track');
-      var counter = document.querySelector('#carr-20260327-eu-sempre-quis-construir-um-lu .carrossel-counter');
-      var dots = document.querySelectorAll('#dots-carr-20260327-eu-sempre-quis-construir-um-lu .carrossel-dot');
-      var total = 7;
-      track.addEventListener('scroll', function() {
-        var idx = Math.round(track.scrollLeft / track.offsetWidth);
-        counter.textContent = (idx + 1) + ' / ' + total;
-        dots.forEach(function(d, i) { d.classList.toggle('ativa', i === idx); });
-      });
-    })();
-    window.carrosselNav = window.carrosselNav || function(id, dir) {
-      var t = document.querySelector('#' + id + ' .carrossel-track');
-      t.scrollBy({ left: dir * t.offsetWidth, behavior: 'smooth' });
-    };</script>
-    <div class="post-divider"></div>
-    
-    <div class="post-conteudo" style="padding-top:0">
-      <div class="post-conteudo-label">Legenda</div>
-      <div class="post-texto">Depois de anos na oftalmologia, a Dra. Juliana percebeu que o cuidado com a saúde das pessoas podia — e devia — ser diferente.<br>Mais acolhedor. Mais completo. Mais acessível.<br>O que ela sempre quis construir está prestes a abrir as portas.<br>---</div>
-    </div>
-    
-    <div class="post-acoes">
-      <button class="btn-aprovar" id="aprovar-20260327-eu-sempre-quis-construir-um-lu" onclick="marcarPost('20260327-eu-sempre-quis-construir-um-lu', 'aprovado')">
-        ✓ Aprovar
-      </button>
-      <button class="btn-ajuste" id="ajuste-20260327-eu-sempre-quis-construir-um-lu" onclick="marcarPost('20260327-eu-sempre-quis-construir-um-lu', 'ajuste')">
-        ✗ Pedir ajuste
-      </button>
-    </div>
-    <div class="campo-ajuste" id="campo-20260327-eu-sempre-quis-construir-um-lu">
-      <textarea
-        id="obs-20260327-eu-sempre-quis-construir-um-lu"
-        placeholder="O que você gostaria de ajustar neste post?"
-        oninput="atualizarComentario('20260327-eu-sempre-quis-construir-um-lu', this.value)"
-        rows="3"
-      ></textarea>
-      <button class="btn-confirmar-obs" id="btnobs-20260327-eu-sempre-quis-construir-um-lu" onclick="confirmarObs('20260327-eu-sempre-quis-construir-um-lu')">
-        Registrar observação
-      </button>
-    </div>
-  </div>
-  <div class="post-card" id="card-20260328-em-12-dias-abrimos-as-portas-c" data-post-id="20260328-em-12-dias-abrimos-as-portas-c">
-    <div class="post-header">
-      <div class="post-meta">
-        <div class="post-data">28/03 (sáb)</div>
-        <div class="post-titulo">&quot;Em 12 dias, abrimos as portas.&quot; — Contagem regressiva</div>
-      </div>
-      <span class="post-formato formato-card">Card</span>
-    </div>
-    
-    <div class="post-arte">
-      <div class="youtube-facade" id="ytf-20260328-em-12-dias-abrimos-as-portas-c" onclick="abrirReel('yjkHNpIlEsA','ytf-20260328-em-12-dias-abrimos-as-portas-c')">
-        <img
-          src="https://img.youtube.com/vi/yjkHNpIlEsA/maxresdefault.jpg"
-          onerror="this.src='https://img.youtube.com/vi/yjkHNpIlEsA/hqdefault.jpg'"
-          alt="Reel — &quot;Em 12 dias, abrimos as portas.&quot; — Contagem regressiva"
-        />
-        <div class="yt-play-btn">
-          <svg viewBox="0 0 68 48" width="68" height="48">
-            <path d="M66.5 7.7a8.5 8.5 0 0 0-6-6C56 0 34 0 34 0S12 0 7.5 1.7a8.5 8.5 0 0 0-6 6C0 14.3 0 24 0 24s0 9.7 1.5 16.3a8.5 8.5 0 0 0 6 6C12 48 34 48 34 48s22 0 26.5-1.7a8.5 8.5 0 0 0 6-6C68 33.7 68 24 68 24s0-9.7-1.5-16.3z" fill="rgba(0,0,0,0.7)"/>
-            <path d="M45 24 27 14v20z" fill="white"/>
-          </svg>
-        </div>
-      </div>
-    </div>
-    <script>(function(){
-      window.abrirReel = window.abrirReel || function(ytId, facadeId) {
-        // Overlay fullscreen dentro do site (mobile e desktop)
-        var overlay = document.getElementById('yt-overlay');
-        if (!overlay) {
-          overlay = document.createElement('div');
-          overlay.id = 'yt-overlay';
-          overlay.style.cssText = 'position:fixed;inset:0;background:#000;z-index:500;display:none;flex-direction:column;align-items:center;justify-content:center;';
-
-          var closeBtn = document.createElement('button');
-          closeBtn.innerHTML = '&#10005;';
-          closeBtn.style.cssText = 'position:absolute;top:16px;right:16px;z-index:10;background:rgba(255,255,255,0.15);color:#fff;border:none;border-radius:50%;width:44px;height:44px;font-size:20px;cursor:pointer;line-height:1;';
-          closeBtn.setAttribute('aria-label', 'Fechar vídeo');
-          closeBtn.onclick = function() {
-            overlay.style.display = 'none';
-            var ifr = document.getElementById('yt-iframe');
-            if (ifr) ifr.src = '';
-          };
-
-          var ifr = document.createElement('iframe');
-          ifr.id = 'yt-iframe';
-          ifr.style.cssText = 'width:100%;height:100%;border:none;';
-          ifr.setAttribute('allow','accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen');
-          ifr.setAttribute('allowfullscreen','');
-
-          overlay.appendChild(closeBtn);
-          overlay.appendChild(ifr);
-          document.body.appendChild(overlay);
-        }
-
-        var ifr = document.getElementById('yt-iframe');
-        ifr.src = 'https://www.youtube.com/embed/' + ytId + '?autoplay=1&rel=0&modestbranding=1&playsinline=1';
-        overlay.style.display = 'flex';
-      };
-    })();</script>
-    <div class="post-divider"></div>
-    
-    <div class="post-conteudo" style="padding-top:0">
-      <div class="post-conteudo-label">Legenda</div>
-      <div class="post-texto">A contagem regressiva começou.<br>Em 12 dias, uma nova forma de cuidar da saúde chega a Novo Hamburgo.<br>Você vai querer conhecer. 🗓️<br>---<br>### FASE 2 — REVELAÇÃO DA MARCA (29/03–02/04)<br>---</div>
-    </div>
-    
-    <div class="post-acoes">
-      <button class="btn-aprovar" id="aprovar-20260328-em-12-dias-abrimos-as-portas-c" onclick="marcarPost('20260328-em-12-dias-abrimos-as-portas-c', 'aprovado')">
-        ✓ Aprovar
-      </button>
-      <button class="btn-ajuste" id="ajuste-20260328-em-12-dias-abrimos-as-portas-c" onclick="marcarPost('20260328-em-12-dias-abrimos-as-portas-c', 'ajuste')">
-        ✗ Pedir ajuste
-      </button>
-    </div>
-    <div class="campo-ajuste" id="campo-20260328-em-12-dias-abrimos-as-portas-c">
-      <textarea
-        id="obs-20260328-em-12-dias-abrimos-as-portas-c"
-        placeholder="O que você gostaria de ajustar neste post?"
-        oninput="atualizarComentario('20260328-em-12-dias-abrimos-as-portas-c', this.value)"
-        rows="3"
-      ></textarea>
-      <button class="btn-confirmar-obs" id="btnobs-20260328-em-12-dias-abrimos-as-portas-c" onclick="confirmarObs('20260328-em-12-dias-abrimos-as-portas-c')">
-        Registrar observação
-      </button>
-    </div>
-  </div>
-  <div class="post-card" id="card-20260329-nasce-a-prisma-especialidades-" data-post-id="20260329-nasce-a-prisma-especialidades-">
-    <div class="post-header">
-      <div class="post-meta">
-        <div class="post-data">29/03 (dom)</div>
-        <div class="post-titulo">&quot;Nasce a Prisma Especialidades.&quot; — Revelação oficial com logo</div>
+        <div class="post-data">31/03 (ter)</div>
+        <div class="post-titulo">&quot;Popular com qualidade. É possível.&quot; — O diferencial da clínica</div>
       </div>
       <span class="post-formato formato-card">Card</span>
     </div>
@@ -826,29 +709,228 @@
     
     <div class="post-conteudo">
       <div class="post-conteudo-label">Texto</div>
-      <div class="post-texto">Nasce a Prisma Especialidades.</div>
+      <div class="post-texto">Popular com qualidade.<br>Isso é possível — e é o que a gente faz.</div>
     </div>
     <div class="post-conteudo" style="padding-top:0">
       <div class="post-conteudo-label">Legenda</div>
-      <div class="post-texto">Apresentamos a Prisma Especialidades.<br>Um centro médico multiespecialidades pensado para cuidar de você e de toda a sua família — com qualidade real, atendimento humano e preço justo.<br>Abertura em 09/04. 📍 Novo Hamburgo<br>Saúde completa para você e sua família.<br>---</div>
+      <div class="post-texto">Existe um problema silencioso nas clínicas populares: muitas cobram barato porque pagam mal e entregam pouco.<br>A Prisma Especialidades foi fundada com uma premissa diferente — preço justo, médicos valorizados e atendimento que você vai recomendar para quem você mais ama.<br>Popular com qualidade não é slogan. É o que guia cada decisão aqui dentro.<br>---</div>
     </div>
     
     <div class="post-acoes">
-      <button class="btn-aprovar" id="aprovar-20260329-nasce-a-prisma-especialidades-" onclick="marcarPost('20260329-nasce-a-prisma-especialidades-', 'aprovado')">
+      <button class="btn-aprovar" id="aprovar-20260331-popular-com-qualidade-e-possiv" onclick="marcarPost('20260331-popular-com-qualidade-e-possiv', 'aprovado')">
         ✓ Aprovar
       </button>
-      <button class="btn-ajuste" id="ajuste-20260329-nasce-a-prisma-especialidades-" onclick="marcarPost('20260329-nasce-a-prisma-especialidades-', 'ajuste')">
+      <button class="btn-ajuste" id="ajuste-20260331-popular-com-qualidade-e-possiv" onclick="marcarPost('20260331-popular-com-qualidade-e-possiv', 'ajuste')">
         ✗ Pedir ajuste
       </button>
     </div>
-    <div class="campo-ajuste" id="campo-20260329-nasce-a-prisma-especialidades-">
+    <div class="campo-ajuste" id="campo-20260331-popular-com-qualidade-e-possiv">
       <textarea
-        id="obs-20260329-nasce-a-prisma-especialidades-"
+        id="obs-20260331-popular-com-qualidade-e-possiv"
         placeholder="O que você gostaria de ajustar neste post?"
-        oninput="atualizarComentario('20260329-nasce-a-prisma-especialidades-', this.value)"
+        oninput="atualizarComentario('20260331-popular-com-qualidade-e-possiv', this.value)"
         rows="3"
       ></textarea>
-      <button class="btn-confirmar-obs" id="btnobs-20260329-nasce-a-prisma-especialidades-" onclick="confirmarObs('20260329-nasce-a-prisma-especialidades-')">
+      <button class="btn-confirmar-obs" id="btnobs-20260331-popular-com-qualidade-e-possiv" onclick="confirmarObs('20260331-popular-com-qualidade-e-possiv')">
+        Registrar observação
+      </button>
+    </div>
+  </div>
+  <div class="post-card" id="card-20260401-o-espaco-que-preparamos-para-v" data-post-id="20260401-o-espaco-que-preparamos-para-v">
+    <div class="post-header">
+      <div class="post-meta">
+        <div class="post-data">01/04 (qua)</div>
+        <div class="post-titulo">&quot;O espaço que preparamos para você.&quot; — Foto da clínica por dentro</div>
+      </div>
+      <span class="post-formato formato-card">Card</span>
+    </div>
+    
+    <div class="post-divider"></div>
+    
+    <div class="post-conteudo">
+      <div class="post-conteudo-label">Texto</div>
+      <div class="post-texto">O espaço que preparamos para você.</div>
+    </div>
+    <div class="post-conteudo" style="padding-top:0">
+      <div class="post-conteudo-label">Legenda</div>
+      <div class="post-texto">Cada detalhe foi pensado para que você se sinta bem desde a entrada.<br>Um ambiente acolhedor, organizado e cuidadoso — para toda a família.<br>📍 Av. Pedro Adams Filho, 6739 — Guarani, Novo Hamburgo<br>Abertura em 09 de abril.<br>---</div>
+    </div>
+    
+    <div class="post-acoes">
+      <button class="btn-aprovar" id="aprovar-20260401-o-espaco-que-preparamos-para-v" onclick="marcarPost('20260401-o-espaco-que-preparamos-para-v', 'aprovado')">
+        ✓ Aprovar
+      </button>
+      <button class="btn-ajuste" id="ajuste-20260401-o-espaco-que-preparamos-para-v" onclick="marcarPost('20260401-o-espaco-que-preparamos-para-v', 'ajuste')">
+        ✗ Pedir ajuste
+      </button>
+    </div>
+    <div class="campo-ajuste" id="campo-20260401-o-espaco-que-preparamos-para-v">
+      <textarea
+        id="obs-20260401-o-espaco-que-preparamos-para-v"
+        placeholder="O que você gostaria de ajustar neste post?"
+        oninput="atualizarComentario('20260401-o-espaco-que-preparamos-para-v', this.value)"
+        rows="3"
+      ></textarea>
+      <button class="btn-confirmar-obs" id="btnobs-20260401-o-espaco-que-preparamos-para-v" onclick="confirmarObs('20260401-o-espaco-que-preparamos-para-v')">
+        Registrar observação
+      </button>
+    </div>
+  </div>
+  <div class="post-card" id="card-20260402-a-oftalmologia-de-excelencia-c" data-post-id="20260402-a-oftalmologia-de-excelencia-c">
+    <div class="post-header">
+      <div class="post-meta">
+        <div class="post-data">02/04 (qui)</div>
+        <div class="post-titulo">&quot;A oftalmologia de excelência continua — agora como parte de algo maior.&quot; — Continuidade Catarata Center</div>
+      </div>
+      <span class="post-formato formato-card">Card</span>
+    </div>
+    
+    <div class="post-divider"></div>
+    
+    <div class="post-conteudo">
+      <div class="post-conteudo-label">Texto</div>
+      <div class="post-texto">A oftalmologia de excelência que você conhece<br>agora é parte de algo maior.</div>
+    </div>
+    <div class="post-conteudo" style="padding-top:0">
+      <div class="post-conteudo-label">Legenda</div>
+      <div class="post-texto">O Catarata Center sempre foi referência em oftalmologia de qualidade em Novo Hamburgo. Isso não muda.<br>A diferença é que agora, o mesmo padrão de cuidado se expande para muito mais especialidades — sob o mesmo teto.<br>Bem-vindo à Prisma Especialidades. 👁️<br>---<br>### FASE 3 — AQUECIMENTO PRÉ-ABERTURA (03–07/04)<br>---</div>
+    </div>
+    
+    <div class="post-acoes">
+      <button class="btn-aprovar" id="aprovar-20260402-a-oftalmologia-de-excelencia-c" onclick="marcarPost('20260402-a-oftalmologia-de-excelencia-c', 'aprovado')">
+        ✓ Aprovar
+      </button>
+      <button class="btn-ajuste" id="ajuste-20260402-a-oftalmologia-de-excelencia-c" onclick="marcarPost('20260402-a-oftalmologia-de-excelencia-c', 'ajuste')">
+        ✗ Pedir ajuste
+      </button>
+    </div>
+    <div class="campo-ajuste" id="campo-20260402-a-oftalmologia-de-excelencia-c">
+      <textarea
+        id="obs-20260402-a-oftalmologia-de-excelencia-c"
+        placeholder="O que você gostaria de ajustar neste post?"
+        oninput="atualizarComentario('20260402-a-oftalmologia-de-excelencia-c', this.value)"
+        rows="3"
+      ></textarea>
+      <button class="btn-confirmar-obs" id="btnobs-20260402-a-oftalmologia-de-excelencia-c" onclick="confirmarObs('20260402-a-oftalmologia-de-excelencia-c')">
+        Registrar observação
+      </button>
+    </div>
+  </div>
+  <div class="post-card" id="card-20260403-tudo-que-a-sua-familia-precisa" data-post-id="20260403-tudo-que-a-sua-familia-precisa">
+    <div class="post-header">
+      <div class="post-meta">
+        <div class="post-data">03/04 (sex)</div>
+        <div class="post-titulo">&quot;Tudo que a sua família precisa, em um só endereço.&quot; — Apresentação das especialidades</div>
+      </div>
+      <span class="post-formato formato-carrossel">Carrossel</span>
+    </div>
+    
+    <div class="post-divider"></div>
+    
+    <div class="post-conteudo">
+      <div class="post-conteudo-label" style="margin-top:0px">Slide 1</div><div class="post-texto">Tudo que a sua família precisa,<br>em um só endereço.</div><div class="post-conteudo-label" style="margin-top:8px">Slide 2</div><div class="post-texto">🫀 Cardiologia<br>Para o coração, com cuidado.</div><div class="post-conteudo-label" style="margin-top:8px">Slide 3</div><div class="post-texto">👶 Pediatria<br>Para os pequenos da família.</div><div class="post-conteudo-label" style="margin-top:8px">Slide 4</div><div class="post-texto">🦴 Ortopedia<br>Para quem não pode parar.</div><div class="post-conteudo-label" style="margin-top:8px">Slide 5</div><div class="post-texto">🧠 Neurologia<br>Cuidado para a mente e o sistema nervoso.</div><div class="post-conteudo-label" style="margin-top:8px">Slide 6</div><div class="post-texto">👁️ Oftalmologia<br>Com o padrão Catarata Center.</div><div class="post-conteudo-label" style="margin-top:8px">Slide 7</div><div class="post-texto">E muito mais:<br>Clínica Médica · Geriatria · Ginecologia<br>Fisioterapia · Nutrição · Laboratório · Imagens</div>
+    </div>
+    <div class="post-conteudo" style="padding-top:0">
+      <div class="post-conteudo-label">Legenda</div>
+      <div class="post-texto">Uma clínica para toda a família — do bebê ao idoso.<br>Múltiplas especialidades, um só endereço, atendimento de qualidade.<br>Agenda e disponibilidade de especialidades: confira pelo link na bio.<br>---</div>
+    </div>
+    
+    <div class="post-acoes">
+      <button class="btn-aprovar" id="aprovar-20260403-tudo-que-a-sua-familia-precisa" onclick="marcarPost('20260403-tudo-que-a-sua-familia-precisa', 'aprovado')">
+        ✓ Aprovar
+      </button>
+      <button class="btn-ajuste" id="ajuste-20260403-tudo-que-a-sua-familia-precisa" onclick="marcarPost('20260403-tudo-que-a-sua-familia-precisa', 'ajuste')">
+        ✗ Pedir ajuste
+      </button>
+    </div>
+    <div class="campo-ajuste" id="campo-20260403-tudo-que-a-sua-familia-precisa">
+      <textarea
+        id="obs-20260403-tudo-que-a-sua-familia-precisa"
+        placeholder="O que você gostaria de ajustar neste post?"
+        oninput="atualizarComentario('20260403-tudo-que-a-sua-familia-precisa', this.value)"
+        rows="3"
+      ></textarea>
+      <button class="btn-confirmar-obs" id="btnobs-20260403-tudo-que-a-sua-familia-precisa" onclick="confirmarObs('20260403-tudo-que-a-sua-familia-precisa')">
+        Registrar observação
+      </button>
+    </div>
+  </div>
+  <div class="post-card" id="card-20260404-medicos-que-tem-tempo-para-ouv" data-post-id="20260404-medicos-que-tem-tempo-para-ouv">
+    <div class="post-header">
+      <div class="post-meta">
+        <div class="post-data">04/04 (sáb)</div>
+        <div class="post-titulo">&quot;Médicos que têm tempo para ouvir.&quot; — Equipe e lado humano</div>
+      </div>
+      <span class="post-formato formato-card">Card</span>
+    </div>
+    
+    <div class="post-divider"></div>
+    
+    <div class="post-conteudo">
+      <div class="post-conteudo-label">Texto</div>
+      <div class="post-texto">Médicos que têm tempo para ouvir.<br>Porque cuidar começa pela escuta.</div>
+    </div>
+    <div class="post-conteudo" style="padding-top:0">
+      <div class="post-conteudo-label">Legenda</div>
+      <div class="post-texto">Atrás de cada consulta há uma história, uma família, uma preocupação.<br>Na Prisma Especialidades, nossos médicos foram escolhidos não só pela formação — mas pela forma como tratam cada paciente. Com atenção. Com respeito. Com cuidado real.<br>---</div>
+    </div>
+    
+    <div class="post-acoes">
+      <button class="btn-aprovar" id="aprovar-20260404-medicos-que-tem-tempo-para-ouv" onclick="marcarPost('20260404-medicos-que-tem-tempo-para-ouv', 'aprovado')">
+        ✓ Aprovar
+      </button>
+      <button class="btn-ajuste" id="ajuste-20260404-medicos-que-tem-tempo-para-ouv" onclick="marcarPost('20260404-medicos-que-tem-tempo-para-ouv', 'ajuste')">
+        ✗ Pedir ajuste
+      </button>
+    </div>
+    <div class="campo-ajuste" id="campo-20260404-medicos-que-tem-tempo-para-ouv">
+      <textarea
+        id="obs-20260404-medicos-que-tem-tempo-para-ouv"
+        placeholder="O que você gostaria de ajustar neste post?"
+        oninput="atualizarComentario('20260404-medicos-que-tem-tempo-para-ouv', this.value)"
+        rows="3"
+      ></textarea>
+      <button class="btn-confirmar-obs" id="btnobs-20260404-medicos-que-tem-tempo-para-ouv" onclick="confirmarObs('20260404-medicos-que-tem-tempo-para-ouv')">
+        Registrar observação
+      </button>
+    </div>
+  </div>
+  <div class="post-card" id="card-20260405-faltam-4-dias-contagem-regress" data-post-id="20260405-faltam-4-dias-contagem-regress">
+    <div class="post-header">
+      <div class="post-meta">
+        <div class="post-data">05/04 (dom)</div>
+        <div class="post-titulo">&quot;Faltam 4 dias.&quot; — Contagem regressiva</div>
+      </div>
+      <span class="post-formato formato-card">Card</span>
+    </div>
+    
+    <div class="post-divider"></div>
+    
+    <div class="post-conteudo">
+      <div class="post-conteudo-label">Texto</div>
+      <div class="post-texto">Faltam 4 dias.</div>
+    </div>
+    <div class="post-conteudo" style="padding-top:0">
+      <div class="post-conteudo-label">Legenda</div>
+      <div class="post-texto">A abertura está chegando. Em 4 dias, a Prisma Especialidades abre as portas para você e sua família.<br>Quer ser um dos primeiros? O link para agendamento já está na bio. 🗓️<br>---</div>
+    </div>
+    
+    <div class="post-acoes">
+      <button class="btn-aprovar" id="aprovar-20260405-faltam-4-dias-contagem-regress" onclick="marcarPost('20260405-faltam-4-dias-contagem-regress', 'aprovado')">
+        ✓ Aprovar
+      </button>
+      <button class="btn-ajuste" id="ajuste-20260405-faltam-4-dias-contagem-regress" onclick="marcarPost('20260405-faltam-4-dias-contagem-regress', 'ajuste')">
+        ✗ Pedir ajuste
+      </button>
+    </div>
+    <div class="campo-ajuste" id="campo-20260405-faltam-4-dias-contagem-regress">
+      <textarea
+        id="obs-20260405-faltam-4-dias-contagem-regress"
+        placeholder="O que você gostaria de ajustar neste post?"
+        oninput="atualizarComentario('20260405-faltam-4-dias-contagem-regress', this.value)"
+        rows="3"
+      ></textarea>
+      <button class="btn-confirmar-obs" id="btnobs-20260405-faltam-4-dias-contagem-regress" onclick="confirmarObs('20260405-faltam-4-dias-contagem-regress')">
         Registrar observação
       </button>
     </div>
@@ -904,13 +986,13 @@
     } catch(e) {}
   })();
 
-  const totalPosts = 5;
+  const totalPosts = 7;
   const nomeCliente = "Prisma Especialidades";
-  const periodo = "23 a 29 de março";
+  const periodo = "30/03 a 5/04";
   const whatsappNumero = '5551980603512';
-  const whatsappGrupo = '{{WHATSAPP_GRUPO}}';  // link do grupo (ex: https://chat.whatsapp.com/XXX)
-  const postsMeta = {"20260325-uma-nova-fase-esta-chegando-te": {"data": "25/03", "titulo": "\"Uma nova fase está chegando.\" — Teaser de abertura"}, "20260326-saude-da-familia-nao-deveria-s": {"data": "26/03", "titulo": "\"Saúde da família não deveria ser tão complicada.\" — A dor e o problema"}, "20260327-eu-sempre-quis-construir-um-lu": {"data": "27/03", "titulo": "\"Eu sempre quis construir um lugar diferente.\" — Dra. Juliana, tom pessoal"}, "20260328-em-12-dias-abrimos-as-portas-c": {"data": "28/03", "titulo": "\"Em 12 dias, abrimos as portas.\" — Contagem regressiva"}, "20260329-nasce-a-prisma-especialidades-": {"data": "29/03", "titulo": "\"Nasce a Prisma Especialidades.\" — Revelação oficial com logo"}};
-  const postsOrdem = ["20260325-uma-nova-fase-esta-chegando-te", "20260326-saude-da-familia-nao-deveria-s", "20260327-eu-sempre-quis-construir-um-lu", "20260328-em-12-dias-abrimos-as-portas-c", "20260329-nasce-a-prisma-especialidades-"];
+  const whatsappGrupo = 'https://chat.whatsapp.com/IjFPBeEKvJeAiaZBpl5xpq?mode=gi_t';  // link do grupo (ex: https://chat.whatsapp.com/XXX)
+  const postsMeta = {"20260330-um-centro-medico-pensado-para-": {"data": "30/03", "titulo": "\"Um centro médico pensado para cuidar de você e de quem você ama.\" — O conceito"}, "20260331-popular-com-qualidade-e-possiv": {"data": "31/03", "titulo": "\"Popular com qualidade. É possível.\" — O diferencial da clínica"}, "20260401-o-espaco-que-preparamos-para-v": {"data": "01/04", "titulo": "\"O espaço que preparamos para você.\" — Foto da clínica por dentro"}, "20260402-a-oftalmologia-de-excelencia-c": {"data": "02/04", "titulo": "\"A oftalmologia de excelência continua — agora como parte de algo maior.\" — Continuidade Catarata Center"}, "20260403-tudo-que-a-sua-familia-precisa": {"data": "03/04", "titulo": "\"Tudo que a sua família precisa, em um só endereço.\" — Apresentação das especialidades"}, "20260404-medicos-que-tem-tempo-para-ouv": {"data": "04/04", "titulo": "\"Médicos que têm tempo para ouvir.\" — Equipe e lado humano"}, "20260405-faltam-4-dias-contagem-regress": {"data": "05/04", "titulo": "\"Faltam 4 dias.\" — Contagem regressiva"}};
+  const postsOrdem = ["20260330-um-centro-medico-pensado-para-", "20260331-popular-com-qualidade-e-possiv", "20260401-o-espaco-que-preparamos-para-v", "20260402-a-oftalmologia-de-excelencia-c", "20260403-tudo-que-a-sua-familia-precisa", "20260404-medicos-que-tem-tempo-para-ouv", "20260405-faltam-4-dias-contagem-regress"];
   const statusPosts = {};
   const comentariosPosts = {};
 
@@ -1034,20 +1116,74 @@
     const mensagem = linhas.join('\n');
 
     if (whatsappGrupo) {
-      // Copia mensagem e abre o grupo
-      navigator.clipboard.writeText(mensagem).catch(function() {});
-      window.open(whatsappGrupo, '_blank');
+      // Mostra modal com a mensagem para o cliente copiar e abrir o grupo
+      _mensagemParaEnviar = mensagem;
+      document.getElementById('modalMensagemTexto').value = mensagem;
+      document.getElementById('btnCopiarMensagem').textContent = 'Copiar mensagem';
+      document.getElementById('btnCopiarMensagem').classList.remove('copiado');
+      document.getElementById('modalMensagem').classList.add('visivel');
     } else {
       // Fallback: abre conversa direta com a Silvana
       window.open('https://wa.me/' + whatsappNumero + '?text=' + encodeURIComponent(mensagem), '_blank');
+      // Grava aprovação no localStorage para travar a página
+      try { localStorage.setItem('aprovacao:' + location.pathname, '1'); } catch(e) {}
+      document.getElementById('telaConfirmacao').classList.add('visivel');
     }
+  }
 
+  // Variável para guardar a mensagem do modal
+  var _mensagemParaEnviar = '';
+
+  function copiarMensagemModal() {
+    var texto = document.getElementById('modalMensagemTexto').value;
+    var btn = document.getElementById('btnCopiarMensagem');
+    navigator.clipboard.writeText(texto).then(function() {
+      btn.textContent = 'Copiado! ✓';
+      btn.classList.add('copiado');
+    }).catch(function() {
+      // Fallback para browsers sem clipboard API
+      document.getElementById('modalMensagemTexto').select();
+      document.execCommand('copy');
+      btn.textContent = 'Copiado! ✓';
+      btn.classList.add('copiado');
+    });
+  }
+
+  function abrirWhatsAppModal() {
+    window.open(whatsappGrupo, '_blank');
+    fecharModalMensagem();
     // Grava aprovação no localStorage para travar a página
     try { localStorage.setItem('aprovacao:' + location.pathname, '1'); } catch(e) {}
-
     document.getElementById('telaConfirmacao').classList.add('visivel');
   }
+
+  function fecharModalMensagem() {
+    document.getElementById('modalMensagem').classList.remove('visivel');
+  }
+
+  // Fecha modal ao clicar no backdrop
+  document.getElementById('modalMensagem').addEventListener('click', function(e) {
+    if (e.target === this) fecharModalMensagem();
+  });
+
 </script>
+
+
+<!-- Modal: mensagem WhatsApp -->
+<div class="modal-mensagem" id="modalMensagem">
+  <div class="modal-mensagem-inner">
+    <div class="modal-mensagem-titulo">Enviar aprovações</div>
+    <div class="modal-mensagem-instrucao">Copie a mensagem abaixo e cole no WhatsApp do grupo.</div>
+    <textarea class="modal-mensagem-texto" id="modalMensagemTexto" readonly></textarea>
+    <button class="modal-btn-copiar" id="btnCopiarMensagem" onclick="copiarMensagemModal()">
+      Copiar mensagem
+    </button>
+    <button class="modal-btn-wpp" id="btnAbrirWpp" onclick="abrirWhatsAppModal()">
+      Abrir WhatsApp
+    </button>
+    <button class="modal-btn-fechar" onclick="fecharModalMensagem()">Fechar</button>
+  </div>
+</div>
 
 </body>
 </html>

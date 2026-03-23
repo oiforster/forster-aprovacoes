@@ -471,6 +471,21 @@
     }
     .btn-enviar:not(:disabled):hover { background: #333; }
 
+    /* JÁ APROVADA (persiste via localStorage) */
+    .tela-ja-aprovada {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: #F5F5F0;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 32px;
+      text-align: center;
+      z-index: 300;
+    }
+    .tela-ja-aprovada.visivel { display: flex; }
+
     /* CONFIRMAÇÃO */
     .tela-confirmacao {
       display: none;
@@ -518,7 +533,101 @@
       .semanas-nav { max-width: 440px; margin: 0 auto; }
       .rodape { max-width: 440px; left: 50%; transform: translateX(-50%); }
     }
-  </style>
+  
+    /* MODAL MENSAGEM WHATSAPP */
+    .modal-mensagem {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.55);
+      z-index: 400;
+      align-items: flex-end;
+      justify-content: center;
+      padding-bottom: 0;
+    }
+    .modal-mensagem.visivel { display: flex; }
+    .modal-mensagem-inner {
+      background: #fff;
+      border-radius: 20px 20px 0 0;
+      padding: 28px 24px 40px;
+      width: 100%;
+      max-width: 540px;
+      max-height: 85vh;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      animation: slideUp 0.25s ease;
+    }
+    @keyframes slideUp {
+      from { transform: translateY(60px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+    .modal-mensagem-titulo {
+      font-size: 17px;
+      font-weight: 700;
+      color: #1a1a1a;
+      text-align: center;
+    }
+    .modal-mensagem-instrucao {
+      font-size: 14px;
+      color: #666;
+      text-align: center;
+      line-height: 1.5;
+    }
+    .modal-mensagem-texto {
+      background: #f5f5f0;
+      border-radius: 12px;
+      padding: 16px;
+      font-size: 14px;
+      color: #333;
+      line-height: 1.6;
+      white-space: pre-wrap;
+      font-family: inherit;
+      border: none;
+      resize: none;
+      width: 100%;
+      box-sizing: border-box;
+      min-height: 120px;
+    }
+    .modal-btn-copiar {
+      background: #25D366;
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      padding: 16px;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      width: 100%;
+      transition: background 0.2s;
+    }
+    .modal-btn-copiar:active { background: #1ebe5a; }
+    .modal-btn-copiar.copiado { background: #1ebe5a; }
+    .modal-btn-wpp {
+      background: #fff;
+      color: #128C7E;
+      border: 2px solid #128C7E;
+      border-radius: 12px;
+      padding: 14px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      width: 100%;
+      transition: background 0.2s;
+    }
+    .modal-btn-wpp:active { background: #f0faf9; }
+    .modal-btn-fechar {
+      background: none;
+      border: none;
+      color: #999;
+      font-size: 14px;
+      cursor: pointer;
+      text-align: center;
+      padding: 4px;
+    }
+
+    </style>
 </head>
 <body>
 
@@ -835,6 +944,21 @@
   </button>
 </div>
 
+<!-- TELA JÁ APROVADA -->
+<div class="tela-ja-aprovada" id="telaJaAprovada">
+  <div class="confirmacao-icone" style="background:#1A1A1A">
+    <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+      <polyline points="20 6 9 17 4 12"></polyline>
+    </svg>
+  </div>
+  <div class="confirmacao-titulo">Tudo certo por aqui!</div>
+  <div class="confirmacao-texto">
+    Você já enviou suas aprovações desta semana.<br>
+    Quando houver novos conteúdos para revisar,<br>
+    a Silvana vai te enviar um novo link. 🙌
+  </div>
+</div>
+
 <!-- TELA DE CONFIRMAÇÃO -->
 <div class="tela-confirmacao" id="telaConfirmacao">
   <div class="confirmacao-icone">
@@ -850,10 +974,23 @@
 </div>
 
 <script>
+  // Verifica se já aprovou antes (persiste entre refreshes)
+  (function() {
+    try {
+      if (localStorage.getItem('aprovacao:' + location.pathname) === '1') {
+        document.addEventListener('DOMContentLoaded', function() {
+          var t = document.getElementById('telaJaAprovada');
+          if (t) t.classList.add('visivel');
+        });
+      }
+    } catch(e) {}
+  })();
+
   const totalPosts = 7;
   const nomeCliente = "Prisma Especialidades";
   const periodo = "30/03 a 5/04";
   const whatsappNumero = '5551980603512';
+  const whatsappGrupo = 'https://chat.whatsapp.com/IjFPBeEKvJeAiaZBpl5xpq?mode=gi_t';  // link do grupo (ex: https://chat.whatsapp.com/XXX)
   const postsMeta = {"20260330-um-centro-medico-pensado-para-": {"data": "30/03", "titulo": "\"Um centro médico pensado para cuidar de você e de quem você ama.\" — O conceito"}, "20260331-popular-com-qualidade-e-possiv": {"data": "31/03", "titulo": "\"Popular com qualidade. É possível.\" — O diferencial da clínica"}, "20260401-o-espaco-que-preparamos-para-v": {"data": "01/04", "titulo": "\"O espaço que preparamos para você.\" — Foto da clínica por dentro"}, "20260402-a-oftalmologia-de-excelencia-c": {"data": "02/04", "titulo": "\"A oftalmologia de excelência continua — agora como parte de algo maior.\" — Continuidade Catarata Center"}, "20260403-tudo-que-a-sua-familia-precisa": {"data": "03/04", "titulo": "\"Tudo que a sua família precisa, em um só endereço.\" — Apresentação das especialidades"}, "20260404-medicos-que-tem-tempo-para-ouv": {"data": "04/04", "titulo": "\"Médicos que têm tempo para ouvir.\" — Equipe e lado humano"}, "20260405-faltam-4-dias-contagem-regress": {"data": "05/04", "titulo": "\"Faltam 4 dias.\" — Contagem regressiva"}};
   const postsOrdem = ["20260330-um-centro-medico-pensado-para-", "20260331-popular-com-qualidade-e-possiv", "20260401-o-espaco-que-preparamos-para-v", "20260402-a-oftalmologia-de-excelencia-c", "20260403-tudo-que-a-sua-familia-precisa", "20260404-medicos-que-tem-tempo-para-ouv", "20260405-faltam-4-dias-contagem-regress"];
   const statusPosts = {};
@@ -977,12 +1114,76 @@
     }
 
     const mensagem = linhas.join('\n');
-    const url = 'https://wa.me/' + whatsappNumero + '?text=' + encodeURIComponent(mensagem);
-    window.open(url, '_blank');
 
+    if (whatsappGrupo) {
+      // Mostra modal com a mensagem para o cliente copiar e abrir o grupo
+      _mensagemParaEnviar = mensagem;
+      document.getElementById('modalMensagemTexto').value = mensagem;
+      document.getElementById('btnCopiarMensagem').textContent = 'Copiar mensagem';
+      document.getElementById('btnCopiarMensagem').classList.remove('copiado');
+      document.getElementById('modalMensagem').classList.add('visivel');
+    } else {
+      // Fallback: abre conversa direta com a Silvana
+      window.open('https://wa.me/' + whatsappNumero + '?text=' + encodeURIComponent(mensagem), '_blank');
+      // Grava aprovação no localStorage para travar a página
+      try { localStorage.setItem('aprovacao:' + location.pathname, '1'); } catch(e) {}
+      document.getElementById('telaConfirmacao').classList.add('visivel');
+    }
+  }
+
+  // Variável para guardar a mensagem do modal
+  var _mensagemParaEnviar = '';
+
+  function copiarMensagemModal() {
+    var texto = document.getElementById('modalMensagemTexto').value;
+    var btn = document.getElementById('btnCopiarMensagem');
+    navigator.clipboard.writeText(texto).then(function() {
+      btn.textContent = 'Copiado! ✓';
+      btn.classList.add('copiado');
+    }).catch(function() {
+      // Fallback para browsers sem clipboard API
+      document.getElementById('modalMensagemTexto').select();
+      document.execCommand('copy');
+      btn.textContent = 'Copiado! ✓';
+      btn.classList.add('copiado');
+    });
+  }
+
+  function abrirWhatsAppModal() {
+    window.open(whatsappGrupo, '_blank');
+    fecharModalMensagem();
+    // Grava aprovação no localStorage para travar a página
+    try { localStorage.setItem('aprovacao:' + location.pathname, '1'); } catch(e) {}
     document.getElementById('telaConfirmacao').classList.add('visivel');
   }
+
+  function fecharModalMensagem() {
+    document.getElementById('modalMensagem').classList.remove('visivel');
+  }
+
+  // Fecha modal ao clicar no backdrop
+  document.getElementById('modalMensagem').addEventListener('click', function(e) {
+    if (e.target === this) fecharModalMensagem();
+  });
+
 </script>
+
+
+<!-- Modal: mensagem WhatsApp -->
+<div class="modal-mensagem" id="modalMensagem">
+  <div class="modal-mensagem-inner">
+    <div class="modal-mensagem-titulo">Enviar aprovações</div>
+    <div class="modal-mensagem-instrucao">Copie a mensagem abaixo e cole no WhatsApp do grupo.</div>
+    <textarea class="modal-mensagem-texto" id="modalMensagemTexto" readonly></textarea>
+    <button class="modal-btn-copiar" id="btnCopiarMensagem" onclick="copiarMensagemModal()">
+      Copiar mensagem
+    </button>
+    <button class="modal-btn-wpp" id="btnAbrirWpp" onclick="abrirWhatsAppModal()">
+      Abrir WhatsApp
+    </button>
+    <button class="modal-btn-fechar" onclick="fecharModalMensagem()">Fechar</button>
+  </div>
+</div>
 
 </body>
 </html>
