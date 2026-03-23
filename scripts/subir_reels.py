@@ -255,6 +255,8 @@ def main():
     parser = argparse.ArgumentParser(description='Sobe Reels para YouTube como não-listados.')
     parser.add_argument('--cliente', type=str, default=None)
     parser.add_argument('--mes',     type=str, default=None)
+    parser.add_argument('--inicio',  type=str, default=None)
+    parser.add_argument('--fim',     type=str, default=None)
     args = parser.parse_args()
 
     ano_mes      = args.mes or date.today().strftime('%Y-%m')

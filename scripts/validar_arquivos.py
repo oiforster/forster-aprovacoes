@@ -310,6 +310,8 @@ def main():
     parser = argparse.ArgumentParser(description='Valida arquivos antes de gerar aprovações')
     parser.add_argument('--cliente', help='Nome do cliente (parcial aceito)')
     parser.add_argument('--mes', help='Mês no formato YYYY-MM (padrão: mês atual)')
+    parser.add_argument('--inicio', help='Início do período personalizado (YYYY-MM-DD)')
+    parser.add_argument('--fim', help='Fim do período personalizado (YYYY-MM-DD)')
     args = parser.parse_args()
 
     ano_mes = args.mes or date.today().strftime('%Y-%m')

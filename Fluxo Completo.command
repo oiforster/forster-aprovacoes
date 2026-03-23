@@ -83,23 +83,18 @@ print(segunda.strftime('%Y-%m-%d'), domingo.strftime('%Y-%m-%d'))
   3)
     read -p "  Data de início (DD/MM/AAAA ou AAAA-MM-DD): " INI_INPUT
     read -p "  Data de fim    (DD/MM/AAAA ou AAAA-MM-DD): " FIM_INPUT
-    # Normaliza para YYYY-MM-DD se vier em DD/MM/AAAA
-    PERIODO_INICIO=$(python3 -c "
-s=''
-if '/' in s:
-    d,m,a = s.split('/')
-    print(f'{a}-{m.zfill(2)}-{d.zfill(2)}')
-else:
-    print(s)
-" 2>/dev/null || echo "$INI_INPUT")
-    PERIODO_FIM=$(python3 -c "
-s=''
-if '/' in s:
-    d,m,a = s.split('/')
-    print(f'{a}-{m.zfill(2)}-{d.zfill(2)}')
-else:
-    print(s)
-" 2>/dev/null || echo "$FIM_INPUT")
+    # Normaliza DD/MM/AAAA para YYYY-MM-DD
+    normalizar_data() {
+      local d="$1"
+      if [[ "$d" == *"/"* ]]; then
+        local dia="${d%%/*}"; local resto="${d#*/}"; local mes="${resto%%/*}"; local ano="${resto#*/}"
+        printf '%s-%02d-%02d' "$ano" "$mes" "$dia"
+      else
+        echo "$d"
+      fi
+    }
+    PERIODO_INICIO=$(normalizar_data "$INI_INPUT")
+    PERIODO_FIM=$(normalizar_data "$FIM_INPUT")
     echo "  📅 Período: $PERIODO_INICIO a $PERIODO_FIM"
     echo ""
     ;;
