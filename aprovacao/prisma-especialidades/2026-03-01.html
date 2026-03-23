@@ -210,15 +210,14 @@
     /* ARTE INLINE — imagem única */
     .post-arte {
       width: 100%;
-      background: #F0F0EC;
+      background: #000;
       overflow: hidden;
     }
     .post-arte > img {
       width: 100%;
-      height: auto;
+      aspect-ratio: 3 / 4;
+      object-fit: contain;
       display: block;
-      max-height: 520px;
-      object-fit: cover;
     }
 
     /* CARROSSEL — estilo Instagram */
@@ -243,7 +242,7 @@
     }
     .carrossel-slide img {
       width: 100%;
-      aspect-ratio: 1 / 1;
+      aspect-ratio: 3 / 4;
       object-fit: contain;
       display: block;
       background: #000;
@@ -259,6 +258,32 @@
       padding: 3px 9px;
       border-radius: 20px;
       letter-spacing: 0.03em;
+    }
+    /* Setas de navegação — visíveis só em desktop (hover: hover) */
+    .carrossel-prev, .carrossel-next {
+      display: none;
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 36px;
+      height: 36px;
+      background: rgba(0,0,0,0.52);
+      color: #fff;
+      border: none;
+      border-radius: 50%;
+      font-size: 22px;
+      line-height: 1;
+      cursor: pointer;
+      align-items: center;
+      justify-content: center;
+      z-index: 10;
+      transition: background 0.15s;
+    }
+    .carrossel-prev:hover, .carrossel-next:hover { background: rgba(0,0,0,0.78); }
+    .carrossel-prev { left: 10px; }
+    .carrossel-next { right: 10px; }
+    @media (hover: hover) {
+      .carrossel-prev, .carrossel-next { display: flex; }
     }
     .carrossel-dots {
       display: flex;
@@ -521,6 +546,8 @@
       <div class="carrossel-wrapper" id="carr-20260326-saude-da-familia-nao-deveria-s">
         <div class="carrossel-track"><div class="carrossel-slide"><img src="https://lh3.googleusercontent.com/d/1sxoOkxiuz-4ok2KlaxUbXJrc5Ou8t0HO" loading="lazy" onerror="this.closest('.carrossel-slide').style.display='none'" /></div><div class="carrossel-slide"><img src="https://lh3.googleusercontent.com/d/1X_s6Kg2OGXbOhk-umdIimy4LL17L1xxE" loading="lazy" onerror="this.closest('.carrossel-slide').style.display='none'" /></div><div class="carrossel-slide"><img src="https://lh3.googleusercontent.com/d/1GyOtbw1W9S5BLw3TQcy8a3TdqTM6H1Z4" loading="lazy" onerror="this.closest('.carrossel-slide').style.display='none'" /></div><div class="carrossel-slide"><img src="https://lh3.googleusercontent.com/d/1m0hrAUY7K6zSfF7BNU-4mhFhd7b9sOdk" loading="lazy" onerror="this.closest('.carrossel-slide').style.display='none'" /></div><div class="carrossel-slide"><img src="https://lh3.googleusercontent.com/d/1twB0hzxUdkk8qIfF7wPAFCtBqjq6l1AL" loading="lazy" onerror="this.closest('.carrossel-slide').style.display='none'" /></div><div class="carrossel-slide"><img src="https://lh3.googleusercontent.com/d/1NucrbdGyqv-lM-Xfq-c1sGZ_1Zkl2_FA" loading="lazy" onerror="this.closest('.carrossel-slide').style.display='none'" /></div></div>
         <div class="carrossel-counter">1 / 6</div>
+        <button class="carrossel-prev" onclick="carrosselNav('carr-20260326-saude-da-familia-nao-deveria-s',-1)" aria-label="Anterior">&#8249;</button>
+        <button class="carrossel-next" onclick="carrosselNav('carr-20260326-saude-da-familia-nao-deveria-s', 1)" aria-label="Próximo">&#8250;</button>
       </div>
       <div class="carrossel-dots" id="dots-carr-20260326-saude-da-familia-nao-deveria-s"><span class="carrossel-dot ativa"></span><span class="carrossel-dot"></span><span class="carrossel-dot"></span><span class="carrossel-dot"></span><span class="carrossel-dot"></span><span class="carrossel-dot"></span></div>
     </div>
@@ -534,7 +561,11 @@
         counter.textContent = (idx + 1) + ' / ' + total;
         dots.forEach(function(d, i) { d.classList.toggle('ativa', i === idx); });
       });
-    })();</script>
+    })();
+    window.carrosselNav = window.carrosselNav || function(id, dir) {
+      var t = document.querySelector('#' + id + ' .carrossel-track');
+      t.scrollBy({ left: dir * t.offsetWidth, behavior: 'smooth' });
+    };</script>
     <div class="post-divider"></div>
     
     <div class="post-conteudo">

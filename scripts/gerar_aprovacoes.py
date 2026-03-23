@@ -102,24 +102,38 @@ def formatar_periodo(datas):
 
 # ─── BUSCA DE ARTES ──────────────────────────────────────────────────────────
 
-def gdrive_id_para_url(filepath):
+def gdrive_id_para_url(filepath, _tentativas=2):
     """
-    Tenta obter URL de embed do Google Drive por dois métodos:
-    1. xattr com.google.drivefs.item-id (automático, quando disponível)
-    2. xattr com.google.cloudsync.itemid (versões antigas do Drive)
-    Retorna URL ou None se nenhum método funcionar.
+    Obtém URL de embed do Google Drive via xattr do macOS.
+    Se o arquivo estiver em modo Streaming (não baixado ainda), força
+    a leitura para acionar o download e tenta de novo.
+    Retorna URL ou None.
     """
-    for xattr_key in ['com.google.drivefs.item-id', 'com.google.cloudsync.itemid']:
-        try:
-            result = subprocess.run(
-                ['xattr', '-p', xattr_key, str(filepath)],
-                capture_output=True, text=True, timeout=5
-            )
-            file_id = result.stdout.strip()
-            if file_id:
-                return f"https://lh3.googleusercontent.com/d/{file_id}"
-        except Exception:
-            pass
+    xattr_keys = ['com.google.drivefs.item-id', 'com.google.cloudsync.itemid']
+
+    for tentativa in range(_tentativas):
+        for xattr_key in xattr_keys:
+            try:
+                result = subprocess.run(
+                    ['xattr', '-p', xattr_key, str(filepath)],
+                    capture_output=True, text=True, timeout=5
+                )
+                file_id = result.stdout.strip()
+                if file_id:
+                    return f"https://lh3.googleusercontent.com/d/{file_id}"
+            except Exception:
+                pass
+
+        if tentativa == 0:
+            # Força leitura do arquivo para acionar sincronização do Drive Streaming
+            try:
+                import time
+                with open(filepath, 'rb') as f:
+                    f.read(4096)
+                time.sleep(1.5)
+            except Exception:
+                break  # arquivo inacessível — não tenta de novo
+
     return None
 
 def normalizar_url_gdrive(url):
@@ -167,6 +181,9 @@ def ler_links_md(pasta_artes):
                 raw[chave] = normalizar_url_gdrive(url)
     except Exception:
         pass
+
+    # Ignora linha de pasta (apenas documentação; xattr cuida do resto)
+    raw.pop('pasta', None)
 
     # Agrupa slides de carrossel: '25-03_1', '25-03_2' → '25-03': [url1, url2]
     links = {}
@@ -641,6 +658,8 @@ def gerar_html_post(post):
       <div class="carrossel-wrapper" id="{c_id}">
         <div class="carrossel-track">{slides_html}</div>
         <div class="carrossel-counter">1 / {total}</div>
+        <button class="carrossel-prev" onclick="carrosselNav('{c_id}',-1)" aria-label="Anterior">&#8249;</button>
+        <button class="carrossel-next" onclick="carrosselNav('{c_id}', 1)" aria-label="Próximo">&#8250;</button>
       </div>
       <div class="carrossel-dots" id="dots-{c_id}">{dots_html}</div>
     </div>
@@ -654,7 +673,11 @@ def gerar_html_post(post):
         counter.textContent = (idx + 1) + ' / ' + total;
         dots.forEach(function(d, i) {{ d.classList.toggle('ativa', i === idx); }});
       }});
-    }})();</script>'''
+    }})();
+    window.carrosselNav = window.carrosselNav || function(id, dir) {{
+      var t = document.querySelector('#' + id + ' .carrossel-track');
+      t.scrollBy({{ left: dir * t.offsetWidth, behavior: 'smooth' }});
+    }};</script>'''
         else:
             # Imagem única (ou lista de 1 elemento)
             url = arte[0] if isinstance(arte, list) else arte

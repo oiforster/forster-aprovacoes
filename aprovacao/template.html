@@ -210,15 +210,14 @@
     /* ARTE INLINE — imagem única */
     .post-arte {
       width: 100%;
-      background: #F0F0EC;
+      background: #000;
       overflow: hidden;
     }
     .post-arte > img {
       width: 100%;
-      height: auto;
+      aspect-ratio: 3 / 4;
+      object-fit: contain;
       display: block;
-      max-height: 520px;
-      object-fit: cover;
     }
 
     /* CARROSSEL — estilo Instagram */
@@ -243,7 +242,7 @@
     }
     .carrossel-slide img {
       width: 100%;
-      aspect-ratio: 1 / 1;
+      aspect-ratio: 3 / 4;
       object-fit: contain;
       display: block;
       background: #000;
@@ -259,6 +258,32 @@
       padding: 3px 9px;
       border-radius: 20px;
       letter-spacing: 0.03em;
+    }
+    /* Setas de navegação — visíveis só em desktop (hover: hover) */
+    .carrossel-prev, .carrossel-next {
+      display: none;
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 36px;
+      height: 36px;
+      background: rgba(0,0,0,0.52);
+      color: #fff;
+      border: none;
+      border-radius: 50%;
+      font-size: 22px;
+      line-height: 1;
+      cursor: pointer;
+      align-items: center;
+      justify-content: center;
+      z-index: 10;
+      transition: background 0.15s;
+    }
+    .carrossel-prev:hover, .carrossel-next:hover { background: rgba(0,0,0,0.78); }
+    .carrossel-prev { left: 10px; }
+    .carrossel-next { right: 10px; }
+    @media (hover: hover) {
+      .carrossel-prev, .carrossel-next { display: flex; }
     }
     .carrossel-dots {
       display: flex;
