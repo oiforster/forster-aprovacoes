@@ -7,14 +7,13 @@ Sistema de aprovação de conteúdo da Forster Filmes.
 
 ## Como funciona (visão geral)
 
-1. Você escreve o conteúdo do mês no Obsidian como sempre fez
-2. Quando as artes ficarem prontas, você joga os arquivos na pasta `Posts_Fixos/` da Entrega do cliente com os nomes no padrão correto
-3. Se houver Reels para subir ao YouTube, o Samuel roda o `subir_reels.py` primeiro
-4. Você abre o `Gerar Aprovações.command` (duplo clique)
-5. O sistema gera as páginas e te dá a mensagem de WhatsApp pronta
-6. Você copia e manda no WhatsApp do cliente
-7. O cliente abre o link, aprova ou pede ajuste em cada post
-8. *(em desenvolvimento)* As respostas chegam formatadas no WhatsApp de volta para você
+1. Você escreve o conteúdo do mês no Obsidian como sempre
+2. A designer entrega as artes na pasta `Posts_Fixos/` com os nomes no padrão correto
+3. O Samuel nomeia e finaliza os Reels no Final Cut
+4. Duplo clique em `Fluxo Completo.command` — o sistema faz o resto
+5. Você copia a mensagem de WhatsApp que aparece no Terminal e manda para o cliente
+6. O cliente aprova pelo link no celular
+7. A resposta chega formatada no WhatsApp (grupo do cliente ou direto com a Silvana/Samuel)
 
 ---
 
@@ -26,14 +25,14 @@ As artes ficam dentro da pasta de entrega mensal do cliente, em `Posts_Fixos/`:
 06_Entregas/
 └── 2026-04 Entrega [Cliente]/
     ├── Posts_Fixos/
-    │   ├── 07-04.jpg          ← card ou reel (post único)
+    │   ├── 07-04.jpg          ← card (post único)
     │   ├── 09-04_1.jpg        ← slide 1 do carrossel de 09/04
     │   ├── 09-04_2.jpg        ← slide 2
     │   └── 09-04_3.jpg        ← slide 3
     └── Videos/
         ├── REEL 01 – Nome do Vídeo.mov
         ├── REEL 01 – Nome do Vídeo (capa).jpg
-        └── _youtube.md        ← gerado automaticamente pelo subir_reels.py
+        └── _youtube.md        ← gerado automaticamente
 ```
 
 ### Nomenclatura das artes
@@ -42,87 +41,132 @@ As artes ficam dentro da pasta de entrega mensal do cliente, em `Posts_Fixos/`:
 |------|----------------|---------|
 | Post único (card, foto) | `DD-MM.jpg` | `07-04.jpg` |
 | Slide 1 de carrossel | `DD-MM_1.jpg` | `09-04_1.jpg` |
-| Slide 2 de carrossel | `DD-MM_2.jpg` | `09-04_2.jpg` |
-| Capa de Reel (só para upload YouTube) | `REEL NN – Nome (capa).jpg` | `REEL 01 – Dia da Mulher (capa).jpg` |
+| Slide 2 em diante | `DD-MM_N.jpg` | `09-04_2.jpg` |
+| Capa de Reel (para YouTube) | `REEL NN – Nome (capa).jpg` | `REEL 01 – Abertura (capa).jpg` |
 
 **Formatos aceitos:** `.jpg`, `.jpeg`, `.png`, `.webp`
 
-> A pasta `Posts_Fixos/` precisa estar compartilhada no Google Drive com "qualquer pessoa com o link pode visualizar". Faça isso uma vez por cliente.
+> A pasta `Posts_Fixos/` precisa estar compartilhada no Google Drive com "qualquer pessoa com o link pode visualizar". Fazer isso uma vez por cliente na primeira entrega.
 
 ---
 
-## Como linkar um Reel a um post no Obsidian
+## Como linkar um Reel a um post
 
-No arquivo de conteúdo mensal, no bloco do post que é um Reel, adicione o campo `**Vídeo:**` com o nome exato do arquivo de vídeo (sem extensão):
+No arquivo de conteúdo mensal, no bloco do post que é um Reel, preencher o campo `**Vídeo:**` com o nome exato do arquivo (sem a extensão `.mov`):
 
 ```
 #### 28/03 (Sáb) — Reel — Contagem regressiva
 
 **Vídeo:**
-REEL 12 - Dia da Mulher
+REEL 12 – Dia da Mulher
 
 **Legenda:**
 Texto da legenda aqui.
 ```
 
-O nome precisa bater exatamente com o arquivo `.mov` na pasta `Videos/`. O Samuel sobe o vídeo ao YouTube antes de você gerar as aprovações — o sistema detecta automaticamente.
+O nome precisa bater exatamente com o arquivo `.mov` na pasta `Videos/`. O Samuel sobe o vídeo ao YouTube antes de gerar as aprovações — o sistema detecta automaticamente.
 
 ---
 
-## Gerar as páginas de aprovação
+## Usar o Fluxo Completo
 
-Navegue no Finder até:
+No Finder, navegue até:
 `Google Drive → Meu Drive → Forster Filmes → CLAUDE_COWORK → Agência → _Interno → forster-aprovacoes`
 
-Dê **duplo clique** em `Gerar Aprovações.command`.
+Dê **duplo clique** em `Fluxo Completo.command`.
 
-Uma janela do Terminal vai abrir e executar o script. Aguarde até ver a mensagem de WhatsApp gerada na tela.
+Uma janela do Terminal abre e faz uma série de perguntas:
 
-Se quiser gerar apenas para um cliente específico, abra o Terminal e rode:
+**1. Para qual cliente?**
+Digite o número da lista ou o nome (parcial aceito). Enter = todos.
 
-```bash
-python3 ~/Library/CloudStorage/GoogleDrive-oiforster@gmail.com/Meu\ Drive/Forster\ Filmes/CLAUDE_COWORK/Agência/_Interno/forster-aprovacoes/scripts/gerar_aprovacoes.py --cliente "Nome do Cliente" --mes 2026-04
+**2. Qual mês?**
+Digite `2026-04` ou Enter para o mês atual.
+
+**3. Qual período para aprovação?**
 ```
+1. Próxima semana (padrão)
+2. Semana atual
+3. Período personalizado
+```
+- Opção `1` ou Enter: gera para a semana que começa na próxima segunda
+- Opção `2`: gera para a semana atual (de segunda a domingo)
+- Opção `3`: você digita a data de início e fim manualmente (aceita `23/03/2026` ou `2026-03-23`)
+
+**4. Continuar com erros?**
+Se algum arquivo de arte estiver faltando ou mal nomeado, o sistema avisa. Você pode corrigir e rodar de novo, ou digitar `s` para continuar mesmo assim (útil quando as artes de datas futuras ainda não chegaram).
+
+**5. Publicar no site?**
+Digite `s` ou Enter para publicar. O site atualiza em cerca de 30 segundos.
 
 ---
 
-## Publicar no site
+## Mensagem de WhatsApp para o cliente
 
-Após gerar as páginas, publique com este comando no Terminal:
+Após gerar as páginas, o Terminal mostra a mensagem pronta para copiar:
 
-```bash
-cd ~/Library/CloudStorage/GoogleDrive-oiforster@gmail.com/Meu\ Drive/Forster\ Filmes/CLAUDE_COWORK/Agência/_Interno/forster-aprovacoes && git add . && git commit -m "Aprovações" && git push
+```
+Olá! 😊
+
+Aqui estão os posts da semana de *30/03 a 5/04* para aprovação.
+
+👉 https://oiforster.github.io/forster-aprovacoes/aprovacao/oticas-casa-marco/
+
+Você pode aprovar cada post ou pedir ajuste com um toque. Se preferir, tem um botão para aprovar tudo de uma vez.
+
+Qualquer dúvida, é só chamar! 🙌
 ```
 
-O site atualiza em cerca de 30 segundos em:
-`https://oiforster.github.io/forster-aprovacoes/`
+Copie e envie no WhatsApp do cliente.
 
 ---
 
 ## O que o cliente vê
 
-- Lista de todos os posts da semana (ou mês) com data, título e formato
-- A arte (imagem, carrossel ou vídeo) de cada post
+- Lista de todos os posts do período com data, título e formato
+- A arte de cada post (imagem, carrossel ou vídeo)
 - A legenda que vai no Instagram
 - Botão **✓ Aprovar** ou **✗ Pedir ajuste** em cada post
-- Se pedir ajuste: campo de texto + botão "Registrar observação"
+- Se pedir ajuste: campo de texto para registrar a observação
 - Botão geral **Aprovar todos os posts**
 - Barra de progresso mostrando quantos já foram respondidos
-- Ao finalizar todos: botão **Enviar aprovações**
+- Ao finalizar: botão **Enviar aprovações**
+
+Ao clicar "Enviar aprovações":
+- A mensagem com todos os status é copiada automaticamente para o clipboard do cliente
+- O WhatsApp do grupo do cliente (ou contato da Silvana/Samuel) é aberto
+- O cliente cola e envia
+
+Depois de enviar, a página mostra: **"Tudo certo por aqui! Você já enviou suas aprovações desta semana."** — e fica bloqueada para evitar envio duplicado.
 
 ### Como o cliente assiste um Reel
 
-- **No celular:** toca na capa → abre direto no app do YouTube
-- **No computador:** toca na capa → reproduz inline na página (proporção 9:16)
+Ao tocar na capa do vídeo, um player abre por cima da página (tela cheia, proporção 9:16) com o vídeo rodando direto. Botão ✕ fecha. Funciona no celular e no computador.
+
+---
+
+## Canal de retorno por cliente
+
+| Cliente | Onde a aprovação chega |
+|---------|----------------------|
+| Óticas Casa Marco | WhatsApp da Silvana (direto) |
+| Colégio Luterano Redentor | Grupo WhatsApp |
+| Vanessa Mainardi | Grupo WhatsApp |
+| Joele Lerípio | WhatsApp do Samuel (direto) |
+| Micheline Twigger | Grupo WhatsApp |
+| Fyber Show Piscinas | Grupo WhatsApp |
+| Prisma Especialidades | Grupo WhatsApp |
+| Martina Schneider | Grupo WhatsApp |
+| Catarata Center | Grupo WhatsApp |
+| Baviera Tecnologia | WhatsApp do Samuel (direto) |
 
 ---
 
 ## Estrutura do arquivo de conteúdo mensal
 
-O script lê os dados diretamente do `.md`. A estrutura esperada é:
+O script lê os dados diretamente do `.md`. A estrutura esperada é a do template em `_Templates/Conteudo_Mensal_Template.md`. Campos obrigatórios:
 
-### Tabela de calendário (obrigatória)
-
+**Tabela de calendário:**
 ```markdown
 | Data | Formato | Título / Tema | Status |
 |------|---------|---------------|--------|
@@ -131,8 +175,7 @@ O script lê os dados diretamente do `.md`. A estrutura esperada é:
 | 28/03 Sáb | Reel | Contagem regressiva | Criado |
 ```
 
-### Seções de conteúdo detalhado
-
+**Seções de conteúdo** (padrão `#### DD/MM`):
 ```markdown
 #### 07/04 (Ter) — Card — Título do post
 
@@ -144,13 +187,10 @@ Legenda do post no Instagram.
 
 ---
 
-#### 09/04 (Qui) — Carrossel — Título do carrossel
+#### 09/04 (Qui) — Carrossel — Título
 
 **Slide 1 (Título do slide):**
 Texto do slide 1.
-
-**Slide 2 (Outro título):**
-Texto do slide 2.
 
 **Legenda:**
 Legenda do carrossel.
@@ -160,16 +200,20 @@ Legenda do carrossel.
 #### 28/03 (Sáb) — Reel — Contagem regressiva
 
 **Vídeo:**
-REEL 12 - Dia da Mulher
+REEL 12 – Dia da Mulher
 
 **Legenda:**
 Legenda do Reel.
 ```
 
-> Quando há arte, o texto do card/slides fica oculto (já está visível na arte). Só a legenda aparece.
+---
+
+## Subir apenas os Reels ao YouTube (sem gerar aprovações)
+
+Duplo clique em `Subir Reels YouTube.command`. Seleciona cliente e mês, sobe os vídeos e atualiza o `_youtube.md`.
 
 ---
 
-## Próximos passos do sistema
+## Gerar apenas as aprovações (sem validação nem YouTube)
 
-- **Retorno do cliente direto no WhatsApp:** ao enviar aprovações, o cliente vai receber um botão que gera uma mensagem formatada para mandar no WhatsApp da Silvana, com todos os status de aprovação e observações
+Duplo clique em `Gerar Aprovações.command`. Útil quando os Reels já foram subidos e você só quer regar as páginas ou republicar.
