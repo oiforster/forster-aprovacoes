@@ -592,16 +592,19 @@ def gerar_html_post(post):
     post_id = post['id']
 
     # Conteúdo principal
+    # Quando há arte (imagem ou carrossel), o texto do card/slides já está
+    # visível na própria arte — mostra só a legenda para imitar o Instagram.
+    tem_arte = bool(post.get('arte_url'))
     html_conteudo = ''
 
-    if post['texto_card']:
+    if not tem_arte and post['texto_card']:
         html_conteudo += f'''
     <div class="post-conteudo">
       <div class="post-conteudo-label">Texto</div>
       <div class="post-texto">{escape_html(post["texto_card"])}</div>
     </div>'''
 
-    if post['slides']:
+    if not tem_arte and post['slides']:
         slides_html = ''
         for i, slide in enumerate(post['slides']):
             slides_html += f'<div class="post-conteudo-label" style="margin-top:{8 if i>0 else 0}px">Slide {i+1}{" — " + slide["titulo"] if slide["titulo"] != f"Slide {i+1}" else ""}</div>'
