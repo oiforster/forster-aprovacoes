@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Aprovação de Vídeos — William Dhein</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #F5F5F0;
+      color: #1A1A1A;
+      min-height: 100vh;
+    }
+
+    /* HEADER */
+    .header {
+      background: #1A1A1A;
+      color: #fff;
+      padding: 20px 20px 16px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .header-label {
+      font-size: 11px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #999;
+      margin-bottom: 4px;
+    }
+    .header-cliente {
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+    .header-periodo {
+      font-size: 13px;
+      color: #aaa;
+      margin-top: 3px;
+    }
+    .header-progress {
+      margin-top: 12px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .progress-bar-bg {
+      flex: 1;
+      height: 4px;
+      background: #333;
+      border-radius: 2px;
+      overflow: hidden;
+    }
+    .progress-bar-fill {
+      height: 100%;
+      background: #4CAF50;
+      border-radius: 2px;
+      width: 0%;
+      transition: width 0.3s ease;
+    }
+    .progress-text {
+      font-size: 12px;
+      color: #aaa;
+      white-space: nowrap;
+    }
+
+    /* APROVAR TUDO */
+    .aprovar-tudo-container {
+      padding: 16px 16px 8px;
+    }
+    .btn-aprovar-tudo {
+      width: 100%;
+      padding: 14px;
+      background: #1A1A1A;
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      font-size: 15px;
+      font-weight: 600;
+      letter-spacing: 0.01em;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .btn-aprovar-tudo:hover { background: #333; }
+    .btn-aprovar-tudo.ativo { background: #4CAF50; }
+
+    /* LISTA DE VÍDEOS */
+    .posts-lista {
+      padding: 8px 16px 120px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    /* CARD DE VÍDEO */
+    .post-card {
+      background: #fff;
+      border-radius: 14px;
+      overflow: hidden;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.07);
+      transition: box-shadow 0.2s, opacity 0.2s;
+    }
+    .post-card.aprovado { box-shadow: 0 0 0 2px #4CAF50; }
+    .post-card.ajuste   { box-shadow: 0 0 0 2px #FF5722; }
+
+    .post-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 14px 14px 10px;
+    }
+    .post-meta { flex: 1; min-width: 0; }
+
+    .video-numero {
+      display: inline-block;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: #888;
+      margin-bottom: 4px;
+    }
+
+    .post-titulo {
+      font-size: 15px;
+      font-weight: 600;
+      line-height: 1.35;
+      word-break: break-word;
+    }
+
+    .video-contexto {
+      margin: 0 14px 12px;
+      font-size: 13px;
+      color: #555;
+      line-height: 1.5;
+      padding: 10px 12px;
+      background: #F8F8F5;
+      border-radius: 8px;
+      border-left: 3px solid #ddd;
+    }
+
+    .post-formato {
+      flex-shrink: 0;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      padding: 4px 8px;
+      border-radius: 6px;
+    }
+    .formato-reels { background: #FFF3E0; color: #E65100; }
+
+    /* PLAYER YOUTUBE */
+    .post-arte {
+      width: 100%;
+      aspect-ratio: 9/16;
+      overflow: hidden;
+      background: #000;
+      position: relative;
+    }
+    .youtube-facade {
+      width: 100%;
+      height: 100%;
+      position: relative;
+      cursor: pointer;
+    }
+    .youtube-facade img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    .yt-play-btn {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+    }
+    .sem-video {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #F0F0EC;
+    }
+    .sem-video-label {
+      font-size: 13px;
+      color: #999;
+      padding: 20px;
+      text-align: center;
+    }
+
+    .post-divider {
+      height: 1px;
+      background: #F0F0EC;
+      margin: 0 14px;
+    }
+
+    /* AÇÕES */
+    .post-acoes {
+      display: flex;
+      gap: 10px;
+      padding: 12px 14px;
+    }
+    .btn-aprovar, .btn-ajuste {
+      flex: 1;
+      padding: 11px 8px;
+      border: 2px solid;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s;
+      background: transparent;
+    }
+    .btn-aprovar {
+      border-color: #4CAF50;
+      color: #4CAF50;
+    }
+    .btn-aprovar.ativo {
+      background: #4CAF50;
+      color: #fff;
+    }
+    .btn-ajuste {
+      border-color: #FF5722;
+      color: #FF5722;
+    }
+    .btn-ajuste.ativo {
+      background: #FF5722;
+      color: #fff;
+    }
+
+    .campo-ajuste {
+      display: none;
+      padding: 0 14px 14px;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .campo-ajuste.visivel { display: flex; }
+    .campo-ajuste textarea {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1.5px solid #E0E0E0;
+      border-radius: 8px;
+      font-size: 14px;
+      font-family: inherit;
+      resize: vertical;
+      min-height: 80px;
+    }
+    .campo-ajuste textarea:focus {
+      outline: none;
+      border-color: #FF5722;
+    }
+    .btn-confirmar-obs {
+      align-self: flex-end;
+      padding: 8px 16px;
+      background: #1A1A1A;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    /* FOOTER */
+    .footer-enviar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: 12px 16px 20px;
+      background: #fff;
+      box-shadow: 0 -1px 0 rgba(0,0,0,0.08);
+    }
+    .btn-enviar {
+      width: 100%;
+      padding: 15px;
+      background: #25D366;
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .btn-enviar:hover { background: #1ebe5d; }
+    .btn-enviar:disabled {
+      background: #ccc;
+      cursor: default;
+    }
+    .footer-pendente {
+      font-size: 12px;
+      color: #999;
+      text-align: center;
+      margin-top: 6px;
+    }
+
+    /* OVERLAY YOUTUBE */
+    #yt-overlay {
+      position: fixed;
+      inset: 0;
+      background: #000;
+      z-index: 500;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+</style>
+</head>
+<body>
+
+  <div class="header">
+    <div class="header-label">Aprovação de Vídeos</div>
+    <div class="header-cliente">William Dhein</div>
+    <div class="header-periodo">março de 2026</div>
+    <div class="header-progress">
+      <div class="progress-bar-bg">
+        <div class="progress-bar-fill" id="progress-fill"></div>
+      </div>
+      <span class="progress-text" id="progress-text">0 / 4</span>
+    </div>
+  </div>
+
+  <div class="aprovar-tudo-container">
+    <button class="btn-aprovar-tudo" id="btn-aprovar-tudo" onclick="aprovarTudo()">
+      ✓ Aprovar todos os vídeos
+    </button>
+  </div>
+
+  <div class="posts-lista">
+    
+<div class="post-card" id="card-reel-01" data-video-id="reel-01">
+  <div class="post-header">
+    <div class="post-meta">
+      <div class="video-numero">REEL 01</div>
+      <div class="post-titulo">Quem é o Dr. William</div>
+    </div>
+    <span class="post-formato formato-reels">Vídeo</span>
+  </div>
+  <div class="post-arte">
+    <div class="youtube-facade" id="ytf-reel-01" onclick="abrirVideo('szcj1yVBDJw','ytf-reel-01')">
+      <img
+        src="https://img.youtube.com/vi/szcj1yVBDJw/maxresdefault.jpg"
+        onerror="this.src='https://img.youtube.com/vi/szcj1yVBDJw/hqdefault.jpg'"
+        alt="Quem é o Dr. William"
+      />
+      <div class="yt-play-btn">
+        <svg viewBox="0 0 68 48" width="68" height="48">
+          <path d="M66.5 7.7a8.5 8.5 0 0 0-6-6C56 0 34 0 34 0S12 0 7.5 1.7a8.5 8.5 0 0 0-6 6C0 14.3 0 24 0 24s0 9.7 1.5 16.3a8.5 8.5 0 0 0 6 6C12 48 34 48 34 48s22 0 26.5-1.7a8.5 8.5 0 0 0 6-6C68 33.7 68 24 68 24s0-9.7-1.5-16.3z" fill="rgba(0,0,0,0.7)"/>
+          <path d="M45 24 27 14v20z" fill="white"/>
+        </svg>
+      </div>
+    </div>
+  </div>
+  <div class="post-divider"></div>
+  <div class="post-acoes">
+    <button class="btn-aprovar" id="aprovar-reel-01" onclick="marcarVideo('reel-01', 'aprovado')">✓ Aprovar</button>
+    <button class="btn-ajuste"  id="ajuste-reel-01"  onclick="marcarVideo('reel-01', 'ajuste')">✗ Pedir ajuste</button>
+  </div>
+  <div class="campo-ajuste" id="campo-reel-01">
+    <textarea id="obs-reel-01" placeholder="O que você gostaria de ajustar neste vídeo?"
+      oninput="atualizarObs('reel-01', this.value)" rows="3"></textarea>
+    <button class="btn-confirmar-obs" id="btnobs-reel-01" onclick="confirmarObs('reel-01')">
+      Registrar observação
+    </button>
+  </div>
+</div>
+<div class="post-card" id="card-reel-02" data-video-id="reel-02">
+  <div class="post-header">
+    <div class="post-meta">
+      <div class="video-numero">REEL 02</div>
+      <div class="post-titulo">O que é Osteopatia</div>
+    </div>
+    <span class="post-formato formato-reels">Vídeo</span>
+  </div>
+  <div class="post-arte">
+    <div class="youtube-facade" id="ytf-reel-02" onclick="abrirVideo('5xE2mK4W8qU','ytf-reel-02')">
+      <img
+        src="https://img.youtube.com/vi/5xE2mK4W8qU/maxresdefault.jpg"
+        onerror="this.src='https://img.youtube.com/vi/5xE2mK4W8qU/hqdefault.jpg'"
+        alt="O que é Osteopatia"
+      />
+      <div class="yt-play-btn">
+        <svg viewBox="0 0 68 48" width="68" height="48">
+          <path d="M66.5 7.7a8.5 8.5 0 0 0-6-6C56 0 34 0 34 0S12 0 7.5 1.7a8.5 8.5 0 0 0-6 6C0 14.3 0 24 0 24s0 9.7 1.5 16.3a8.5 8.5 0 0 0 6 6C12 48 34 48 34 48s22 0 26.5-1.7a8.5 8.5 0 0 0 6-6C68 33.7 68 24 68 24s0-9.7-1.5-16.3z" fill="rgba(0,0,0,0.7)"/>
+          <path d="M45 24 27 14v20z" fill="white"/>
+        </svg>
+      </div>
+    </div>
+  </div>
+  <div class="post-divider"></div>
+  <div class="post-acoes">
+    <button class="btn-aprovar" id="aprovar-reel-02" onclick="marcarVideo('reel-02', 'aprovado')">✓ Aprovar</button>
+    <button class="btn-ajuste"  id="ajuste-reel-02"  onclick="marcarVideo('reel-02', 'ajuste')">✗ Pedir ajuste</button>
+  </div>
+  <div class="campo-ajuste" id="campo-reel-02">
+    <textarea id="obs-reel-02" placeholder="O que você gostaria de ajustar neste vídeo?"
+      oninput="atualizarObs('reel-02', this.value)" rows="3"></textarea>
+    <button class="btn-confirmar-obs" id="btnobs-reel-02" onclick="confirmarObs('reel-02')">
+      Registrar observação
+    </button>
+  </div>
+</div>
+<div class="post-card" id="card-reel-03" data-video-id="reel-03">
+  <div class="post-header">
+    <div class="post-meta">
+      <div class="video-numero">REEL 03</div>
+      <div class="post-titulo">Fisioterapia e Especialidades</div>
+    </div>
+    <span class="post-formato formato-reels">Vídeo</span>
+  </div>
+  <div class="post-arte">
+    <div class="youtube-facade" id="ytf-reel-03" onclick="abrirVideo('2zxWSXstb0I','ytf-reel-03')">
+      <img
+        src="https://img.youtube.com/vi/2zxWSXstb0I/maxresdefault.jpg"
+        onerror="this.src='https://img.youtube.com/vi/2zxWSXstb0I/hqdefault.jpg'"
+        alt="Fisioterapia e Especialidades"
+      />
+      <div class="yt-play-btn">
+        <svg viewBox="0 0 68 48" width="68" height="48">
+          <path d="M66.5 7.7a8.5 8.5 0 0 0-6-6C56 0 34 0 34 0S12 0 7.5 1.7a8.5 8.5 0 0 0-6 6C0 14.3 0 24 0 24s0 9.7 1.5 16.3a8.5 8.5 0 0 0 6 6C12 48 34 48 34 48s22 0 26.5-1.7a8.5 8.5 0 0 0 6-6C68 33.7 68 24 68 24s0-9.7-1.5-16.3z" fill="rgba(0,0,0,0.7)"/>
+          <path d="M45 24 27 14v20z" fill="white"/>
+        </svg>
+      </div>
+    </div>
+  </div>
+  <div class="post-divider"></div>
+  <div class="post-acoes">
+    <button class="btn-aprovar" id="aprovar-reel-03" onclick="marcarVideo('reel-03', 'aprovado')">✓ Aprovar</button>
+    <button class="btn-ajuste"  id="ajuste-reel-03"  onclick="marcarVideo('reel-03', 'ajuste')">✗ Pedir ajuste</button>
+  </div>
+  <div class="campo-ajuste" id="campo-reel-03">
+    <textarea id="obs-reel-03" placeholder="O que você gostaria de ajustar neste vídeo?"
+      oninput="atualizarObs('reel-03', this.value)" rows="3"></textarea>
+    <button class="btn-confirmar-obs" id="btnobs-reel-03" onclick="confirmarObs('reel-03')">
+      Registrar observação
+    </button>
+  </div>
+</div>
+<div class="post-card" id="card-reel-04" data-video-id="reel-04">
+  <div class="post-header">
+    <div class="post-meta">
+      <div class="video-numero">REEL 04</div>
+      <div class="post-titulo">Como Funcionam os Atendimentos</div>
+    </div>
+    <span class="post-formato formato-reels">Vídeo</span>
+  </div>
+  <div class="post-arte">
+    <div class="youtube-facade" id="ytf-reel-04" onclick="abrirVideo('hrXvFrH3dYs','ytf-reel-04')">
+      <img
+        src="https://img.youtube.com/vi/hrXvFrH3dYs/maxresdefault.jpg"
+        onerror="this.src='https://img.youtube.com/vi/hrXvFrH3dYs/hqdefault.jpg'"
+        alt="Como Funcionam os Atendimentos"
+      />
+      <div class="yt-play-btn">
+        <svg viewBox="0 0 68 48" width="68" height="48">
+          <path d="M66.5 7.7a8.5 8.5 0 0 0-6-6C56 0 34 0 34 0S12 0 7.5 1.7a8.5 8.5 0 0 0-6 6C0 14.3 0 24 0 24s0 9.7 1.5 16.3a8.5 8.5 0 0 0 6 6C12 48 34 48 34 48s22 0 26.5-1.7a8.5 8.5 0 0 0 6-6C68 33.7 68 24 68 24s0-9.7-1.5-16.3z" fill="rgba(0,0,0,0.7)"/>
+          <path d="M45 24 27 14v20z" fill="white"/>
+        </svg>
+      </div>
+    </div>
+  </div>
+  <div class="post-divider"></div>
+  <div class="post-acoes">
+    <button class="btn-aprovar" id="aprovar-reel-04" onclick="marcarVideo('reel-04', 'aprovado')">✓ Aprovar</button>
+    <button class="btn-ajuste"  id="ajuste-reel-04"  onclick="marcarVideo('reel-04', 'ajuste')">✗ Pedir ajuste</button>
+  </div>
+  <div class="campo-ajuste" id="campo-reel-04">
+    <textarea id="obs-reel-04" placeholder="O que você gostaria de ajustar neste vídeo?"
+      oninput="atualizarObs('reel-04', this.value)" rows="3"></textarea>
+    <button class="btn-confirmar-obs" id="btnobs-reel-04" onclick="confirmarObs('reel-04')">
+      Registrar observação
+    </button>
+  </div>
+</div>
+  </div>
+
+  <div class="footer-enviar">
+    <button class="btn-enviar" id="btn-enviar" onclick="enviarWhatsApp()" disabled>
+      Enviar resposta via WhatsApp
+    </button>
+    <div class="footer-pendente" id="footer-pendente">Revise todos os vídeos antes de enviar.</div>
+  </div>
+
+  <div id="yt-overlay"></div>
+
+  <script>
+    var TOTAL = 4;
+    var estados = {};
+    var observacoes = {};
+
+    function atualizar() {
+      var revisados = Object.keys(estados).length;
+      var pct = TOTAL > 0 ? (revisados / TOTAL * 100) : 0;
+      document.getElementById('progress-fill').style.width = pct + '%';
+      document.getElementById('progress-text').textContent = revisados + ' / ' + TOTAL;
+
+      var todos = revisados === TOTAL;
+      var btnEnviar = document.getElementById('btn-enviar');
+      var pendente  = document.getElementById('footer-pendente');
+      btnEnviar.disabled = !todos;
+      pendente.style.display = todos ? 'none' : 'block';
+
+      var tudo = document.getElementById('btn-aprovar-tudo');
+      var todosAprovados = Object.values(estados).every(function(e) { return e === 'aprovado'; });
+      tudo.classList.toggle('ativo', todos && todosAprovados);
+    }
+
+    function marcarVideo(id, estado) {
+      var card    = document.getElementById('card-' + id);
+      var btnApr  = document.getElementById('aprovar-' + id);
+      var btnAjt  = document.getElementById('ajuste-' + id);
+      var campo   = document.getElementById('campo-' + id);
+
+      if (estados[id] === estado) {
+        delete estados[id];
+        card.classList.remove('aprovado', 'ajuste');
+        btnApr.classList.remove('ativo');
+        btnAjt.classList.remove('ativo');
+        campo.classList.remove('visivel');
+      } else {
+        estados[id] = estado;
+        card.classList.remove('aprovado', 'ajuste');
+        btnApr.classList.remove('ativo');
+        btnAjt.classList.remove('ativo');
+        card.classList.add(estado);
+        if (estado === 'aprovado') btnApr.classList.add('ativo');
+        if (estado === 'ajuste')   btnAjt.classList.add('ativo');
+        campo.classList.toggle('visivel', estado === 'ajuste');
+      }
+      atualizar();
+    }
+
+    function atualizarObs(id, valor) {
+      observacoes[id] = valor;
+    }
+
+    function confirmarObs(id) {
+      var txt = document.getElementById('obs-' + id).value.trim();
+      if (!txt) { alert('Escreva uma observação antes de confirmar.'); return; }
+      observacoes[id] = txt;
+      var btn = document.getElementById('btnobs-' + id);
+      btn.textContent = '✓ Registrado';
+      btn.style.background = '#4CAF50';
+      setTimeout(function() {
+        btn.textContent = 'Registrar observação';
+        btn.style.background = '';
+      }, 2000);
+    }
+
+    function aprovarTudo() {
+      var ids = ["reel-01", "reel-02", "reel-03", "reel-04"];
+      ids.forEach(function(id) {
+        if (estados[id] !== 'aprovado') marcarVideo(id, 'aprovado');
+      });
+    }
+
+    function abrirVideo(ytId, facadeId) {
+      var overlay = document.getElementById('yt-overlay');
+      var ifr = document.getElementById('yt-iframe');
+      if (!ifr) {
+        var closeBtn = document.createElement('button');
+        closeBtn.innerHTML = '&#10005;';
+        closeBtn.style.cssText = 'position:absolute;top:16px;right:16px;z-index:10;background:rgba(255,255,255,0.15);color:#fff;border:none;border-radius:50%;width:44px;height:44px;font-size:20px;cursor:pointer;';
+        closeBtn.onclick = function() {
+          overlay.style.display = 'none';
+          document.getElementById('yt-iframe').src = '';
+        };
+        ifr = document.createElement('iframe');
+        ifr.id = 'yt-iframe';
+        ifr.style.cssText = 'width:100%;height:100%;border:none;';
+        ifr.setAttribute('allow','accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen');
+        ifr.setAttribute('allowfullscreen','');
+        overlay.appendChild(closeBtn);
+        overlay.appendChild(ifr);
+      }
+      ifr.src = 'https://www.youtube.com/embed/' + ytId + '?autoplay=1&rel=0&modestbranding=1&playsinline=1';
+      overlay.style.display = 'flex';
+    }
+
+    function enviarWhatsApp() {
+      var cliente = 'William Dhein';
+      var mes     = 'março de 2026';
+      var url     = 'https://oiforster.github.io/forster-aprovacoes/aprovacao/william-dhein/2026-03.html';
+
+      var ids = ["reel-01", "reel-02", "reel-03", "reel-04"];
+      var linhas = [
+        '✅ *Aprovação de Vídeos — ' + cliente + ' — ' + mes + '*',
+        ''
+      ];
+
+      ids.forEach(function(id) {
+        var card  = document.getElementById('card-' + id);
+        var titulo = card.querySelector('.post-titulo').textContent;
+        var estado = estados[id];
+        var obs    = observacoes[id] || '';
+        if (estado === 'aprovado') {
+          linhas.push('✓ ' + titulo + ' — *Aprovado*');
+        } else if (estado === 'ajuste') {
+          linhas.push('✗ ' + titulo + ' — *Ajuste solicitado*');
+          if (obs) linhas.push('  → ' + obs);
+        }
+      });
+
+      linhas.push('');
+      linhas.push('🔗 ' + url);
+
+      var msg = linhas.join('\n');
+      var link = 'https://wa.me/message/O6NXY5T2OHTZO1';
+      var sep = link.includes('?') ? '&' : '?';
+      window.open(link + sep + 'text=' + encodeURIComponent(msg), '_blank');
+    }
+
+    document.addEventListener('DOMContentLoaded', atualizar);
+</script>
+</body>
+</html>
