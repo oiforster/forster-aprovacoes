@@ -208,13 +208,46 @@ def ler_links_md(pasta_artes):
 
     return links
 
+def ler_youtube_id(pasta_videos, prefixo):
+    """Lê _youtube.md e retorna o video ID para DD-MM, ou None."""
+    arquivo = pasta_videos / '_youtube.md'
+    if not arquivo.exists():
+        return None
+    with open(arquivo, 'r', encoding='utf-8') as f:
+        for linha in f:
+            linha = linha.strip()
+            if ':' not in linha or linha.startswith('#'):
+                continue
+            chave, url = linha.split(':', 1)
+            if chave.strip().lower() == prefixo.lower():
+                m = re.search(r'(?:youtu\.be/|[?&]v=)([a-zA-Z0-9_\-]{11})', url)
+                if m:
+                    return m.group(1)
+    return None
+
+def encontrar_pasta_entrega(data, pasta_cliente):
+    """
+    Encontra a pasta 06_Entregas/YYYY-MM* do mês correspondente.
+    Retorna (pasta_posts_fixos, pasta_videos) ou (None, None).
+    """
+    pasta_entregas = pasta_cliente / '06_Entregas'
+    if not pasta_entregas.exists():
+        return None, None
+
+    prefixo_mes = data.strftime('%Y-%m')
+    for entry in pasta_entregas.iterdir():
+        if entry.is_dir() and entry.name.startswith(prefixo_mes):
+            return entry / 'Posts_Fixos', entry / 'Videos'
+
+    return None, None
+
 def encontrar_arte(data, pasta_estrategia):
     """
-    Procura arte para um post em 04_Estratégia/_Artes/YYYY-MM/
+    Procura arte para um post em:
+        06_Entregas/YYYY-MM Entrega [Cliente]/Posts_Fixos/
 
-    Ordem de prioridade:
-    1. xattr do Google Drive no arquivo local (automático)
-    2. _links.md na pasta _Artes/YYYY-MM/ (fallback manual)
+    Fallback (estrutura antiga):
+        04_Estratégia/_Artes/YYYY-MM/
 
     Nomenclatura:
         Imagem única:  DD-MM.jpg
@@ -225,7 +258,15 @@ def encontrar_arte(data, pasta_estrategia):
         list  → lista de URLs para carrossel
         None  → sem arte
     """
-    pasta_artes = pasta_estrategia / '_Artes' / data.strftime('%Y-%m')
+    # Caminho principal: 06_Entregas/YYYY-MM*/Posts_Fixos/
+    pasta_cliente = pasta_estrategia.parent
+    pasta_posts_fixos, _ = encontrar_pasta_entrega(data, pasta_cliente)
+
+    if pasta_posts_fixos and pasta_posts_fixos.exists():
+        pasta_artes = pasta_posts_fixos
+    else:
+        # Fallback: estrutura antiga em 04_Estratégia/_Artes/YYYY-MM/
+        pasta_artes = pasta_estrategia / '_Artes' / data.strftime('%Y-%m')
 
     if not pasta_artes.exists():
         return None
@@ -465,12 +506,26 @@ def parse_conteudo_mensal(arquivo_path, datas_semana=None, pasta_estrategia=None
 
         post_id = f"{data.strftime('%Y%m%d')}-{slugify(info['titulo'])[:30]}"
 
-        # Busca arte automaticamente na pasta _Artes/
-        arte_url = None
+        # Busca arte (Posts_Fixos) e caminho de vídeo (Videos)
+        arte_url   = None
+        video_path = None
+        youtube_id = None
         if pasta_estrategia:
             arte_url = encontrar_arte(data, pasta_estrategia)
             if arte_url:
                 print(f"    🖼️  Arte encontrada para {data.strftime('%d/%m')}")
+            # Busca YouTube ID na pasta Videos/_youtube.md
+            _, pasta_videos = encontrar_pasta_entrega(data, pasta_estrategia.parent)
+            if pasta_videos and pasta_videos.exists():
+                prefixo = data.strftime('%d-%m')
+                youtube_id = ler_youtube_id(pasta_videos, prefixo)
+                if youtube_id:
+                    print(f"    🎬  Reel YouTube encontrado para {data.strftime('%d/%m')}")
+                for ext in ['.mp4', '.mov', '.m4v']:
+                    candidato = pasta_videos / f"{prefixo}{ext}"
+                    if candidato.exists():
+                        video_path = str(candidato)
+                        break
 
         posts.append({
             'id': post_id,
@@ -484,6 +539,8 @@ def parse_conteudo_mensal(arquivo_path, datas_semana=None, pasta_estrategia=None
             'slides': slides,
             'media_link': media_link,
             'arte_url': arte_url,
+            'youtube_id': youtube_id,   # ID do YouTube para embed (Reels)
+            'video_path': video_path,   # caminho local do Reel (para upload)
         })
 
     return posts
@@ -645,9 +702,25 @@ def gerar_html_post(post):
       <div class="post-texto" style="color:#aaa;font-style:italic">Conteúdo detalhado não disponível neste arquivo.</div>
     </div>'''
 
-    # Arte inline (imagem única ou carrossel)
+    # Embed YouTube (Reels) — prioridade sobre arte estática
     html_arte = ''
-    arte = post.get('arte_url')
+    if post.get('youtube_id'):
+        yt_id = post['youtube_id']
+        html_arte = f'''
+    <div class="post-arte">
+      <div class="youtube-wrapper">
+        <iframe
+          src="https://www.youtube.com/embed/{yt_id}?rel=0&modestbranding=1&playsinline=1"
+          frameborder="0"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowfullscreen
+          loading="lazy"
+        ></iframe>
+      </div>
+    </div>'''
+
+    # Arte inline (imagem única ou carrossel) — só se não há YouTube
+    arte = post.get('arte_url') if not html_arte else None
     if arte:
         if isinstance(arte, list) and len(arte) > 1:
             # Carrossel estilo Instagram

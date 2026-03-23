@@ -116,10 +116,10 @@
 
     /* POSTS */
     .posts-container {
-      padding: 8px 16px 100px;
+      padding: 16px 16px 100px;
       display: flex;
       flex-direction: column;
-      gap: 16px;
+      gap: 28px;
     }
 
     .post-card {
@@ -212,6 +212,21 @@
       width: 100%;
       background: #000;
       overflow: hidden;
+    }
+
+    /* PLAYER YOUTUBE — proporção 9:16 (Reel vertical) */
+    .youtube-wrapper {
+      position: relative;
+      width: 100%;
+      padding-bottom: 177.78%; /* 16/9 invertido */
+      height: 0;
+      background: #000;
+    }
+    .youtube-wrapper iframe {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      border: none;
     }
     .post-arte > img {
       width: 100%;

@@ -7,7 +7,7 @@ Sistema de aprovação de conteúdo da Forster Filmes. Este guia cobre tudo que 
 ## Como funciona (visão geral)
 
 1. Você escreve o conteúdo do mês no Obsidian como sempre fez
-2. Quando as artes ficarem prontas, você joga os arquivos numa pasta `_Artes/` com nome no padrão `DD-MM.jpg`
+2. Quando as artes ficarem prontas, você joga os arquivos na pasta `_Artes/` com os nomes no padrão correto
 3. Você abre o arquivo `Gerar Aprovações.command` (duplo clique)
 4. O sistema gera as páginas e te dá a mensagem de WhatsApp pronta
 5. Você copia e manda no WhatsApp do cliente
@@ -41,30 +41,43 @@ O texto que vai aparecer na arte.
 A legenda do post no Instagram.
 ```
 
-> O sistema extrai automaticamente o texto e a legenda para mostrar ao cliente.
+> Quando há arte, o sistema mostra só a legenda — o texto do card já está visível na própria arte.
 
 ---
 
 ### 2. Adicionar as artes (quando prontas)
 
-Dentro da pasta `04_Estratégia/` do cliente, crie a pasta `_Artes/YYYY-MM/` e jogue os arquivos com o nome no padrão **DD-MM.jpg**:
+Dentro da pasta `04_Estratégia/` do cliente, crie a pasta `_Artes/YYYY-MM/` e jogue os arquivos com os nomes no padrão correto.
+
+#### Post único (card, reels, vídeo)
+
+Um arquivo por data, nomeado `DD-MM.jpg`:
 
 ```
-04_Estratégia/
-├── 2026-04 — Conteúdo Mensal Prisma Especialidades.md
-└── _Artes/
-    └── 2026-04/
-        ├── 07-04.jpg    ← arte do post de 07/04
-        ├── 08-04.jpg    ← arte do post de 08/04
-        └── 09-04.jpg
+_Artes/2026-04/
+├── 07-04.jpg    ← arte do post de 07/04
+├── 08-04.jpg    ← arte do post de 08/04
+└── 10-04.jpg
 ```
 
-**Regras de nomenclatura:**
-- Um post por dia: `07-04.jpg`
-- Dois posts no mesmo dia: `07-04-1.jpg` e `07-04-2.jpg`
-- Formatos aceitos: `.jpg`, `.jpeg`, `.png`, `.webp`
+#### Carrossel
 
-> **Importante:** a pasta `_Artes/` precisa estar compartilhada no Google Drive com "qualquer pessoa com o link pode visualizar". Faça isso uma vez só por cliente — clique direito na pasta `_Artes/` no Drive → Compartilhar → Qualquer pessoa com o link.
+Um arquivo por slide, com `_1`, `_2`, `_3`... no final:
+
+```
+_Artes/2026-04/
+├── 09-04_1.jpg    ← slide 1 do carrossel de 09/04
+├── 09-04_2.jpg    ← slide 2
+├── 09-04_3.jpg    ← slide 3
+├── 09-04_4.jpg    ← slide 4
+└── 09-04_5.jpg    ← slide 5
+```
+
+O sistema detecta automaticamente que é um carrossel e exibe as imagens com a navegação de slides (igual ao Instagram), com flechinhas no desktop e deslize no celular.
+
+**Formatos aceitos:** `.jpg`, `.jpeg`, `.png`, `.webp`
+
+> **Importante:** a pasta `_Artes/` precisa estar compartilhada no Google Drive com "qualquer pessoa com o link pode visualizar". Faça isso uma vez só por cliente — clique direito na pasta `_Artes/` no Finder → Compartilhar → Qualquer pessoa com o link → Leitor.
 
 ---
 
@@ -140,7 +153,10 @@ git add . && git commit -m "Aprovações" && git push
 Peça para ele tentar no Chrome ou Safari. O link funciona em qualquer celular, sem precisar de login.
 
 **O post apareceu sem a imagem.**
-A arte pode não estar na pasta `_Artes/` com o nome correto, ou a pasta não está compartilhada publicamente no Drive. Verifique o nome do arquivo (ex: `07-04.jpg`) e as permissões da pasta.
+Verifique se o arquivo está na pasta `_Artes/YYYY-MM/` com o nome correto (ex: `07-04.jpg` ou `07-04_1.jpg`). Verifique também se a pasta `_Artes/` está compartilhada publicamente no Drive.
+
+**Os slides do carrossel apareceram na ordem errada.**
+Os slides são ordenados pelo nome do arquivo. Certifique-se que a numeração está correta: `09-04_1.jpg`, `09-04_2.jpg`, `09-04_3.jpg`...
 
 **O sistema não encontrou posts para um cliente.**
 Verifique se o arquivo `YYYY-MM — Conteúdo Mensal [Cliente].md` existe na pasta `04_Estratégia/` do cliente e se tem a tabela de calendário com datas no formato `DD/MM`.
