@@ -1,9 +1,10 @@
 # Sistema de Aprovação de Conteúdo — Documentação Técnica
 
-**Projeto:** forster-aprovacoes
-**Criado em:** março de 2026
-**Repositório:** https://github.com/oiforster/forster-aprovacoes
-**Site:** https://forster-aprovacoes.netlify.app
+**Projeto:** forster-aprovacoes  
+**Criado em:** março de 2026  
+**Repositório:** https://github.com/oiforster/forster-aprovacoes  
+**Site:** https://oiforster.github.io/forster-aprovacoes  
+**Última atualização:** março de 2026
 
 ---
 
@@ -11,18 +12,18 @@
 
 A Forster Filmes aprovava postagens com clientes via grupo de WhatsApp — prático para o cliente, mas sem registro formal, sem rastreabilidade e dependente de a Silvana lembrar de cobrar cada cliente. A solução precisava:
 
-- Ser no WhatsApp (canal já no dia a dia dos clientes)
+- Funcionar pelo WhatsApp (canal já no dia a dia dos clientes)
 - Abrir bem no celular, sem login, sem app para instalar
 - Registrar respostas automaticamente
 - Não exigir que a Silvana aprenda um sistema novo
-- Mostrar as artes reais (não só texto) para o cliente aprovar
+- Mostrar as artes reais (imagem, carrossel, vídeo) para o cliente aprovar
 
 ---
 
 ## Arquitetura do sistema
 
 ```
-Obsidian (.md)              Google Drive (_Artes/)
+Obsidian (.md)              Google Drive (Posts_Fixos/ + Videos/)
       │                             │
       └──────────┬──────────────────┘
                  ▼
@@ -38,20 +39,43 @@ Obsidian (.md)              Google Drive (_Artes/)
                  ▼
         GitHub (oiforster/forster-aprovacoes)
                  │
-          deploy automático
+          GitHub Pages (deploy automático)
                  │
                  ▼
-        Netlify (forster-aprovacoes.netlify.app)
+        https://oiforster.github.io/forster-aprovacoes/
                  │
           link enviado via WhatsApp
                  │
                  ▼
         Cliente aprova no celular
                  │
-          Netlify Forms
+          (próxima fase)
                  │
                  ▼
-        Painel Netlify (Silvana consulta)
+        Respostas chegam formatadas no WhatsApp da Silvana
+```
+
+---
+
+## Estrutura do repositório
+
+```
+forster-aprovacoes/
+├── aprovacao/
+│   ├── template.html                    ← template base de todas as páginas
+│   └── [slug-cliente]/
+│       ├── index.html                   ← sempre aponta para a versão mais recente
+│       └── YYYY-MM-DD.html              ← página gerada por semana ou mês
+├── scripts/
+│   ├── gerar_aprovacoes.py              ← script principal
+│   ├── subir_reels.py                   ← upload de Reels ao YouTube
+│   ├── youtube_credentials.json         ← NUNCA commitar (no .gitignore)
+│   └── youtube_token.json               ← NUNCA commitar (no .gitignore)
+├── index.html                           ← página inicial do site
+├── netlify.toml                         ← headers HTTP (mantido mesmo no GitHub Pages)
+├── GUIA_SILVANA.md                      ← manual de uso para a Silvana
+├── DOCUMENTACAO_TECNICA.md              ← este arquivo
+└── Gerar Aprovações.command             ← duplo clique para gerar + publicar
 ```
 
 ---
@@ -60,227 +84,163 @@ Obsidian (.md)              Google Drive (_Artes/)
 
 ### 1. `scripts/gerar_aprovacoes.py`
 
-Script Python principal. Roda no Mac da Silvana.
+Script Python principal. Roda no Mac da Silvana (ou do Samuel).
 
-**O que faz:**
-- Detecta automaticamente o caminho da pasta `Agência/` no Google Drive (lida com encoding NFD do macOS)
-- Lê os arquivos `YYYY-MM — Conteúdo Mensal [Cliente].md` de cada cliente
-- Faz parse da tabela de calendário (extrai data, formato, título, status)
-- Faz parse das seções de conteúdo detalhado (texto do card, legenda, slides de carrossel)
-- Busca artes automaticamente na pasta `04_Estratégia/_Artes/YYYY-MM/`
-- Detecta imagem única (`DD-MM.jpg`) ou carrossel (`DD-MM_1.jpg`, `DD-MM_2.jpg`...)
-- Extrai o Google Drive File ID via xattr `com.google.drivefs.item-id#S` (macOS Drive File Stream)
-- Se o arquivo estiver em modo Streaming, força leitura para acionar download e tenta de novo
-- Constrói URL de embed: `https://lh3.googleusercontent.com/d/FILE_ID`
-- Quando há arte, exibe apenas a legenda (o texto do card já está visível na arte)
-- Gera HTML de aprovação a partir do `aprovacao/template.html`
-- Salva em `aprovacao/[slug-cliente]/[YYYY-MM-DD].html` e `index.html`
-- Gera mensagem de WhatsApp pronta para copiar
+**Funções principais:**
 
-**Argumentos:**
+| Função | O que faz |
+|--------|-----------|
+| `encontrar_pasta_agencia()` | Detecta o caminho NFD da pasta `Agência/` no Google Drive |
+| `gdrive_id_para_url(path)` | Lê o xattr `com.google.drivefs.item-id#S` do arquivo e retorna URL `lh3.googleusercontent.com/d/ID` |
+| `encontrar_pasta_entrega(data, pasta_cliente)` | Encontra `06_Entregas/YYYY-MM*/` e retorna `(pasta_entrega, pasta_videos)` |
+| `encontrar_arte(data, pasta_cliente)` | Busca arte em `Posts_Fixos/` da pasta de entrega; detecta imagem única (`DD-MM.jpg`) ou carrossel (`DD-MM_1.jpg`...) |
+| `ler_youtube_id(pasta_videos, reel_nome)` | Lê `Videos/_youtube.md` e retorna o YouTube ID pelo nome do Reel |
+| `extrair_partes_post(texto_secao)` | Faz parse da seção do post: texto do card, legenda, slides, link de mídia, nome do reel |
+| `gerar_html_post(post)` | Gera o HTML de um card de post (com arte, carrossel ou YouTube facade) |
+| `gerar_pagina_aprovacao(...)` | Monta a página HTML completa a partir do template |
+
+**Detalhes técnicos:**
+
+- Encoding NFD/NFC: o Google Drive sincroniza `Agência` em NFD no macOS. O script usa `os.listdir()` para encontrar o caminho real antes de qualquer operação
+- xattr: atributo `com.google.drivefs.item-id#S` (com sufixo `#S`) contém o Drive File ID. Se o arquivo estiver em modo Streaming (não baixado), o script força a leitura de 4KB, aguarda 1,5s e tenta novamente
+- URL de imagem: `https://lh3.googleusercontent.com/d/FILE_ID` (o endpoint `uc?export=view` foi descontinuado)
+- Campo `**Vídeo:**` no .md: suporta valor na mesma linha (`**Vídeo:** REEL 01 – Nome`) ou na linha seguinte (`**Vídeo:**\nREEL 01 – Nome`)
+
+**Argumentos CLI:**
+
 ```bash
 --cliente "Nome"      # filtra por cliente (parcial aceito)
 --semana YYYY-MM-DD   # segunda-feira da semana
 --mes YYYY-MM         # mês completo
---base-url URL        # URL base do Netlify (padrão: forster-aprovacoes.netlify.app)
 ```
 
-**Dependências:** Python 3 (padrão no macOS), sem pacotes externos.
-
 ---
 
-### 2. `aprovacao/template.html`
+### 2. `scripts/subir_reels.py`
 
-Template HTML da página de aprovação. Um único arquivo com CSS e JavaScript inline.
-
-**Features:**
-- Mobile-first (max-width 440px, otimizado para iPhone)
-- Header sticky com nome do cliente, período e barra de progresso
-- Botão "Aprovar todos os posts" no topo
-- Navegação por semanas (tabs) quando há mais de uma semana
-- Cards individuais por post: data, formato com cor, arte inline, legenda, botões
-- Arte com proporção 3:4 (padrão Instagram/stories)
-- Carrossel de imagens estilo Instagram: scroll-snap nativo no mobile (deslize com o dedo), setas de navegação no desktop, contador "1/5" e pontinhos indicadores
-- Campo de texto para comentário ao pedir ajuste
-- Botão "Enviar aprovações" habilitado apenas quando todos os posts foram respondidos
-- Tela de confirmação após envio
-- Formulário Netlify Forms oculto para registro das respostas
-- Graceful degradation: imagem com `onerror` esconde o container se não carregar
-
-**Placeholders substituídos pelo script:**
-- `{{TITULO_PAGINA}}` — título da aba do browser
-- `{{NOME_CLIENTE}}` — nome do cliente no header
-- `{{PERIODO}}` — período formatado ("7 a 13 de abril")
-- `{{TOTAL_POSTS}}` — número de posts (para o contador de progresso)
-- `{{POSTS_HTML}}` — HTML de todos os cards
-- `{{SEMANAS_NAV}}` — HTML da navegação de semanas (se houver)
-- `{{FORM_ID}}` — ID único do formulário Netlify (`[slug-cliente]-[YYYY-MM-DD]`)
-
----
-
-### 3. `Gerar Aprovações.command`
-
-Script bash para duplo clique no macOS. Interface amigável para a Silvana.
+Script Python para upload de Reels ao YouTube. Roda no Mac do Samuel antes de gerar aprovações.
 
 **Fluxo:**
-1. Pergunta para qual cliente (número, nome ou todos)
-2. Pergunta o período (próxima semana, semana específica ou mês)
-3. Roda o script Python
-4. Pergunta se deve publicar (git add + commit + push)
+1. Busca `06_Entregas/YYYY-MM*/Videos/REEL NN – Nome.mov` do cliente
+2. Faz upload como vídeo não listado (unlisted) no YouTube
+3. Se existir `REEL NN – Nome (capa).jpg`, sobe como thumbnail
+4. Salva o resultado em `Videos/_youtube.md` com a chave sendo o nome do Reel (sem extensão)
 
-**Para funcionar:** o arquivo precisa ter permissão de execução (`chmod +x`). Já configurado no repositório.
+**Formato do `_youtube.md`:**
+```
+# YouTube IDs dos Reels — gerado automaticamente
+REEL 12 - Dia da Mulher: https://youtu.be/yjkHNpIlEsA
+```
 
-**Para usar:** duplo clique no Finder. Na primeira vez, pode ser necessário ir em Preferências do Sistema → Privacidade e Segurança → permitir execução.
+**Dependências:** `google-api-python-client`, `google-auth-oauthlib`  
+**Instalação:** `pip3 install --user google-api-python-client google-auth-oauthlib`
+
+**Credenciais OAuth:**
+- Arquivo: `scripts/youtube_credentials.json` (baixar do Google Cloud Console)
+- Projeto: Google Cloud Console → APIs & Services → forster-aprovacoes
+- API habilitada: YouTube Data API v3
+- App em modo de teste → Samuel adicionado como test user
+- Token salvo em `scripts/youtube_token.json` após primeira autenticação
+
+**Detecção de vídeo já enviado:** o script lê o `_youtube.md` e pula arquivos cujo nome já está registrado.
 
 ---
 
-### 4. `netlify.toml`
+### 3. `aprovacao/template.html`
 
-Configuração do Netlify.
+Template HTML base. Substituições feitas pelo `gerar_aprovacoes.py`:
 
-```toml
-[build]
-  publish = "."           # publica a raiz do repositório
+| Placeholder | Substituído por |
+|-------------|----------------|
+| `{{TITULO_PAGINA}}` | Nome do cliente + período |
+| `{{NOME_CLIENTE}}` | Nome do cliente |
+| `{{PERIODO}}` | Ex: "Semana de 23 a 29 de março" |
+| `{{TOTAL_POSTS}}` | Número total de posts |
+| `{{SEMANAS_NAV}}` | HTML da navegação por semanas (se > 1 semana) |
+| `{{POSTS_HTML}}` | HTML de todos os cards de post |
+| `{{FORM_ID}}` | ID único do formulário |
 
-[[headers]]               # headers de segurança
-  for = "/*"
+**Comportamento do vídeo (Reel):**
+- Exibe facade: thumbnail do YouTube (`img.youtube.com/vi/ID/maxresdefault.jpg`) com botão play overlay
+- **Mobile** (`ontouchstart` detectado): toque abre `youtu.be/ID` no app do YouTube
+- **Desktop**: toque substitui a facade por iframe inline 9:16 com autoplay
 
-[[redirects]]             # redireciona /aprovacao/cliente/ → index.html
-  from = "/aprovacao/:cliente/"
-  to = "/aprovacao/:cliente/index.html"
-  status = 200
-```
+**Carrossel:**
+- CSS `scroll-snap-type: x mandatory` + `-webkit-overflow-scrolling: touch`
+- Contador "1 / N" no canto superior direito
+- Dots de navegação embaixo
+- Setas prev/next visíveis apenas em dispositivos com hover (desktop)
 
----
-
-### 5. Netlify Forms
-
-Cada página de aprovação tem um formulário oculto registrado no Netlify com o nome `aprovacao-[slug-cliente]-[YYYY-MM-DD]`.
-
-**Campos enviados:**
-- `cliente` — nome do cliente
-- `periodo` — período da semana
-- `resultados` — JSON com `{ post_id: { status, comentario } }` para cada post
-
-**Como consultar:** app.netlify.com → projeto forster-aprovacoes → Forms → selecionar formulário.
-
----
-
-## Convenção de artes
-
-```
-04_Estratégia/
-└── _Artes/
-    └── YYYY-MM/
-        ├── DD-MM.jpg          ← post único (card, reels, vídeo)
-        ├── DD-MM_1.jpg        ← slide 1 do carrossel
-        ├── DD-MM_2.jpg        ← slide 2 do carrossel
-        └── DD-MM_3.jpg        ← slide 3 (quantos slides quiser)
-```
-
-**Formatos aceitos:** `.jpg`, `.jpeg`, `.png`, `.webp`
-
-**Como o script obtém a URL (sem configuração manual):**
-1. Encontra os arquivos por nome (prefixo `DD-MM`)
-2. Lê o xattr `com.google.drivefs.item-id#S` — metadado gravado pelo Google Drive File Stream no macOS para cada arquivo sincronizado
-3. Se o arquivo ainda não foi baixado (modo Streaming), força a leitura de 4KB para acionar o download e tenta de novo após 1,5s
-4. Constrói `https://lh3.googleusercontent.com/d/FILE_ID`
-
-**Pré-requisito:** a pasta `_Artes/` precisa estar compartilhada como "qualquer pessoa com o link pode visualizar" no Google Drive. Configurar uma vez por cliente.
-
-**Fallback manual (`_links.md`):** se o xattr falhar por algum motivo (arquivo muito recente, Drive não processou ainda), é possível criar um arquivo `_links.md` na pasta `_Artes/YYYY-MM/` com os links individuais:
-```
-DD-MM: https://drive.google.com/file/d/ID/view
-DD-MM_1: https://drive.google.com/file/d/ID1/view
-DD-MM_2: https://drive.google.com/file/d/ID2/view
-```
-O script tenta xattr primeiro e só usa `_links.md` se xattr não retornar nada.
+**Espaçamento entre posts:**
+- Semana única: posts são filhos diretos de `.posts-container` (flexbox, `gap: 28px`)
+- Múltiplas semanas: posts ficam dentro de `.semana-bloco` (também flexbox com `gap: 28px`)
 
 ---
 
-## Formato do arquivo .md de conteúdo mensal
+### 4. `Gerar Aprovações.command`
 
-O script é compatível com o formato padrão da Forster Filmes. Para funcionar corretamente, o arquivo precisa ter:
-
-### Tabela de calendário (obrigatório)
-
-```markdown
-| Data | Formato | Título / Tema | Status |
-|------|---------|---------------|--------|
-| 07/04 Ter | Card | Título do post | Criado |
-| 08/04 Qua | Carrossel | Título do carrossel | Criado |
-```
-
-- A data deve estar na primeira coluna no formato `DD/MM` (com ou sem dia da semana)
-- O formato (Card, Carrossel, Reels, Vídeo) é detectado por palavras-chave na segunda coluna
-- O título vai para o header do card na página de aprovação
-
-### Seções de conteúdo detalhado (recomendado)
-
-```markdown
-#### 07/04 (Ter) — Card — Título do post
-
-**Texto do card:**
-O texto da arte.
-
-**Legenda:**
-A legenda do Instagram.
-```
-
-Para carrosseis:
-
-```markdown
-#### 08/04 (Qua) — Carrossel — Título
-
-**Slide 1 (capa):**
-Texto da capa.
-
-**Slide 2:**
-Texto do segundo slide.
-
-**Legenda:**
-Legenda do post.
-```
-
-> Quando há arte carregada, o script exibe apenas a legenda na página de aprovação — o texto do card e os slides ficam ocultos porque já estão visíveis nas imagens.
+Arquivo bash executável por duplo clique no macOS. Abre o Terminal, roda `gerar_aprovacoes.py` e faz `git push` automaticamente.
 
 ---
 
-## Deploy e CI/CD
+## Hospedagem
 
-- **Repositório:** GitHub `oiforster/forster-aprovacoes`
-- **Branch principal:** `main`
-- **Deploy automático:** qualquer push para `main` aciona rebuild no Netlify
-- **Tempo de deploy:** ~30 segundos
-- **Free tier Netlify:** suficiente para o volume atual (100GB de banda/mês, formulários com 100 submissions/mês)
+**GitHub Pages** (desde março de 2026)
 
----
+- URL: `https://oiforster.github.io/forster-aprovacoes/`
+- Deploy: automático a cada `git push` na branch `main`
+- Gratuito, sem limites de banda que pausem o site
+- Anteriormente hospedado no Netlify (pausado por limite de uso do plano gratuito)
 
-## Estrutura de pastas do repositório
-
-```
-forster-aprovacoes/
-├── index.html                          ← página inicial do site
-├── netlify.toml                        ← configuração Netlify
-├── .gitignore                          ← ignora .DS_Store e __pycache__
-├── Gerar Aprovações.command            ← duplo clique para rodar
-├── GUIA_SILVANA.md                     ← guia de uso para Silvana
-├── DOCUMENTACAO_TECNICA.md             ← este arquivo
-├── scripts/
-│   └── gerar_aprovacoes.py             ← script principal
-└── aprovacao/
-    ├── template.html                   ← template HTML
-    └── [slug-cliente]/
-        ├── index.html                  ← última semana gerada
-        └── YYYY-MM-DD.html             ← semanas anteriores
-```
+**Headers HTTP** (configurados no `netlify.toml`, compatível com ambos):
+- HTML: `Cache-Control: no-cache, no-store, must-revalidate`
+- Outros: `X-Frame-Options: DENY`, `X-Content-Type-Options: nosniff`
 
 ---
 
-## Possíveis evoluções
+## Fluxo de trabalho mensal (Samuel + Silvana)
 
-- **Notificação automática:** integrar com Z-API ou Twilio para enviar o WhatsApp automaticamente (sem a Silvana copiar e colar)
-- **Dashboard de status:** página interna mostrando quais clientes aprovaram a semana e quais ainda não responderam
-- **Lembretes automáticos:** reenviar o link para clientes que não aprovaram após X dias
-- **Histórico de aprovações:** página por cliente mostrando aprovações de meses anteriores
-- **Domínio personalizado:** `aprovacoes.forsterfilmes.com.br` em vez de `forster-aprovacoes.netlify.app`
+1. **Samuel** edita, exporta e nomeia os Reels: `REEL NN – Nome.mov` + `REEL NN – Nome (capa).jpg` na pasta `Videos/`
+2. **Samuel** roda `subir_reels.py` → vídeos sobem ao YouTube como unlisted, `_youtube.md` é atualizado
+3. **Silvana** adiciona as artes em `Posts_Fixos/` com os nomes no padrão `DD-MM.jpg` / `DD-MM_N.jpg`
+4. **Silvana** verifica se o campo `**Vídeo:**` está preenchido no `.md` para posts que são Reels
+5. **Silvana** dá duplo clique em `Gerar Aprovações.command`
+6. Sistema gera as páginas HTML e faz `git push` automaticamente
+7. **Silvana** copia a mensagem de WhatsApp e manda para o cliente
+8. Cliente aprova pelo link no celular
+
+---
+
+## Clientes configurados
+
+Qualquer cliente em `_Clientes/Clientes Recorrentes/` com arquivo `YYYY-MM — Conteúdo Mensal [Cliente].md` é detectado automaticamente.
+
+Atualmente testado com: **Prisma Especialidades**
+
+---
+
+## Pendências e próximos passos
+
+### Alta prioridade
+
+- [ ] **Retorno do cliente via WhatsApp:** ao clicar em "Enviar aprovações", a página gera uma mensagem formatada e abre o WhatsApp da Silvana com os status de cada post. Substitui a necessidade de formulário server-side. Funciona 100% com GitHub Pages (sem backend).
+
+### Média prioridade
+
+- [ ] **Botão "Subir Reel" no .command:** integrar o `subir_reels.py` no fluxo do `Gerar Aprovações.command` para que a Silvana (ou Samuel) faça tudo em um duplo clique
+- [ ] **Atualização automática do .md com retorno do cliente:** após receber o WhatsApp de aprovação, script que parseia a mensagem e adiciona seção "Retorno do Cliente" no `.md` do mês
+
+### Baixa prioridade
+
+- [ ] Expandir para todos os clientes recorrentes (testar estrutura de pastas de cada um)
+- [ ] Suporte a vídeos do YouTube (formato YT) além de Reels
+
+---
+
+## Referências técnicas
+
+- xattr no macOS Drive File Stream: atributo `com.google.drivefs.item-id#S`
+- Embed de imagem do Drive: `https://lh3.googleusercontent.com/d/FILE_ID`
+- YouTube Data API v3: upload + thumbnails com OAuth 2.0
+- Scopes necessários: `youtube.upload` + `youtube` (para thumbnails)
+- NFD/NFC no macOS: Google Drive usa NFD para `Agência`, Python usa NFC por padrão → usar `os.listdir()` para encontrar o path real

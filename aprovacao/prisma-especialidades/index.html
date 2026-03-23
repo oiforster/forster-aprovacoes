@@ -423,6 +423,25 @@
       min-height: 80px;
     }
     .campo-ajuste textarea::placeholder { color: #bbb; }
+    .btn-confirmar-obs {
+      display: block;
+      width: 100%;
+      margin-top: 8px;
+      padding: 10px;
+      background: #FF9800;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.15s;
+      text-align: center;
+    }
+    .btn-confirmar-obs:active { background: #e65100; }
+    .btn-confirmar-obs.confirmado {
+      background: #4CAF50;
+    }
 
     /* FORMULÁRIO OCULTO (Netlify Forms) */
     .form-submissao { display: none; }
@@ -493,8 +512,8 @@
     }
 
     /* SEMANA OCULTA */
-    .semana-bloco { display: none; }
-    .semana-bloco.ativa { display: block; }
+    .semana-bloco { display: none; flex-direction: column; gap: 28px; }
+    .semana-bloco.ativa { display: flex; }
 
     @media (min-width: 480px) {
       .posts-container { max-width: 440px; margin: 0 auto; }
@@ -566,10 +585,14 @@
     </div>
     <div class="campo-ajuste" id="campo-20260325-uma-nova-fase-esta-chegando-te">
       <textarea
+        id="obs-20260325-uma-nova-fase-esta-chegando-te"
         placeholder="O que você gostaria de ajustar neste post?"
         oninput="atualizarComentario('20260325-uma-nova-fase-esta-chegando-te', this.value)"
         rows="3"
       ></textarea>
+      <button class="btn-confirmar-obs" id="btnobs-20260325-uma-nova-fase-esta-chegando-te" onclick="confirmarObs('20260325-uma-nova-fase-esta-chegando-te')">
+        Registrar observação
+      </button>
     </div>
   </div>
   <div class="post-card" id="card-20260326-saude-da-familia-nao-deveria-s" data-post-id="20260326-saude-da-familia-nao-deveria-s">
@@ -622,10 +645,14 @@
     </div>
     <div class="campo-ajuste" id="campo-20260326-saude-da-familia-nao-deveria-s">
       <textarea
+        id="obs-20260326-saude-da-familia-nao-deveria-s"
         placeholder="O que você gostaria de ajustar neste post?"
         oninput="atualizarComentario('20260326-saude-da-familia-nao-deveria-s', this.value)"
         rows="3"
       ></textarea>
+      <button class="btn-confirmar-obs" id="btnobs-20260326-saude-da-familia-nao-deveria-s" onclick="confirmarObs('20260326-saude-da-familia-nao-deveria-s')">
+        Registrar observação
+      </button>
     </div>
   </div>
   <div class="post-card" id="card-20260327-eu-sempre-quis-construir-um-lu" data-post-id="20260327-eu-sempre-quis-construir-um-lu">
@@ -678,10 +705,14 @@
     </div>
     <div class="campo-ajuste" id="campo-20260327-eu-sempre-quis-construir-um-lu">
       <textarea
+        id="obs-20260327-eu-sempre-quis-construir-um-lu"
         placeholder="O que você gostaria de ajustar neste post?"
         oninput="atualizarComentario('20260327-eu-sempre-quis-construir-um-lu', this.value)"
         rows="3"
       ></textarea>
+      <button class="btn-confirmar-obs" id="btnobs-20260327-eu-sempre-quis-construir-um-lu" onclick="confirmarObs('20260327-eu-sempre-quis-construir-um-lu')">
+        Registrar observação
+      </button>
     </div>
   </div>
   <div class="post-card" id="card-20260328-em-12-dias-abrimos-as-portas-c" data-post-id="20260328-em-12-dias-abrimos-as-portas-c">
@@ -710,19 +741,22 @@
     </div>
     <script>(function(){
       window.abrirReel = window.abrirReel || function(ytId, facadeId) {
+        // Mobile: abre direto no app do YouTube (evita problema de autoplay no iframe)
+        if ('ontouchstart' in window || navigator.maxTouchPoints > 0) {
+          window.open('https://youtu.be/' + ytId, '_blank');
+          return;
+        }
+        // Desktop: substitui facade por iframe inline 9:16, sem fullscreen
         var facade = document.getElementById(facadeId);
         var wrap = document.createElement('div');
         wrap.className = 'youtube-wrapper';
         var ifr = document.createElement('iframe');
-        ifr.src = 'https://www.youtube.com/embed/' + ytId + '?autoplay=1&rel=0&modestbranding=1&playsinline=0';
+        ifr.src = 'https://www.youtube.com/embed/' + ytId + '?autoplay=1&rel=0&modestbranding=1&playsinline=1';
         ifr.setAttribute('allow','accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen');
         ifr.setAttribute('allowfullscreen','');
         ifr.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;border:none;';
         wrap.appendChild(ifr);
         facade.parentNode.replaceChild(wrap, facade);
-        var el = wrap;
-        if (el.requestFullscreen) el.requestFullscreen();
-        else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
       };
     })();</script>
     <div class="post-divider"></div>
@@ -742,10 +776,14 @@
     </div>
     <div class="campo-ajuste" id="campo-20260328-em-12-dias-abrimos-as-portas-c">
       <textarea
+        id="obs-20260328-em-12-dias-abrimos-as-portas-c"
         placeholder="O que você gostaria de ajustar neste post?"
         oninput="atualizarComentario('20260328-em-12-dias-abrimos-as-portas-c', this.value)"
         rows="3"
       ></textarea>
+      <button class="btn-confirmar-obs" id="btnobs-20260328-em-12-dias-abrimos-as-portas-c" onclick="confirmarObs('20260328-em-12-dias-abrimos-as-portas-c')">
+        Registrar observação
+      </button>
     </div>
   </div>
   <div class="post-card" id="card-20260329-nasce-a-prisma-especialidades-" data-post-id="20260329-nasce-a-prisma-especialidades-">
@@ -778,10 +816,14 @@
     </div>
     <div class="campo-ajuste" id="campo-20260329-nasce-a-prisma-especialidades-">
       <textarea
+        id="obs-20260329-nasce-a-prisma-especialidades-"
         placeholder="O que você gostaria de ajustar neste post?"
         oninput="atualizarComentario('20260329-nasce-a-prisma-especialidades-', this.value)"
         rows="3"
       ></textarea>
+      <button class="btn-confirmar-obs" id="btnobs-20260329-nasce-a-prisma-especialidades-" onclick="confirmarObs('20260329-nasce-a-prisma-especialidades-')">
+        Registrar observação
+      </button>
     </div>
   </div></div><div class="semana-bloco" id="semana-2026-03-30">
   <div class="post-card" id="card-20260330-um-centro-medico-pensado-para-" data-post-id="20260330-um-centro-medico-pensado-para-">
@@ -813,10 +855,14 @@
     </div>
     <div class="campo-ajuste" id="campo-20260330-um-centro-medico-pensado-para-">
       <textarea
+        id="obs-20260330-um-centro-medico-pensado-para-"
         placeholder="O que você gostaria de ajustar neste post?"
         oninput="atualizarComentario('20260330-um-centro-medico-pensado-para-', this.value)"
         rows="3"
       ></textarea>
+      <button class="btn-confirmar-obs" id="btnobs-20260330-um-centro-medico-pensado-para-" onclick="confirmarObs('20260330-um-centro-medico-pensado-para-')">
+        Registrar observação
+      </button>
     </div>
   </div>
   <div class="post-card" id="card-20260331-popular-com-qualidade-e-possiv" data-post-id="20260331-popular-com-qualidade-e-possiv">
@@ -849,10 +895,14 @@
     </div>
     <div class="campo-ajuste" id="campo-20260331-popular-com-qualidade-e-possiv">
       <textarea
+        id="obs-20260331-popular-com-qualidade-e-possiv"
         placeholder="O que você gostaria de ajustar neste post?"
         oninput="atualizarComentario('20260331-popular-com-qualidade-e-possiv', this.value)"
         rows="3"
       ></textarea>
+      <button class="btn-confirmar-obs" id="btnobs-20260331-popular-com-qualidade-e-possiv" onclick="confirmarObs('20260331-popular-com-qualidade-e-possiv')">
+        Registrar observação
+      </button>
     </div>
   </div>
   <div class="post-card" id="card-20260401-o-espaco-que-preparamos-para-v" data-post-id="20260401-o-espaco-que-preparamos-para-v">
@@ -885,10 +935,14 @@
     </div>
     <div class="campo-ajuste" id="campo-20260401-o-espaco-que-preparamos-para-v">
       <textarea
+        id="obs-20260401-o-espaco-que-preparamos-para-v"
         placeholder="O que você gostaria de ajustar neste post?"
         oninput="atualizarComentario('20260401-o-espaco-que-preparamos-para-v', this.value)"
         rows="3"
       ></textarea>
+      <button class="btn-confirmar-obs" id="btnobs-20260401-o-espaco-que-preparamos-para-v" onclick="confirmarObs('20260401-o-espaco-que-preparamos-para-v')">
+        Registrar observação
+      </button>
     </div>
   </div>
   <div class="post-card" id="card-20260402-a-oftalmologia-de-excelencia-c" data-post-id="20260402-a-oftalmologia-de-excelencia-c">
@@ -921,10 +975,14 @@
     </div>
     <div class="campo-ajuste" id="campo-20260402-a-oftalmologia-de-excelencia-c">
       <textarea
+        id="obs-20260402-a-oftalmologia-de-excelencia-c"
         placeholder="O que você gostaria de ajustar neste post?"
         oninput="atualizarComentario('20260402-a-oftalmologia-de-excelencia-c', this.value)"
         rows="3"
       ></textarea>
+      <button class="btn-confirmar-obs" id="btnobs-20260402-a-oftalmologia-de-excelencia-c" onclick="confirmarObs('20260402-a-oftalmologia-de-excelencia-c')">
+        Registrar observação
+      </button>
     </div>
   </div>
   <div class="post-card" id="card-20260403-tudo-que-a-sua-familia-precisa" data-post-id="20260403-tudo-que-a-sua-familia-precisa">
@@ -956,10 +1014,14 @@
     </div>
     <div class="campo-ajuste" id="campo-20260403-tudo-que-a-sua-familia-precisa">
       <textarea
+        id="obs-20260403-tudo-que-a-sua-familia-precisa"
         placeholder="O que você gostaria de ajustar neste post?"
         oninput="atualizarComentario('20260403-tudo-que-a-sua-familia-precisa', this.value)"
         rows="3"
       ></textarea>
+      <button class="btn-confirmar-obs" id="btnobs-20260403-tudo-que-a-sua-familia-precisa" onclick="confirmarObs('20260403-tudo-que-a-sua-familia-precisa')">
+        Registrar observação
+      </button>
     </div>
   </div>
   <div class="post-card" id="card-20260404-medicos-que-tem-tempo-para-ouv" data-post-id="20260404-medicos-que-tem-tempo-para-ouv">
@@ -992,10 +1054,14 @@
     </div>
     <div class="campo-ajuste" id="campo-20260404-medicos-que-tem-tempo-para-ouv">
       <textarea
+        id="obs-20260404-medicos-que-tem-tempo-para-ouv"
         placeholder="O que você gostaria de ajustar neste post?"
         oninput="atualizarComentario('20260404-medicos-que-tem-tempo-para-ouv', this.value)"
         rows="3"
       ></textarea>
+      <button class="btn-confirmar-obs" id="btnobs-20260404-medicos-que-tem-tempo-para-ouv" onclick="confirmarObs('20260404-medicos-que-tem-tempo-para-ouv')">
+        Registrar observação
+      </button>
     </div>
   </div>
   <div class="post-card" id="card-20260405-faltam-4-dias-contagem-regress" data-post-id="20260405-faltam-4-dias-contagem-regress">
@@ -1028,10 +1094,14 @@
     </div>
     <div class="campo-ajuste" id="campo-20260405-faltam-4-dias-contagem-regress">
       <textarea
+        id="obs-20260405-faltam-4-dias-contagem-regress"
         placeholder="O que você gostaria de ajustar neste post?"
         oninput="atualizarComentario('20260405-faltam-4-dias-contagem-regress', this.value)"
         rows="3"
       ></textarea>
+      <button class="btn-confirmar-obs" id="btnobs-20260405-faltam-4-dias-contagem-regress" onclick="confirmarObs('20260405-faltam-4-dias-contagem-regress')">
+        Registrar observação
+      </button>
     </div>
   </div></div><div class="semana-bloco" id="semana-2026-04-06">
   <div class="post-card" id="card-20260406-quem-esta-por-tras-da-prisma-e" data-post-id="20260406-quem-esta-por-tras-da-prisma-e">
@@ -1064,10 +1134,14 @@
     </div>
     <div class="campo-ajuste" id="campo-20260406-quem-esta-por-tras-da-prisma-e">
       <textarea
+        id="obs-20260406-quem-esta-por-tras-da-prisma-e"
         placeholder="O que você gostaria de ajustar neste post?"
         oninput="atualizarComentario('20260406-quem-esta-por-tras-da-prisma-e', this.value)"
         rows="3"
       ></textarea>
+      <button class="btn-confirmar-obs" id="btnobs-20260406-quem-esta-por-tras-da-prisma-e" onclick="confirmarObs('20260406-quem-esta-por-tras-da-prisma-e')">
+        Registrar observação
+      </button>
     </div>
   </div>
   <div class="post-card" id="card-20260407-faltam-2-dias-para-a-abertura-" data-post-id="20260407-faltam-2-dias-para-a-abertura-">
@@ -1100,10 +1174,14 @@
     </div>
     <div class="campo-ajuste" id="campo-20260407-faltam-2-dias-para-a-abertura-">
       <textarea
+        id="obs-20260407-faltam-2-dias-para-a-abertura-"
         placeholder="O que você gostaria de ajustar neste post?"
         oninput="atualizarComentario('20260407-faltam-2-dias-para-a-abertura-', this.value)"
         rows="3"
       ></textarea>
+      <button class="btn-confirmar-obs" id="btnobs-20260407-faltam-2-dias-para-a-abertura-" onclick="confirmarObs('20260407-faltam-2-dias-para-a-abertura-')">
+        Registrar observação
+      </button>
     </div>
   </div>
   <div class="post-card" id="card-20260408-amanha-as-portas-abrem-para-to" data-post-id="20260408-amanha-as-portas-abrem-para-to">
@@ -1136,10 +1214,14 @@
     </div>
     <div class="campo-ajuste" id="campo-20260408-amanha-as-portas-abrem-para-to">
       <textarea
+        id="obs-20260408-amanha-as-portas-abrem-para-to"
         placeholder="O que você gostaria de ajustar neste post?"
         oninput="atualizarComentario('20260408-amanha-as-portas-abrem-para-to', this.value)"
         rows="3"
       ></textarea>
+      <button class="btn-confirmar-obs" id="btnobs-20260408-amanha-as-portas-abrem-para-to" onclick="confirmarObs('20260408-amanha-as-portas-abrem-para-to')">
+        Registrar observação
+      </button>
     </div>
   </div>
   <div class="post-card" id="card-20260409-hoje-abrimos-bem-vindos-a-pris" data-post-id="20260409-hoje-abrimos-bem-vindos-a-pris">
@@ -1172,10 +1254,14 @@
     </div>
     <div class="campo-ajuste" id="campo-20260409-hoje-abrimos-bem-vindos-a-pris">
       <textarea
+        id="obs-20260409-hoje-abrimos-bem-vindos-a-pris"
         placeholder="O que você gostaria de ajustar neste post?"
         oninput="atualizarComentario('20260409-hoje-abrimos-bem-vindos-a-pris', this.value)"
         rows="3"
       ></textarea>
+      <button class="btn-confirmar-obs" id="btnobs-20260409-hoje-abrimos-bem-vindos-a-pris" onclick="confirmarObs('20260409-hoje-abrimos-bem-vindos-a-pris')">
+        Registrar observação
+      </button>
     </div>
   </div></div>
 </div>
@@ -1249,6 +1335,21 @@
 
   function atualizarComentario(id, valor) {
     comentariosPosts[id] = valor;
+  }
+
+  function confirmarObs(id) {
+    var ta = document.getElementById('obs-' + id);
+    var btn = document.getElementById('btnobs-' + id);
+    if (!ta || !ta.value.trim()) {
+      ta.focus();
+      ta.placeholder = 'Por favor escreva a observação antes de confirmar.';
+      return;
+    }
+    comentariosPosts[id] = ta.value.trim();
+    ta.disabled = true;
+    btn.textContent = '✓ Observação registrada';
+    btn.classList.add('confirmado');
+    btn.disabled = true;
   }
 
   function atualizarProgresso() {

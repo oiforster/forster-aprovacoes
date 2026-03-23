@@ -105,7 +105,7 @@ else
   git commit -m "Aprovações — $(date '+%d/%m/%Y')"
   git push
   echo ""
-  echo "✅ Site atualizado em https://forster-aprovacoes.netlify.app"
+  echo "✅ Site atualizado em https://oiforster.github.io/forster-aprovacoes"
 fi
 
 echo ""

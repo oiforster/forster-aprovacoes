@@ -423,6 +423,25 @@
       min-height: 80px;
     }
     .campo-ajuste textarea::placeholder { color: #bbb; }
+    .btn-confirmar-obs {
+      display: block;
+      width: 100%;
+      margin-top: 8px;
+      padding: 10px;
+      background: #FF9800;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.15s;
+      text-align: center;
+    }
+    .btn-confirmar-obs:active { background: #e65100; }
+    .btn-confirmar-obs.confirmado {
+      background: #4CAF50;
+    }
 
     /* FORMULÁRIO OCULTO (Netlify Forms) */
     .form-submissao { display: none; }
@@ -493,8 +512,8 @@
     }
 
     /* SEMANA OCULTA */
-    .semana-bloco { display: none; }
-    .semana-bloco.ativa { display: block; }
+    .semana-bloco { display: none; flex-direction: column; gap: 28px; }
+    .semana-bloco.ativa { display: flex; }
 
     @media (min-width: 480px) {
       .posts-container { max-width: 440px; margin: 0 auto; }
@@ -603,6 +622,21 @@
 
   function atualizarComentario(id, valor) {
     comentariosPosts[id] = valor;
+  }
+
+  function confirmarObs(id) {
+    var ta = document.getElementById('obs-' + id);
+    var btn = document.getElementById('btnobs-' + id);
+    if (!ta || !ta.value.trim()) {
+      ta.focus();
+      ta.placeholder = 'Por favor escreva a observação antes de confirmar.';
+      return;
+    }
+    comentariosPosts[id] = ta.value.trim();
+    ta.disabled = true;
+    btn.textContent = '✓ Observação registrada';
+    btn.classList.add('confirmado');
+    btn.disabled = true;
   }
 
   function atualizarProgresso() {

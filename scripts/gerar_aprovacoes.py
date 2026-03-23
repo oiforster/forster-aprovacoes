@@ -753,19 +753,22 @@ def gerar_html_post(post):
     </div>
     <script>(function(){{
       window.abrirReel = window.abrirReel || function(ytId, facadeId) {{
+        // Mobile: abre direto no app do YouTube (evita problema de autoplay no iframe)
+        if ('ontouchstart' in window || navigator.maxTouchPoints > 0) {{
+          window.open('https://youtu.be/' + ytId, '_blank');
+          return;
+        }}
+        // Desktop: substitui facade por iframe inline 9:16, sem fullscreen
         var facade = document.getElementById(facadeId);
         var wrap = document.createElement('div');
         wrap.className = 'youtube-wrapper';
         var ifr = document.createElement('iframe');
-        ifr.src = 'https://www.youtube.com/embed/' + ytId + '?autoplay=1&rel=0&modestbranding=1&playsinline=0';
+        ifr.src = 'https://www.youtube.com/embed/' + ytId + '?autoplay=1&rel=0&modestbranding=1&playsinline=1';
         ifr.setAttribute('allow','accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen');
         ifr.setAttribute('allowfullscreen','');
         ifr.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;border:none;';
         wrap.appendChild(ifr);
         facade.parentNode.replaceChild(wrap, facade);
-        var el = wrap;
-        if (el.requestFullscreen) el.requestFullscreen();
-        else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
       }};
     }})();</script>'''
 
@@ -844,10 +847,14 @@ def gerar_html_post(post):
     </div>
     <div class="campo-ajuste" id="campo-{post_id}">
       <textarea
+        id="obs-{post_id}"
         placeholder="O que você gostaria de ajustar neste post?"
         oninput="atualizarComentario('{post_id}', this.value)"
         rows="3"
       ></textarea>
+      <button class="btn-confirmar-obs" id="btnobs-{post_id}" onclick="confirmarObs('{post_id}')">
+        Registrar observação
+      </button>
     </div>
   </div>'''
 
@@ -1002,7 +1009,7 @@ def main():
     parser.add_argument('--cliente', help='Nome do cliente (parcial aceito)')
     parser.add_argument('--semana', help='Segunda-feira da semana (YYYY-MM-DD)')
     parser.add_argument('--mes', help='Gerar mês completo (YYYY-MM)')
-    parser.add_argument('--base-url', default='https://forster-aprovacoes.netlify.app',
+    parser.add_argument('--base-url', default='https://oiforster.github.io/forster-aprovacoes',
                         help='URL base do site Netlify')
     args = parser.parse_args()
 
