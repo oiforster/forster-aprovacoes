@@ -533,7 +533,101 @@
       .semanas-nav { max-width: 440px; margin: 0 auto; }
       .rodape { max-width: 440px; left: 50%; transform: translateX(-50%); }
     }
-  </style>
+  
+    /* MODAL MENSAGEM WHATSAPP */
+    .modal-mensagem {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.55);
+      z-index: 400;
+      align-items: flex-end;
+      justify-content: center;
+      padding-bottom: 0;
+    }
+    .modal-mensagem.visivel { display: flex; }
+    .modal-mensagem-inner {
+      background: #fff;
+      border-radius: 20px 20px 0 0;
+      padding: 28px 24px 40px;
+      width: 100%;
+      max-width: 540px;
+      max-height: 85vh;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      animation: slideUp 0.25s ease;
+    }
+    @keyframes slideUp {
+      from { transform: translateY(60px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+    .modal-mensagem-titulo {
+      font-size: 17px;
+      font-weight: 700;
+      color: #1a1a1a;
+      text-align: center;
+    }
+    .modal-mensagem-instrucao {
+      font-size: 14px;
+      color: #666;
+      text-align: center;
+      line-height: 1.5;
+    }
+    .modal-mensagem-texto {
+      background: #f5f5f0;
+      border-radius: 12px;
+      padding: 16px;
+      font-size: 14px;
+      color: #333;
+      line-height: 1.6;
+      white-space: pre-wrap;
+      font-family: inherit;
+      border: none;
+      resize: none;
+      width: 100%;
+      box-sizing: border-box;
+      min-height: 120px;
+    }
+    .modal-btn-copiar {
+      background: #25D366;
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      padding: 16px;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      width: 100%;
+      transition: background 0.2s;
+    }
+    .modal-btn-copiar:active { background: #1ebe5a; }
+    .modal-btn-copiar.copiado { background: #1ebe5a; }
+    .modal-btn-wpp {
+      background: #fff;
+      color: #128C7E;
+      border: 2px solid #128C7E;
+      border-radius: 12px;
+      padding: 14px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      width: 100%;
+      transition: background 0.2s;
+    }
+    .modal-btn-wpp:active { background: #f0faf9; }
+    .modal-btn-fechar {
+      background: none;
+      border: none;
+      color: #999;
+      font-size: 14px;
+      cursor: pointer;
+      text-align: center;
+      padding: 4px;
+    }
+
+    </style>
 </head>
 <body>
 
@@ -744,20 +838,74 @@
     const mensagem = linhas.join('\n');
 
     if (whatsappGrupo) {
-      // Copia mensagem e abre o grupo
-      navigator.clipboard.writeText(mensagem).catch(function() {});
-      window.open(whatsappGrupo, '_blank');
+      // Mostra modal com a mensagem para o cliente copiar e abrir o grupo
+      _mensagemParaEnviar = mensagem;
+      document.getElementById('modalMensagemTexto').value = mensagem;
+      document.getElementById('btnCopiarMensagem').textContent = 'Copiar mensagem';
+      document.getElementById('btnCopiarMensagem').classList.remove('copiado');
+      document.getElementById('modalMensagem').classList.add('visivel');
     } else {
       // Fallback: abre conversa direta com a Silvana
       window.open('https://wa.me/' + whatsappNumero + '?text=' + encodeURIComponent(mensagem), '_blank');
+      // Grava aprovação no localStorage para travar a página
+      try { localStorage.setItem('aprovacao:' + location.pathname, '1'); } catch(e) {}
+      document.getElementById('telaConfirmacao').classList.add('visivel');
     }
+  }
 
+  // Variável para guardar a mensagem do modal
+  var _mensagemParaEnviar = '';
+
+  function copiarMensagemModal() {
+    var texto = document.getElementById('modalMensagemTexto').value;
+    var btn = document.getElementById('btnCopiarMensagem');
+    navigator.clipboard.writeText(texto).then(function() {
+      btn.textContent = 'Copiado! ✓';
+      btn.classList.add('copiado');
+    }).catch(function() {
+      // Fallback para browsers sem clipboard API
+      document.getElementById('modalMensagemTexto').select();
+      document.execCommand('copy');
+      btn.textContent = 'Copiado! ✓';
+      btn.classList.add('copiado');
+    });
+  }
+
+  function abrirWhatsAppModal() {
+    window.open(whatsappGrupo, '_blank');
+    fecharModalMensagem();
     // Grava aprovação no localStorage para travar a página
     try { localStorage.setItem('aprovacao:' + location.pathname, '1'); } catch(e) {}
-
     document.getElementById('telaConfirmacao').classList.add('visivel');
   }
+
+  function fecharModalMensagem() {
+    document.getElementById('modalMensagem').classList.remove('visivel');
+  }
+
+  // Fecha modal ao clicar no backdrop
+  document.getElementById('modalMensagem').addEventListener('click', function(e) {
+    if (e.target === this) fecharModalMensagem();
+  });
+
 </script>
+
+
+<!-- Modal: mensagem WhatsApp -->
+<div class="modal-mensagem" id="modalMensagem">
+  <div class="modal-mensagem-inner">
+    <div class="modal-mensagem-titulo">Enviar aprovações</div>
+    <div class="modal-mensagem-instrucao">Copie a mensagem abaixo e cole no WhatsApp do grupo.</div>
+    <textarea class="modal-mensagem-texto" id="modalMensagemTexto" readonly></textarea>
+    <button class="modal-btn-copiar" id="btnCopiarMensagem" onclick="copiarMensagemModal()">
+      Copiar mensagem
+    </button>
+    <button class="modal-btn-wpp" id="btnAbrirWpp" onclick="abrirWhatsAppModal()">
+      Abrir WhatsApp
+    </button>
+    <button class="modal-btn-fechar" onclick="fecharModalMensagem()">Fechar</button>
+  </div>
+</div>
 
 </body>
 </html>
