@@ -49,7 +49,7 @@ CLIENTES_RECORRENTES = [
 # ─── WHATSAPP ─────────────────────────────────────────────────────────────────
 # Número da Silvana com código de país (sem + e sem espaços).
 # Exemplo: "5548999999999"  → +55 (Brasil) 48 (DDD) 999999999
-WHATSAPP_SILVANA_DEFAULT = "5548XXXXXXXXX"  # ← preencher com o número real
+WHATSAPP_SILVANA_DEFAULT = "5551980603512"  # ← preencher com o número real
 
 # Override por cliente (caso a Silvana use números diferentes por projeto)
 WHATSAPP_CLIENTES: dict = {
