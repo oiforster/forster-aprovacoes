@@ -4,7 +4,7 @@
 **Criado em:** março de 2026  
 **Repositório:** https://github.com/oiforster/forster-aprovacoes  
 **Site:** https://oiforster.github.io/forster-aprovacoes  
-**Última atualização:** março de 2026 — EmailJS adicionado como redundância de notificação
+**Última atualização:** março de 2026 — Migração para Synology Drive; `Entrega de Vídeos.command`; suporte a Clientes Pontuais; Open Graph
 
 ---
 
@@ -22,19 +22,22 @@ A Forster Filmes aprovava postagens com clientes via grupo de WhatsApp — prát
 ## Arquitetura do sistema
 
 ```
-Obsidian (.md)              Google Drive (Posts_Fixos/ + Videos/)
+Obsidian (.md)              Synology Drive (Videos/ + _youtube.md)
       │                             │
       └──────────┬──────────────────┘
-                 ▼
-        Fluxo Completo.command
-        (duplo clique no Mac)
                  │
-        ┌────────┼────────────────┐
-        ▼        ▼                ▼
-  validar    subir_reels     gerar_aprovacoes
-  _arquivos  .py (YouTube)   .py (HTML)
-        │        │                │
-        └────────┴────────────────┘
+       ┌─────────┴──────────────────────┐
+       ▼                                ▼
+Fluxo Completo.command       Entrega de Vídeos.command
+(conteúdo recorrente)        (clientes pontuais ou entrega avulsa)
+       │                                │
+ ┌─────┼──────────┐                     ├── subir_reels.py (YouTube)
+ ▼     ▼          ▼                     └── gerar_aprovacoes.py (HTML)
+valid  subir   gerar                              │
+_arq   _reels  _aprov                            ↓ fallback se sem .md:
+                                        gerar_para_cliente_reels()
+                                        (lê _youtube.md diretamente)
+       └──────────┴─────────────────────┘
                  │
           git push automático
                  │
@@ -43,6 +46,7 @@ Obsidian (.md)              Google Drive (Posts_Fixos/ + Videos/)
         oiforster.github.io/forster-aprovacoes/
                  │
           link enviado via WhatsApp
+          (preview com og:image = thumbnail YouTube)
                  │
                  ▼
         Cliente aprova no celular
@@ -66,7 +70,8 @@ forster-aprovacoes/
 │   ├── template.html                    ← template base de todas as páginas
 │   └── [slug-cliente]/
 │       ├── index.html                   ← sempre aponta para a versão mais recente
-│       └── YYYY-MM-DD.html              ← página gerada por semana/período
+│       ├── YYYY-MM-DD.html              ← página gerada por semana/período (recorrentes)
+│       └── YYYY-MM.html                 ← página gerada por mês (pontuais via _youtube.md)
 ├── scripts/
 │   ├── gerar_aprovacoes.py              ← gerador de páginas HTML
 │   ├── subir_reels.py                   ← upload de Reels ao YouTube
@@ -76,9 +81,10 @@ forster-aprovacoes/
 ├── index.html                           ← página inicial do site
 ├── GUIA_SILVANA.md                      ← manual de uso para a Silvana
 ├── DOCUMENTACAO_TECNICA.md              ← este arquivo
-├── Fluxo Completo.command               ← tudo em um duplo clique
-├── Subir Reels YouTube.command          ← upload YouTube standalone
-└── Gerar Aprovações.command             ← gerar + publicar (sem validação/YouTube)
+├── Fluxo Completo.command               ← tudo em um duplo clique (clientes recorrentes)
+├── Entrega de Vídeos.command            ← YouTube + página + publicar (pontuais e avulsos)
+├── Subir Reels YouTube.command          ← upload YouTube standalone (legado)
+└── Gerar Aprovações.command             ← gerar + publicar sem YouTube (legado)
 ```
 
 ---
@@ -114,6 +120,77 @@ chmod +x ~/Library/...forster-aprovacoes/"Gerar Aprovações.command"
 
 ---
 
+### 1b. `Entrega de Vídeos.command`
+
+Arquivo bash executável por duplo clique. Voltado para entrega de vídeos avulsos ou de clientes pontuais. Não inclui validação de artes.
+
+**Etapas:**
+1. **Sincronização** — `git fetch origin main && git reset --hard origin/main`
+2. **Synology links** — `gerar_links_synology.py` cria links de download para `.mov` e frames no Synology; salva `_synology.md` na pasta `Videos/`
+3. **YouTube** — `subir_reels.py` sobe os Reels como unlisted
+4. **Geração** — `gerar_aprovacoes.py` gera a página com botões de download e galeria de frames
+5. **Publicação** — pergunta antes de fazer `git add . && git commit && git push`
+
+**Opções interativas:**
+- Qual cliente? (lista recorrentes + pontuais detectados em `Clientes Pontuais/`)
+- Qual mês? (YYYY-MM ou Enter para o atual)
+- Continuar se Synology falhar? (s/N)
+- Continuar se YouTube falhar? (s/N)
+- Publicar no site? (S/n)
+
+**Diferença do `Fluxo Completo.command`:** sem etapa de validação de artes; inclui clientes pontuais; sync via `reset --hard`; inclui etapa de links Synology.
+
+---
+
+### 1c. `scripts/gerar_links_synology.py`
+
+Gera links de compartilhamento público no Synology DSM para todos os `.mov` e frames de uma entrega. Salva em `_synology.md` na pasta `Videos/` do cliente.
+
+**Fluxo:**
+1. Lê `scripts/synology_config.json` (gitignored) para obter credenciais e paths
+2. Autentica na API FileStation (`SYNO.API.Auth`) via rede local (fallback: DDNS)
+3. Encontra os `.mov` em `06_Entregas/YYYY-MM*/Videos/`
+4. Encontra os frames em `Videos/Frames/`
+5. Para cada arquivo não listado no `_synology.md` existente, chama `SYNO.FileStation.Sharing/create`
+6. Cria também um link para a pasta `Frames/` inteira (`FRAMES_FOLDER`)
+7. Escreve/atualiza `_synology.md` com todos os links
+8. Faz logout
+
+**`_synology.md` — formato:**
+```
+# Links de download — Synology — gerado automaticamente
+
+REEL 01 – Nome do Vídeo: https://forsterfilmes.synology.me:5001/d/s/SHARE_ID/
+REEL 02 – Outro Vídeo: https://forsterfilmes.synology.me:5001/d/s/SHARE_ID/
+
+FRAMES_FOLDER: https://forsterfilmes.synology.me:5001/d/s/FOLDER_ID/
+FRAME_frame_01.jpg: https://forsterfilmes.synology.me:5001/d/s/SHARE_ID/
+FRAME_frame_02.jpg: https://forsterfilmes.synology.me:5001/d/s/SHARE_ID/
+```
+
+**`scripts/synology_config.json` (gitignored — nunca commitar):**
+```json
+{
+  "host_local":      "https://192.168.2.25:5001",
+  "host_external":   "https://forsterfilmes.synology.me:5001",
+  "username":        "guest",
+  "password":        "...",
+  "nas_base_path":   "/Claude Cowork/Agência",
+  "local_sync_name": "SynologyDrive-Agencia"
+}
+```
+
+**Path mapping:** path local `~/Library/CloudStorage/SynologyDrive-Agencia/X` → NAS path `/Claude Cowork/Agência/X` (volume1 implícito na API FileStation).
+
+**Argumentos CLI:**
+```bash
+--cliente "Nome"    # nome do cliente
+--mes YYYY-MM       # mês (padrão: atual)
+--pontual           # busca em Clientes Pontuais primeiro
+```
+
+---
+
 ### 2. `scripts/validar_arquivos.py`
 
 Valida os arquivos de arte e vídeo antes de gerar as páginas de aprovação. Cruza o planejamento do `.md` com o que existe fisicamente nas pastas.
@@ -138,31 +215,43 @@ Valida os arquivos de arte e vídeo antes de gerar as páginas de aprovação. C
 
 ### 3. `scripts/gerar_aprovacoes.py`
 
-Script principal. Lê os arquivos `.md` de Conteúdo Mensal e gera as páginas HTML.
+Script principal. Lê os arquivos `.md` de Conteúdo Mensal e gera as páginas HTML. Tem fallback para clientes pontuais que não têm calendário editorial.
 
 **Funções principais:**
 
 | Função | O que faz |
 |--------|-----------|
-| `encontrar_pasta_agencia()` | Detecta o caminho NFD da pasta `Agência/` no Google Drive |
+| `encontrar_pasta_agencia()` | Prioriza Synology Drive; fallback para Google Drive (legado) |
+| `encontrar_arquivo_mensal(cliente, ano_mes, agencia_path)` | Busca o `.md` de Conteúdo Mensal em Recorrentes e Pontuais |
 | `gdrive_id_para_url(path)` | Lê o xattr `com.google.drivefs.item-id#S` e retorna URL `lh3.googleusercontent.com/d/ID` |
 | `encontrar_arte(data, pasta_cliente)` | Busca arte em `Posts_Fixos/`; detecta card (`DD-MM.jpg`) ou carrossel (`DD-MM_N.jpg`) |
 | `ler_youtube_id(pasta_videos, reel_nome)` | Lê `Videos/_youtube.md` e retorna YouTube ID pelo nome do Reel |
 | `parse_conteudo_mensal(arquivo, datas)` | Parse do `.md`: extrai posts do período solicitado |
-| `gerar_pagina_aprovacao(...)` | Monta a página HTML completa a partir do template |
+| `gerar_pagina_aprovacao(...)` | Monta a página HTML completa a partir do template; popula OG tags |
+| `encontrar_youtube_md_pontual(cliente, ano_mes, agencia_path)` | Busca `_youtube.md` recursivamente nas pastas de entrega do cliente (estruturas não-padrão) |
+| `gerar_para_cliente_reels(cliente, ano_mes, ...)` | Fallback para pontuais: gera página direto do `_youtube.md`, sem precisar de calendário |
 
 **Argumentos CLI:**
 ```bash
---cliente "Nome"     # filtra por cliente (parcial aceito)
+--cliente "Nome"     # filtra por cliente (parcial aceito; busca em Recorrentes e Pontuais)
 --semana YYYY-MM-DD  # segunda-feira da semana
 --mes YYYY-MM        # mês completo
 --inicio YYYY-MM-DD  # início do período personalizado
 --fim YYYY-MM-DD     # fim do período personalizado
 ```
 
+**Lógica de fallback para clientes pontuais:**
+
+Quando `--cliente` é passado e o cliente não está em `CLIENTES_RECORRENTES`, o script busca dinamicamente em `Clientes Pontuais/`. Se o cliente for encontrado mas não tiver arquivo de Conteúdo Mensal (sem calendário editorial), o script chama `gerar_para_cliente_reels()`, que lê o `_youtube.md` da pasta de entrega e gera a página com os vídeos disponíveis.
+
+Nas páginas geradas via `_youtube.md`:
+- `data_display` de cada card exibe `REEL 01`, `REEL 02` etc. (não uma data)
+- `meta_label` no JS faz a mensagem WhatsApp sair como "REEL 01 — Título — Aprovado"
+- Textos do template são adaptados: "Aprovação de vídeos", "Aprovar todos os vídeos"
+
 **Detalhes técnicos:**
-- Encoding NFD/NFC: o Google Drive sincroniza `Agência` em NFD no macOS. O script usa `os.listdir()` para encontrar o caminho real
-- xattr: `com.google.drivefs.item-id#S` contém o Drive File ID. Se o arquivo estiver em modo Streaming (não baixado), o script força leitura de 4KB, aguarda 1,5s e tenta novamente
+- Encoding: Synology Drive preserva NFD no macOS. `encontrar_pasta_agencia()` detecta o path real via verificação de existência direta
+- xattr: `com.google.drivefs.item-id#S` contém o Drive File ID (ainda usado para imagens de clientes recorrentes cujas artes estão no Google Drive)
 - URL de imagem: `https://lh3.googleusercontent.com/d/FILE_ID` (requer pasta `Posts_Fixos/` compartilhada publicamente no Drive)
 - Campo `**Vídeo:**`: suporta valor na mesma linha ou na linha seguinte
 
@@ -173,11 +262,15 @@ Script principal. Lê os arquivos `.md` de Conteúdo Mensal e gera as páginas H
 Upload de Reels ao YouTube como unlisted. Roda no Mac do Samuel.
 
 **Fluxo:**
-1. Busca `06_Entregas/YYYY-MM*/Videos/REEL NN – Nome.mov` do cliente
-2. Faz upload como vídeo não listado (unlisted)
-3. Se existir `REEL NN – Nome (capa).jpg`, sobe como thumbnail
-4. Salva em `Videos/_youtube.md` com a chave sendo o nome do Reel (sem extensão)
-5. Pula arquivos cujo nome já está registrado no `_youtube.md`
+1. Busca a pasta do cliente em `Clientes Recorrentes` e depois em `Clientes Pontuais`
+2. Dentro da pasta do cliente, busca `06_Entregas/YYYY-MM*/Videos/REEL NN – Nome.mov`
+3. Faz upload como vídeo não listado (unlisted)
+4. Se existir `REEL NN – Nome (capa).jpg`, sobe como thumbnail
+5. Salva em `Videos/_youtube.md` com a chave sendo o nome do Reel (sem extensão)
+6. Pula arquivos cujo nome já está registrado no `_youtube.md`
+
+**Atenção — clientes pontuais com estrutura não-padrão:**
+O script encontra a pasta do cliente em Pontuais, mas ainda espera a estrutura `06_Entregas/` dentro dela. Se o cliente pontual usar uma estrutura diferente (ex: `2026-03 - Entrega Cliente/01 - Reels/`), o upload vai ser silenciosamente pulado. Nesses casos, o `Entrega de Vídeos.command` ainda funciona se os vídeos já estiverem no `_youtube.md` de uma upload anterior. Para novos clientes pontuais, criar a pasta `06_Entregas/YYYY-MM/Videos/` seguindo o padrão.
 
 **Formato do `_youtube.md`:**
 ```
@@ -210,6 +303,9 @@ Template HTML base. Substituições feitas pelo `gerar_aprovacoes.py`:
 | Placeholder | Substituído por |
 |-------------|----------------|
 | `{{TITULO_PAGINA}}` | Nome do cliente + período |
+| `{{OG_TITLE}}` | Título para preview no WhatsApp/redes (ex: "Aprovação — Cliente — Março de 2026") |
+| `{{OG_DESCRIPTION}}` | Descrição para preview (convite para aprovar) |
+| `{{OG_IMAGE}}` | URL da thumbnail do YouTube do primeiro vídeo/reel (`maxresdefault.jpg`) |
 | `{{NOME_CLIENTE}}` | Nome do cliente |
 | `{{PERIODO}}` | Ex: "Semana de 23 a 29 de março" |
 | `{{TOTAL_POSTS}}` | Número total de posts |
@@ -317,10 +413,30 @@ Quando `WHATSAPP_GRUPO` está preenchido: a mensagem de aprovação é copiada p
 ## Problemas conhecidos e soluções
 
 ### `chmod +x` perdido após git reset
-O Google Drive não preserva permissões Unix. Após qualquer `git reset --hard` ou clone novo, rodar `chmod +x` manualmente nos `.command`.
+O Synology Drive (assim como o Google Drive) não preserva permissões Unix. Após qualquer `git reset --hard` ou clone novo, rodar `chmod +x` manualmente nos `.command`:
+```bash
+chmod +x ~/Library/CloudStorage/SynologyDrive-Agencia/_Interno/forster-aprovacoes/*.command
+```
 
 ### git corrompido ao operar pela VM do Claude
-A VM do Claude escreve objetos git via Google Drive com encoding diferente, corrompendo o índice. **Regra:** todo `git add/commit/push` deve ser feito pelo Terminal do Mac, nunca pela VM.
+A VM do Claude escreve objetos git via Google Drive com encoding diferente, corrompendo o índice. **Regra:** todo `git add/commit/push` deve ser feito pelo Terminal do Mac, nunca pela VM. O repositório foi migrado para o Synology Drive justamente para minimizar esse risco — mas a regra continua valendo.
+
+### `git pull` travando por arquivos não rastreados ou branches divergentes
+O `Entrega de Vídeos.command` usa `git fetch origin main && git reset --hard origin/main` em vez de `git pull` para evitar esse problema. O `Fluxo Completo.command` usa `git pull` convencional — se travar, rodar manualmente:
+```bash
+cd ~/Library/CloudStorage/SynologyDrive-Agencia/_Interno/forster-aprovacoes
+git fetch origin main
+git reset --hard origin/main
+```
+
+### Clientes pontuais sem estrutura `06_Entregas/`
+O `subir_reels.py` encontra o cliente em `Clientes Pontuais/` mas ainda espera `06_Entregas/` dentro da pasta. Se o cliente usar outra estrutura, o upload é pulado silenciosamente. Nesse caso, fazer upload manual e criar o `_youtube.md` na pasta de vídeos. O `gerar_aprovacoes.py` lê o `_youtube.md` independentemente da estrutura de pastas.
+
+### Synology: `synology_config.json` não encontrado após clone/reset
+O arquivo é gitignored e não é commitado. Se o script não encontrar o arquivo, ele cria um template e encerra. Edite o arquivo gerado preenchendo a senha e rode novamente.
+
+### Synology: erro de permissão ao criar link (código 105 ou 119)
+O usuário `guest` pode não ter permissão de criar links de compartilhamento. No DSM: Control Panel → User & Group → guest → edite permissões ou crie um usuário dedicado com acesso à pasta `Claude Cowork` e direito de compartilhamento.
 
 ### `invalid_scope` no YouTube
 O token OAuth foi gerado com escopos insuficientes. Deletar `scripts/youtube_token.json` e rodar o script novamente para reautenticar.
@@ -336,5 +452,7 @@ A pasta `Posts_Fixos/` precisa estar compartilhada publicamente no Google Drive 
 - Embed de imagem do Drive: `https://lh3.googleusercontent.com/d/FILE_ID`
 - YouTube Data API v3: upload + thumbnails com OAuth 2.0
 - Scopes: `youtube.upload` + `youtube`
-- NFD/NFC no macOS: Google Drive usa NFD para `Agência` → usar `os.listdir()` para path real
+- NFD/NFC no macOS: tanto Google Drive quanto Synology Drive podem usar NFD → `encontrar_pasta_agencia()` usa `Path.exists()` direto no Synology (path sem acentos) e `os.listdir()` para fallback no Google Drive
+- Open Graph: `og:image` usa `https://img.youtube.com/vi/{ID}/maxresdefault.jpg` — thumbnail 1280×720 gerada automaticamente pelo YouTube; sem necessidade de upload manual
 - Bash arrays para paths com espaços: `ARGS=(); ARGS+=(--key "val"); cmd "${ARGS[@]}"`
+- `git reset --hard origin/main` vs `git pull`: o reset é mais robusto para scripts automatizados pois não falha com arquivos não rastreados; use pull apenas em workflows interativos onde o histórico local precisa ser preservado

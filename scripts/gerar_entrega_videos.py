@@ -16,6 +16,8 @@ Uso:
 import os
 import re
 import sys
+import base64
+import tempfile
 import unicodedata
 import argparse
 import subprocess
@@ -206,6 +208,57 @@ def ler_contexto_md(pasta_videos):
                 desc  = m.group(2).strip()
                 contextos[chave] = desc
     return contextos
+
+def ler_synology_md(pasta_videos):
+    """Lê _synology.md → dict { 'REEL 01 – Nome': 'https://...' }"""
+    arquivo = pasta_videos / '_synology.md'
+    if not arquivo.exists():
+        return {}
+    links = {}
+    with open(arquivo, 'r', encoding='utf-8') as f:
+        for linha in f:
+            linha = linha.strip()
+            if not linha or linha.startswith('#'):
+                continue
+            idx = linha.find(': https://')
+            if idx == -1:
+                continue
+            links[linha[:idx].strip()] = linha[idx + 2:].strip()
+    return links
+
+
+def listar_frames(pasta_videos):
+    """Retorna (lista_de_frames, pasta_frames) ou ([], None) se não existir."""
+    pasta_frames = pasta_videos / 'Frames'
+    if not pasta_frames.exists():
+        return [], None
+    ext = {'.jpg', '.jpeg', '.png', '.tif', '.tiff'}
+    frames = sorted([
+        f for f in pasta_frames.iterdir()
+        if f.suffix.lower() in ext and not f.name.startswith('.')
+    ])
+    return frames, pasta_frames
+
+
+def gerar_thumbnail_base64(frame_path, max_size=300):
+    """Gera thumbnail JPEG via sips (macOS nativo) e retorna data URI base64."""
+    try:
+        with tempfile.NamedTemporaryFile(suffix='.jpg', delete=False) as tmp:
+            tmp_path = tmp.name
+        result = subprocess.run(
+            ['sips', '-Z', str(max_size), '-s', 'format', 'jpeg',
+             str(frame_path), '--out', tmp_path],
+            capture_output=True, timeout=15
+        )
+        if result.returncode != 0:
+            return None
+        with open(tmp_path, 'rb') as f:
+            data = base64.b64encode(f.read()).decode('ascii')
+        os.unlink(tmp_path)
+        return f"data:image/jpeg;base64,{data}"
+    except Exception:
+        return None
+
 
 def gerar_template_contexto(pasta_videos, videos):
     """Cria _contexto.md com template para Samuel preencher."""
@@ -537,6 +590,108 @@ CSS = """
       align-items: center;
       justify-content: center;
     }
+
+    /* BOTÃO DOWNLOAD ORIGINAL */
+    .btn-download-original {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      margin: 0 14px 14px;
+      padding: 11px 14px;
+      background: #F5F5F0;
+      border: 1.5px solid #E0E0DA;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      color: #1A1A1A;
+      text-decoration: none;
+      transition: background 0.15s;
+    }
+    .btn-download-original:hover { background: #EAEAE5; }
+    .btn-download-original svg { flex-shrink: 0; }
+
+    /* SEÇÃO FRAMES */
+    .frames-section {
+      margin: 8px 16px 24px;
+      background: #fff;
+      border-radius: 14px;
+      overflow: hidden;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.07);
+    }
+    .frames-header {
+      padding: 14px 14px 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+    .frames-titulo-texto {
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #888;
+    }
+    .btn-baixar-todos {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 8px 14px;
+      background: #1A1A1A;
+      color: #fff;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-decoration: none;
+      white-space: nowrap;
+      transition: background 0.15s;
+    }
+    .btn-baixar-todos:hover { background: #333; }
+    .frames-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2px;
+      padding: 0 2px 2px;
+    }
+    .frame-cell {
+      position: relative;
+      aspect-ratio: 9/16;
+      overflow: hidden;
+      background: #E0E0DC;
+      border-radius: 4px;
+    }
+    .frame-cell img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    .frame-download-btn {
+      position: absolute;
+      bottom: 5px;
+      right: 5px;
+      width: 30px;
+      height: 30px;
+      background: rgba(0,0,0,0.60);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
+      color: #fff;
+      font-size: 14px;
+    }
+    .frame-sem-preview {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      color: #bbb;
+    }
 """
 
 JS_TEMPLATE = """
@@ -670,11 +825,12 @@ JS_TEMPLATE = """
 """
 
 def gerar_html_card(video_info):
-    vid_id     = video_info['id']
-    titulo     = video_info['titulo']
-    contexto   = video_info.get('contexto', '')
-    youtube_id = video_info.get('youtube_id')
-    numero     = video_info['numero']
+    vid_id        = video_info['id']
+    titulo        = video_info['titulo']
+    contexto      = video_info.get('contexto', '')
+    youtube_id    = video_info.get('youtube_id')
+    numero        = video_info['numero']
+    synology_link = video_info.get('synology_link', '')
 
     html_numero = f'<div class="video-numero">REEL {numero:02d}</div>'
 
@@ -704,6 +860,16 @@ def gerar_html_card(video_info):
     <div class="sem-video-label">⏳ Vídeo ainda não enviado ao YouTube</div>
   </div>'''
 
+    html_download = ''
+    if synology_link:
+        html_download = f'''  <a class="btn-download-original" href="{synology_link}" target="_blank">
+    <svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M7.5 1v9M4 7l3.5 3.5L11 7M2 13h11" stroke="#1A1A1A" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    Baixar vídeo original (.mov)
+  </a>
+'''
+
     return f'''
 <div class="post-card" id="card-{vid_id}" data-video-id="{vid_id}">
   <div class="post-header">
@@ -714,7 +880,7 @@ def gerar_html_card(video_info):
     <span class="post-formato formato-reels">Vídeo</span>
   </div>
 {html_contexto}{html_player}
-  <div class="post-divider"></div>
+{html_download}  <div class="post-divider"></div>
   <div class="post-acoes">
     <button class="btn-aprovar" id="aprovar-{vid_id}" onclick="marcarVideo('{vid_id}', 'aprovado')">✓ Aprovar</button>
     <button class="btn-ajuste"  id="ajuste-{vid_id}"  onclick="marcarVideo('{vid_id}', 'ajuste')">✗ Pedir ajuste</button>
@@ -728,7 +894,69 @@ def gerar_html_card(video_info):
   </div>
 </div>'''
 
-def gerar_pagina_html(cliente, ano_mes, videos_info, whatsapp_link):
+def gerar_html_frames_section(frames_info):
+    """
+    frames_info: lista de dicts com keys:
+      nome       → nome do arquivo (ex: 'frame_01.jpg')
+      thumbnail  → data URI base64 ou None
+      link       → URL Synology para download individual ou None
+    frames_folder_link → URL Synology da pasta Frames/ (para 'baixar todos')
+    """
+    if not frames_info:
+        return ''
+
+    # Separa o folder link do resto (passado como último item com chave especial)
+    folder_link = ''
+    cells = []
+    for fi in frames_info:
+        if fi.get('folder_link'):
+            folder_link = fi['folder_link']
+            continue
+        nome      = fi['nome']
+        thumbnail = fi.get('thumbnail')
+        link      = fi.get('link', '')
+
+        if thumbnail:
+            img_html = f'<img src="{thumbnail}" alt="{escape_html(nome)}" loading="lazy">'
+        else:
+            img_html = '<div class="frame-sem-preview">🖼</div>'
+
+        download_html = ''
+        if link:
+            download_html = (
+                f'<a class="frame-download-btn" href="{link}" target="_blank" title="Baixar {escape_html(nome)}">'
+                '⬇'
+                '</a>'
+            )
+
+        cells.append(
+            f'<div class="frame-cell">{img_html}{download_html}</div>'
+        )
+
+    btn_todos = ''
+    if folder_link:
+        btn_todos = (
+            f'<a class="btn-baixar-todos" href="{folder_link}" target="_blank">'
+            '⬇ Baixar todos'
+            '</a>'
+        )
+
+    grid_html = '\n    '.join(cells)
+
+    return f'''
+  <div class="frames-section">
+    <div class="frames-header">
+      <span class="frames-titulo-texto">Frames</span>
+      {btn_todos}
+    </div>
+    <div class="frames-grid">
+    {grid_html}
+    </div>
+  </div>'''
+
+
+def gerar_pagina_html(cliente, ano_mes, videos_info, whatsapp_link,
+                      frames_info=None):
     ano, mes_num = ano_mes.split('-')
     mes_display = f"{MESES_PT[int(mes_num)]} de {ano}"
     slug = slugify(cliente)
@@ -738,6 +966,7 @@ def gerar_pagina_html(cliente, ano_mes, videos_info, whatsapp_link):
     ids_json = '[' + ', '.join(f'"{v["id"]}"' for v in videos_info) + ']'
 
     cards_html = ''.join(gerar_html_card(v) for v in videos_info)
+    frames_html = gerar_html_frames_section(frames_info or [])
 
     # Prepara link WhatsApp (grupo ou número direto)
     if not whatsapp_link:
@@ -783,6 +1012,8 @@ def gerar_pagina_html(cliente, ano_mes, videos_info, whatsapp_link):
   <div class="posts-lista">
     {cards_html}
   </div>
+
+{frames_html}
 
   <div class="footer-enviar">
     <button class="btn-enviar" id="btn-enviar" onclick="enviarWhatsApp()" disabled>
@@ -867,14 +1098,21 @@ def main():
         else:
             print(f"\n  📝 _contexto.md encontrado — lendo descrições...")
 
-    # 6. Ler YouTube IDs e contextos
-    youtube_ids = ler_youtube_md(pasta_videos)
-    contextos   = ler_contexto_md(pasta_videos)
+    # 6. Ler YouTube IDs, contextos e links Synology
+    youtube_ids   = ler_youtube_md(pasta_videos)
+    contextos     = ler_contexto_md(pasta_videos)
+    synology_links = ler_synology_md(pasta_videos)
 
     sem_yt = [f.stem for f in arquivos if f.stem not in youtube_ids]
     if sem_yt:
         print(f"\n  ⚠️  Sem YouTube ID (rode subir_reels.py primeiro):")
         for nome in sem_yt:
+            print(f"      {nome}")
+
+    sem_syn = [f.stem for f in arquivos if f.stem not in synology_links]
+    if sem_syn:
+        print(f"\n  ℹ️  Sem link Synology (rode gerar_links_synology.py para download direto):")
+        for nome in sem_syn:
             print(f"      {nome}")
 
     # 7. Montar lista de vídeos
@@ -892,19 +1130,51 @@ def main():
                 contexto = desc
                 break
 
+        # Busca link Synology com mesma tolerância
+        synology_link = ''
+        for chave, url in synology_links.items():
+            if slugify(chave) == slugify(reel_nome):
+                synology_link = url
+                break
+
         videos_info.append({
-            'id':         f"reel-{numero:02d}",
-            'numero':     numero,
-            'titulo':     titulo,
-            'contexto':   contexto,
-            'youtube_id': youtube_ids.get(reel_nome),
+            'id':            f"reel-{numero:02d}",
+            'numero':        numero,
+            'titulo':        titulo,
+            'contexto':      contexto,
+            'youtube_id':    youtube_ids.get(reel_nome),
+            'synology_link': synology_link,
         })
+
+    # 7b. Montar lista de frames (com thumbnails base64)
+    frames_info = []
+    frames, pasta_frames = listar_frames(pasta_videos)
+    if frames:
+        print(f"\n  🖼  Gerando thumbnails de {len(frames)} frame(s)...")
+        folder_link = synology_links.get('FRAMES_FOLDER', '')
+        for frame in frames:
+            chave_link = f'FRAME_{frame.name}'
+            link       = synology_links.get(chave_link, '')
+            thumbnail  = gerar_thumbnail_base64(frame)
+            if thumbnail:
+                print(f"      ✅ {frame.name}")
+            else:
+                print(f"      ⚠️  {frame.name} (thumbnail não gerado)")
+            frames_info.append({
+                'nome':      frame.name,
+                'thumbnail': thumbnail,
+                'link':      link,
+            })
+        # Adiciona o folder link como item especial no fim
+        if folder_link:
+            frames_info.append({'folder_link': folder_link})
 
     # 8. Gerar HTML
     # Clientes recorrentes: usa o link configurado ou vazio
     # Clientes pontuais: usa o link padrão (mesmo da Silvana/Baviera)
     whatsapp_link = WHATSAPP_LINKS.get(cliente, WHATSAPP_PADRAO_PONTUAL if pontual else '')
-    html = gerar_pagina_html(cliente, ano_mes, videos_info, whatsapp_link)
+    html = gerar_pagina_html(cliente, ano_mes, videos_info, whatsapp_link,
+                             frames_info=frames_info)
 
     slug = slugify(cliente)
     pasta_saida = OUTPUT_DIR / slug

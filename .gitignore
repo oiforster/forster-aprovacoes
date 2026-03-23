@@ -4,3 +4,4 @@ __pycache__/
 *.pyc
 scripts/youtube_credentials.json
 scripts/youtube_token.json
+scripts/synology_config.json
