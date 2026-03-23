@@ -959,11 +959,12 @@ def gerar_pagina_aprovacao(cliente, posts, periodo_label, semana_inicio, form_id
             posts_html += gerar_html_post(post)
 
     # Metadados dos posts para o JS (geração da mensagem WhatsApp)
+    # meta_label permite substituir a data por outro texto (ex: "REEL 01" em entregas pontuais)
     posts_meta_dict = {}
     posts_ordem_list = []
     for post in sorted(posts, key=lambda p: p['data']):
         posts_meta_dict[post['id']] = {
-            'data': post['data'].strftime('%d/%m'),
+            'data': post.get('meta_label', post['data'].strftime('%d/%m')),
             'titulo': post['titulo'],
         }
         posts_ordem_list.append(post['id'])
@@ -1065,6 +1066,7 @@ def gerar_para_cliente_reels(cliente, ano_mes, agencia_path, base_url, output_di
         else:
             num_str = str(i + 1).zfill(2)
             titulo  = reel_nome
+        reel_label = f"REEL {num_str}"
         posts.append({
             'id':           f'reel-{num_str}',
             'formato':      'Reels',
@@ -1075,7 +1077,8 @@ def gerar_para_cliente_reels(cliente, ano_mes, agencia_path, base_url, output_di
             'legenda':      '',
             'media_link':   '',
             'data':         data_entrega,
-            'data_display': formatar_data_display(data_entrega),
+            'data_display': reel_label,   # mostra "REEL 01" em vez de data
+            'meta_label':   reel_label,   # usado na mensagem WhatsApp
             'arte_url':     None,
         })
 
@@ -1088,6 +1091,11 @@ def gerar_para_cliente_reels(cliente, ano_mes, agencia_path, base_url, output_di
     whatsapp      = WHATSAPP_GRUPOS.get(cliente) or f"https://wa.me/{WHATSAPP_CLIENTES.get(cliente, WHATSAPP_SILVANA_DEFAULT)}"
 
     html = gerar_pagina_aprovacao(cliente, posts, periodo_label, data_entrega, form_id, whatsapp)
+
+    # Adapta textos do template para entrega de vídeos (não posts de conteúdo)
+    html = html.replace('Aprovação de conteúdo', 'Aprovação de vídeos')
+    html = html.replace('Aprovar todos os posts', 'Aprovar todos os vídeos')
+    html = html.replace('Todos os posts aprovados', 'Todos os vídeos aprovados')
 
     # Salva em aprovacao/{slug}/YYYY-MM.html
     pasta_saida = output_dir / slug_cliente
