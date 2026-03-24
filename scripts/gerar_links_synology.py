@@ -193,12 +193,16 @@ def escrever_synology_md(pasta: Path, links: dict):
     with open(arquivo, 'w', encoding='utf-8') as f:
         f.write('# Links de download — Synology — gerado automaticamente\n\n')
 
-        # Vídeos primeiro
+        # Pasta de vídeos (link de pasta completa)
+        if 'VIDEOS_FOLDER' in links:
+            f.write(f"VIDEOS_FOLDER: {links['VIDEOS_FOLDER']}\n\n")
+
+        # Vídeos individuais
         for chave, url in links.items():
             if chave.upper().startswith('REEL'):
                 f.write(f"{chave}: {url}\n")
 
-        # Depois frames
+        # Frames
         separador_escrito = False
         for chave, url in links.items():
             if chave.upper().startswith('FRAMES_FOLDER') or chave.upper().startswith('FRAME_'):
@@ -361,8 +365,9 @@ def main():
     a_regenerar = []
     for k, v in list(links.items()):
         # /fbdownload/ = endpoint errado (erro 119)
-        # gofile.me sem ser FRAMES_FOLDER = ainda não convertido para download direto
-        if '/fbdownload/' in v or ('gofile.me' in v and k != 'FRAMES_FOLDER'):
+        # gofile.me em pastas = mantém (são links de pasta, não de arquivo)
+        pastas = ('FRAMES_FOLDER', 'VIDEOS_FOLDER')
+        if '/fbdownload/' in v or ('gofile.me' in v and k not in pastas):
             a_regenerar.append(k)
             del links[k]
     if a_regenerar:
@@ -394,6 +399,18 @@ def main():
     try:
         # 4. Links de vídeos
         print("  📹 Criando links de vídeos:")
+
+        # Pasta Videos/ inteira (botão "Baixar vídeos" no site de aprovação)
+        if 'VIDEOS_FOLDER' not in links:
+            try:
+                nas_videos = local_to_nas(pasta_videos, agencia)
+                url_videos = criar_link(host, sid, nas_videos, is_folder=True)
+                links['VIDEOS_FOLDER'] = url_videos
+                novos += 1
+                print(f"      📁 Pasta completa: link criado")
+            except RuntimeError as e:
+                print(f"      ❌ Pasta Vídeos: {e}")
+
         for v in videos:
             chave = v.stem
             if chave in links:

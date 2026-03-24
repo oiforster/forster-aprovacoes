@@ -967,23 +967,13 @@ JS_TEMPLATE = """
     }}
 
     function _lbAtualizar() {{
-      var link  = lbLinks[lbIdx] || '';
-      var img   = document.getElementById('lb-img');
-      var hint  = document.getElementById('lb-save-hint');
+      // Usa sempre o thumbnail embutido no HTML (funciona offline e fora da rede local).
+      // O NAS não é acessível de redes externas para carregamento direto de imagem.
+      var srcEl = document.getElementById('lb-src-' + lbIdx);
+      if (srcEl && srcEl.src) document.getElementById('lb-img').src = srcEl.src;
 
-      // Carrega o arquivo em alta resolução direto do Synology.
-      // Fallback para o thumbnail base64 se não houver link.
-      if (link) {{
-        img.style.opacity = '0.4';
-        img.onload = function() {{ img.style.opacity = '1'; }};
-        img.src = link;
-        hint.style.display = 'block';
-      }} else {{
-        var srcEl = document.getElementById('lb-src-' + lbIdx);
-        if (srcEl && srcEl.src) img.src = srcEl.src;
-        img.style.opacity = '1';
-        hint.style.display = 'none';
-      }}
+      var hint = document.getElementById('lb-save-hint');
+      if (hint) hint.style.display = 'block';
 
       var nomeEl = document.getElementById('lb-nome');
       if (nomeEl) nomeEl.textContent = lbNomes[lbIdx] || '';
@@ -1000,18 +990,24 @@ JS_TEMPLATE = """
       if (e.key === 'Escape')     fecharLightbox();
     }});
 
-    // ── DOWNLOAD DE VÍDEO ─────────────────────────────────────────
-    // Imagens: salvar pelo lightbox (pressionar e segurar na imagem)
-    // Vídeos: abre em nova aba com anchor programático (nunca bloqueado como popup)
-    function downloadArquivo(url, nome) {{
-      if (!url) return;
+    // ── ABRIR PASTA NO SYNOLOGY ───────────────────────────────────
+    var VIDEOS_FOLDER = {videos_folder_js};
+
+    function abrirPastaVideos() {{
+      if (!VIDEOS_FOLDER) return;
       var a = document.createElement('a');
-      a.href   = url;
+      a.href   = VIDEOS_FOLDER;
       a.target = '_blank';
       a.rel    = 'noopener';
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
+    }}
+
+    // Oculta botão de download de vídeo se não houver link de pasta
+    if (!VIDEOS_FOLDER) {{
+      var btns = document.querySelectorAll('.btn-download-original');
+      btns.forEach(function(b) {{ b.style.display = 'none'; }});
     }}
 
     // ── SWIPE NO CELULAR ───────────────────────────────────────────
@@ -1070,20 +1066,13 @@ def gerar_html_card(video_info):
     <div class="sem-video-label">⏳ Vídeo ainda não enviado ao YouTube</div>
   </div>'''
 
-    html_download = ''
-    if synology_link:
-        try:
-            filename_video = urllib.parse.unquote(synology_link.rstrip('/').split('/')[-1])
-        except Exception:
-            filename_video = titulo + '.mov'
-        # json.dumps produz aspas duplas — precisa escapar para não quebrar o atributo HTML
-        url_attr  = json.dumps(synology_link).replace('"', '&quot;')
-        file_attr = json.dumps(filename_video).replace('"', '&quot;')
-        html_download = f'''  <button class="btn-download-original" onclick="downloadArquivo({url_attr}, {file_attr})">
+    # Botão de download: abre a pasta com todos os vídeos (VIDEOS_FOLDER).
+    # O link é uma variável JS injetada na página — mesmo botão para todos os cards.
+    html_download = '''  <button class="btn-download-original" onclick="abrirPastaVideos()">
     <svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg">
       <path d="M7.5 1v9M4 7l3.5 3.5L11 7M2 13h11" stroke="#1A1A1A" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
     </svg>
-    Baixar vídeo original (.mov)
+    Baixar vídeos originais
   </button>
 '''
 
@@ -1179,7 +1168,7 @@ def gerar_html_frames_section(frames_info):
 
 
 def gerar_pagina_html(cliente, ano_mes, videos_info, whatsapp_link,
-                      frames_info=None):
+                      frames_info=None, videos_folder_link=''):
     ano, mes_num = ano_mes.split('-')
     mes_display = f"{MESES_PT[int(mes_num)]} de {ano}"
     slug = slugify(cliente)
@@ -1202,6 +1191,7 @@ def gerar_pagina_html(cliente, ano_mes, videos_info, whatsapp_link,
         mes_display_escaped=mes_display.replace("'", "\\'"),
         url_pagina=url_pagina,
         whatsapp_link=whatsapp_link,
+        videos_folder_js=json.dumps(videos_folder_link),
     )
 
     return f"""<!DOCTYPE html>
@@ -1411,9 +1401,11 @@ def main():
     # 8. Gerar HTML
     # Clientes recorrentes: usa o link configurado ou vazio
     # Clientes pontuais: usa o link padrão (mesmo da Silvana/Baviera)
-    whatsapp_link = WHATSAPP_LINKS.get(cliente, WHATSAPP_PADRAO_PONTUAL if pontual else '')
+    whatsapp_link      = WHATSAPP_LINKS.get(cliente, WHATSAPP_PADRAO_PONTUAL if pontual else '')
+    videos_folder_link = synology_links.get('VIDEOS_FOLDER', '')
     html = gerar_pagina_html(cliente, ano_mes, videos_info, whatsapp_link,
-                             frames_info=frames_info)
+                             frames_info=frames_info,
+                             videos_folder_link=videos_folder_link)
 
     slug = slugify(cliente)
     pasta_saida = OUTPUT_DIR / slug
