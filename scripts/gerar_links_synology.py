@@ -13,11 +13,10 @@ import os
 import re
 import sys
 import json
-import ssl
 import argparse
 import unicodedata
-import urllib.request
 import urllib.parse
+import subprocess
 from pathlib import Path
 from datetime import date
 
@@ -65,12 +64,6 @@ NAS_PASS          = _cfg['password']
 NAS_BASE_PATH     = _cfg['nas_base_path']
 LOCAL_SYNC_NAME   = _cfg['local_sync_name']
 
-# ─── SSL (ignora cert auto-assinado do NAS) ───────────────────────────────────
-
-CTX = ssl.create_default_context()
-CTX.check_hostname = False
-CTX.verify_mode    = ssl.CERT_NONE
-
 # ─── UTILITÁRIOS ─────────────────────────────────────────────────────────────
 
 def slugify(texto):
@@ -89,9 +82,17 @@ def local_to_nas(local_path: Path, local_agencia: Path) -> str:
 # ─── API SYNOLOGY ─────────────────────────────────────────────────────────────
 
 def api_call(host: str, endpoint: str, params: dict) -> dict:
+    """Chama a API via curl (suporta HTTP/2 e ignora cert auto-assinado)."""
     url = f"{host}/webapi/{endpoint}?" + urllib.parse.urlencode(params)
-    with urllib.request.urlopen(url, context=CTX, timeout=15) as r:
-        return json.loads(r.read())
+    result = subprocess.run(
+        ['curl', '-k', '-s', '--max-time', '30', url],
+        capture_output=True, text=True, timeout=35
+    )
+    if result.returncode != 0:
+        raise RuntimeError(result.stderr.strip() or f"curl retornou código {result.returncode}")
+    if not result.stdout.strip():
+        raise RuntimeError("curl não retornou dados — verifique host e porta")
+    return json.loads(result.stdout)
 
 
 def auth(host: str) -> str:
@@ -332,7 +333,7 @@ def main():
             print(f"  ❌ Não foi possível conectar: {e_ext}")
             print("\n  Verifique:")
             print("  • Synology está ligado e acessível")
-            print("  • Usuário 'guest' tem permissão de leitura em 'Claude Cowork/Agência'")
+            print(f"  • Usuário '{NAS_USER}' tem permissão de acesso no File Station")
             print("  • Porta 5001 está aberta no roteador (para DDNS)")
             sys.exit(1)
 
