@@ -252,6 +252,39 @@ def ler_synology_md(pasta_videos):
     return links
 
 
+def ler_gdrive_md(pasta_videos):
+    """
+    Lê _gdrive.md → dict { slugify('REEL 01 – Nome'): 'FILE_ID' }.
+    Fallback manual para quando o xattr do Google Drive não está disponível
+    (arquivo em modo streaming / não baixado).
+
+    Formato do arquivo:
+        # IDs manuais do Google Drive
+        REEL 02 – O que é Osteopatia: 1aBcDeFgHiJkLmNoPqRsTuVwXyZ
+        REEL 03 - Fisioterapia e Especialidades: 2bCdEfGhIjKlMnOpQrStUvWxYz
+
+    Como obter o File ID:
+        Finder → botão direito no arquivo no Google Drive → Compartilhar →
+        Copiar link → extrair o ID da URL (parte após /d/ ou id=)
+    """
+    arquivo = pasta_videos / '_gdrive.md'
+    if not arquivo.exists():
+        return {}
+    ids = {}
+    with open(arquivo, 'r', encoding='utf-8') as f:
+        for linha in f:
+            linha = linha.strip()
+            if not linha or linha.startswith('#'):
+                continue
+            # Formato: REEL NN – Nome: FILE_ID
+            m = re.match(r'^(REEL\s+\d+\s*[–\-]\s*.+?):\s*(\S+)$', linha, re.IGNORECASE)
+            if m:
+                chave   = m.group(1).strip()
+                file_id = m.group(2).strip()
+                ids[slugify(chave)] = file_id
+    return ids
+
+
 def _encontrar_pasta_frames(pasta_videos):
     """Localiza pasta de frames.
     Ordem: 1) subpasta 'Frames' dentro dos vídeos; 2) pasta irmã com 'frame' no nome."""
@@ -1514,9 +1547,12 @@ def main():
         else:
             print(f"\n  📝 _contexto.md encontrado — lendo descrições...")
 
-    # 6. Ler YouTube IDs e contextos
-    youtube_ids = ler_youtube_md(pasta_videos)
-    contextos   = ler_contexto_md(pasta_videos)
+    # 6. Ler YouTube IDs, contextos e IDs manuais do Google Drive
+    youtube_ids  = ler_youtube_md(pasta_videos)
+    contextos    = ler_contexto_md(pasta_videos)
+    ids_manuais  = ler_gdrive_md(pasta_videos)
+    if ids_manuais:
+        print(f"\n  📋 _gdrive.md encontrado — {len(ids_manuais)} ID(s) manual(is) carregado(s).")
 
     sem_yt = [f.stem for f in arquivos if f.stem not in youtube_ids]
     if sem_yt:
@@ -1541,12 +1577,24 @@ def main():
                 break
 
         # URL de download via Google Drive
-        drive_url = ''
+        drive_url   = ''
+        drive_fonte = ''
         gdrive_path = synology_para_gdrive(arquivo)
         if gdrive_path:
             drive_url = gdrive_video_download_url(gdrive_path) or ''
+            if drive_url:
+                drive_fonte = 'xattr'
+
+        # Fallback: File ID manual via _gdrive.md (quando xattr não disponível)
+        if not drive_url:
+            file_id_manual = ids_manuais.get(slugify(reel_nome))
+            if file_id_manual:
+                drive_url   = f"https://drive.google.com/uc?export=download&id={file_id_manual}&confirm=t"
+                drive_fonte = '_gdrive.md'
+
         if drive_url:
-            print(f"      ✅ {arquivo.name} → Drive OK")
+            sufixo = f' ({drive_fonte})' if drive_fonte == '_gdrive.md' else ''
+            print(f"      ✅ {arquivo.name} → Drive OK{sufixo}")
         else:
             print(f"      ⚠️  {arquivo.name} → sem URL Drive (vídeo sem botão de download)")
 
