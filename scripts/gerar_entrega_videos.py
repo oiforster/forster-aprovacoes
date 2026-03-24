@@ -826,45 +826,48 @@ CSS = """
       font-family: inherit;
     }
 
-    /* OVERLAY DE DOWNLOAD */
+    /* OVERLAY DE DOWNLOAD — tela cheia com imagem em tamanho real */
     #dl-overlay {
       display: none;
       position: fixed;
-      bottom: 32px;
-      left: 50%;
-      transform: translateX(-50%);
+      inset: 0;
       z-index: 9999;
-      background: rgba(18,18,18,0.95);
-      color: #fff;
-      border-radius: 16px;
-      padding: 18px 24px;
-      min-width: 260px;
-      max-width: 88vw;
+      background: rgba(0,0,0,0.97);
       flex-direction: column;
       align-items: center;
-      gap: 12px;
-      box-shadow: 0 8px 40px rgba(0,0,0,0.45);
-      backdrop-filter: blur(6px);
+      justify-content: center;
+      gap: 0;
     }
-    #dl-msg {
+    #dl-img {
+      max-width: 100vw;
+      max-height: 80vh;
+      object-fit: contain;
+      display: block;
+    }
+    #dl-hint {
+      color: rgba(255,255,255,0.75);
       font-size: 14px;
-      font-weight: 600;
+      font-weight: 500;
       text-align: center;
-      letter-spacing: 0.01em;
+      padding: 18px 24px 8px;
+      line-height: 1.5;
     }
-    #dl-bar-track {
-      width: 100%;
-      height: 4px;
-      background: rgba(255,255,255,0.18);
-      border-radius: 2px;
-      overflow: hidden;
-    }
-    #dl-bar {
-      height: 100%;
-      width: 0%;
-      background: #fff;
-      border-radius: 2px;
-      transition: width 0.15s ease;
+    #dl-close {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      background: rgba(255,255,255,0.15);
+      border: none;
+      color: #fff;
+      font-size: 20px;
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: inherit;
     }
 """
 
@@ -1040,66 +1043,29 @@ JS_TEMPLATE = """
       if (e.key === 'Escape')     fecharLightbox();
     }});
 
-    // ── DOWNLOAD COM PROGRESSO ────────────────────────────────────
+    // ── DOWNLOAD DE ARQUIVO ───────────────────────────────────────
     function downloadArquivo(url, nome) {{
       if (!url) return;
+      var ext = nome.split('.').pop().toLowerCase();
+      var isVideo = ['mov', 'mp4', 'm4v'].indexOf(ext) !== -1;
+
+      if (isVideo) {{
+        // Vídeo: abre em nova aba — chamada síncrona, não é bloqueada pelo browser
+        window.open(url, '_blank');
+        return;
+      }}
+
+      // Imagem: mostra overlay em tela cheia
+      // O usuário pressiona e segura para salvar na galeria (iOS e Android)
       var overlay = document.getElementById('dl-overlay');
-      var bar     = document.getElementById('dl-bar');
-      var msg     = document.getElementById('dl-msg');
+      var dlImg   = document.getElementById('dl-img');
+      dlImg.src   = url;
       overlay.style.display = 'flex';
-      bar.style.width = '5%';
-      msg.textContent = 'Baixando...';
-      var ext  = nome.split('.').pop().toLowerCase();
-      var tipos = {{ jpg:'image/jpeg', jpeg:'image/jpeg', png:'image/png',
-                     tif:'image/tiff', tiff:'image/tiff',
-                     mov:'video/quicktime', mp4:'video/mp4' }};
-      var mime = tipos[ext] || 'application/octet-stream';
-      fetch(url)
-        .then(function(r) {{
-          if (!r.ok) throw new Error('HTTP ' + r.status);
-          var total  = parseInt(r.headers.get('content-length') || '0');
-          var loaded = 0;
-          var chunks = [];
-          var reader = r.body.getReader();
-          function pump() {{
-            return reader.read().then(function(d) {{
-              if (d.done) return;
-              chunks.push(d.value);
-              loaded += d.value.length;
-              bar.style.width = total > 0
-                ? Math.min(95, Math.round(loaded / total * 100)) + '%'
-                : '60%';
-              return pump();
-            }});
-          }}
-          return pump().then(function() {{
-            bar.style.width = '100%';
-            var blob = new Blob(chunks, {{ type: mime }});
-            var file = new File([blob], nome, {{ type: mime }});
-            // iOS: usa Web Share API para abrir o painel de salvamento nativo
-            if (navigator.share && navigator.canShare && navigator.canShare({{ files: [file] }})) {{
-              overlay.style.display = 'none';
-              navigator.share({{ files: [file] }}).catch(function() {{}});
-              return;
-            }}
-            // Android / desktop: salva via blob download
-            var burl = URL.createObjectURL(blob);
-            var a    = document.createElement('a');
-            a.href     = burl;
-            a.download = nome;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            setTimeout(function() {{ URL.revokeObjectURL(burl); }}, 15000);
-            msg.textContent = '✓ Arquivo salvo';
-            setTimeout(function() {{ overlay.style.display = 'none'; }}, 2500);
-          }});
-        }})
-        .catch(function() {{
-          // CORS bloqueado ou erro de rede — fallback para nova aba
-          overlay.style.display = 'none';
-          window.open(url, '_blank');
-        }});
+    }}
+
+    function fecharDlOverlay() {{
+      document.getElementById('dl-overlay').style.display = 'none';
+      document.getElementById('dl-img').src = '';
     }}
 
     // ── SWIPE NO CELULAR ───────────────────────────────────────────
@@ -1362,8 +1328,9 @@ def gerar_pagina_html(cliente, ano_mes, videos_info, whatsapp_link,
   </div>
 
   <div id="dl-overlay">
-    <div id="dl-msg">Baixando...</div>
-    <div id="dl-bar-track"><div id="dl-bar"></div></div>
+    <button id="dl-close" onclick="fecharDlOverlay()">✕</button>
+    <img id="dl-img" src="" alt="">
+    <div id="dl-hint">Pressione e segure a imagem para salvar na galeria</div>
   </div>
 
 </body>
