@@ -221,7 +221,7 @@ def ler_synology_md(pasta_videos):
             linha = linha.strip()
             if not linha or linha.startswith('#'):
                 continue
-            idx = linha.find(': https://')
+            idx = linha.find(': http')
             if idx == -1:
                 continue
             links[linha[:idx].strip()] = linha[idx + 2:].strip()
@@ -765,7 +765,8 @@ CSS = """
     #lb-prev { left: 10px; }
     #lb-next { right: 10px; }
     #lb-img {
-      max-width: 88vw;
+      width: min(88vw, 480px);
+      height: auto;
       max-height: 80vh;
       object-fit: contain;
       border-radius: 4px;
@@ -1342,7 +1343,7 @@ def main():
             rel = frame.relative_to(pasta_frames).as_posix()
             chave_link = f'FRAME_{rel}'
             link       = synology_links.get(chave_link, '')
-            thumbnail  = gerar_thumbnail_base64(frame)
+            thumbnail  = gerar_thumbnail_base64(frame, 600)
             if thumbnail:
                 print(f"      ✅ {frame.name}")
             else:

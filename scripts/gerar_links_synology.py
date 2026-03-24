@@ -157,7 +157,7 @@ def ler_synology_md(pasta: Path) -> dict:
             linha = linha.strip()
             if not linha or linha.startswith('#'):
                 continue
-            idx = linha.find(': https://')
+            idx = linha.find(': http')
             if idx == -1:
                 continue
             links[linha[:idx].strip()] = linha[idx + 2:].strip()
