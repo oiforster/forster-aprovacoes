@@ -561,11 +561,11 @@
       </div>
     </div>
   </div>
-  <button class="btn-download-original" onclick="downloadArquivo(&quot;https://forsterfilmes.synology.me:5001/fsdownload/WawwbQ81o/REEL%2001%20%E2%80%93%20Quem%20%C3%A9%20o%20Dr.%20William.mov&quot;, &quot;REEL 01 \u2013 Quem \u00e9 o Dr. William.mov&quot;)">
+  <button class="btn-download-original" onclick="abrirPastaVideos()">
     <svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg">
       <path d="M7.5 1v9M4 7l3.5 3.5L11 7M2 13h11" stroke="#1A1A1A" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
     </svg>
-    Baixar vídeo original (.mov)
+    Baixar vídeos originais
   </button>
   <div class="post-divider"></div>
   <div class="post-acoes">
@@ -603,11 +603,11 @@
       </div>
     </div>
   </div>
-  <button class="btn-download-original" onclick="downloadArquivo(&quot;https://forsterfilmes.synology.me:5001/fsdownload/uGDPkINFS/REEL%2002%20%E2%80%93%20O%20que%20%C3%A9%20Osteopatia.mov&quot;, &quot;REEL 02 \u2013 O que \u00e9 Osteopatia.mov&quot;)">
+  <button class="btn-download-original" onclick="abrirPastaVideos()">
     <svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg">
       <path d="M7.5 1v9M4 7l3.5 3.5L11 7M2 13h11" stroke="#1A1A1A" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
     </svg>
-    Baixar vídeo original (.mov)
+    Baixar vídeos originais
   </button>
   <div class="post-divider"></div>
   <div class="post-acoes">
@@ -645,11 +645,11 @@
       </div>
     </div>
   </div>
-  <button class="btn-download-original" onclick="downloadArquivo(&quot;https://forsterfilmes.synology.me:5001/fsdownload/k330wmiha/REEL%2003%20-%20Fisioterapia%20e%20Especialidades.mov&quot;, &quot;REEL 03 - Fisioterapia e Especialidades.mov&quot;)">
+  <button class="btn-download-original" onclick="abrirPastaVideos()">
     <svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg">
       <path d="M7.5 1v9M4 7l3.5 3.5L11 7M2 13h11" stroke="#1A1A1A" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
     </svg>
-    Baixar vídeo original (.mov)
+    Baixar vídeos originais
   </button>
   <div class="post-divider"></div>
   <div class="post-acoes">
@@ -687,11 +687,11 @@
       </div>
     </div>
   </div>
-  <button class="btn-download-original" onclick="downloadArquivo(&quot;https://forsterfilmes.synology.me:5001/fsdownload/ApvhZuaIF/REEL%2004%20%E2%80%93%20Como%20Funcionam%20os%20Atendimentos.mov&quot;, &quot;REEL 04 \u2013 Como Funcionam os Atendimentos.mov&quot;)">
+  <button class="btn-download-original" onclick="abrirPastaVideos()">
     <svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg">
       <path d="M7.5 1v9M4 7l3.5 3.5L11 7M2 13h11" stroke="#1A1A1A" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
     </svg>
-    Baixar vídeo original (.mov)
+    Baixar vídeos originais
   </button>
   <div class="post-divider"></div>
   <div class="post-acoes">
@@ -873,23 +873,13 @@
     }
 
     function _lbAtualizar() {
-      var link  = lbLinks[lbIdx] || '';
-      var img   = document.getElementById('lb-img');
-      var hint  = document.getElementById('lb-save-hint');
+      // Usa sempre o thumbnail embutido no HTML (funciona offline e fora da rede local).
+      // O NAS não é acessível de redes externas para carregamento direto de imagem.
+      var srcEl = document.getElementById('lb-src-' + lbIdx);
+      if (srcEl && srcEl.src) document.getElementById('lb-img').src = srcEl.src;
 
-      // Carrega o arquivo em alta resolução direto do Synology.
-      // Fallback para o thumbnail base64 se não houver link.
-      if (link) {
-        img.style.opacity = '0.4';
-        img.onload = function() { img.style.opacity = '1'; };
-        img.src = link;
-        hint.style.display = 'block';
-      } else {
-        var srcEl = document.getElementById('lb-src-' + lbIdx);
-        if (srcEl && srcEl.src) img.src = srcEl.src;
-        img.style.opacity = '1';
-        hint.style.display = 'none';
-      }
+      var hint = document.getElementById('lb-save-hint');
+      if (hint) hint.style.display = 'block';
 
       var nomeEl = document.getElementById('lb-nome');
       if (nomeEl) nomeEl.textContent = lbNomes[lbIdx] || '';
@@ -906,18 +896,24 @@
       if (e.key === 'Escape')     fecharLightbox();
     });
 
-    // ── DOWNLOAD DE VÍDEO ─────────────────────────────────────────
-    // Imagens: salvar pelo lightbox (pressionar e segurar na imagem)
-    // Vídeos: abre em nova aba com anchor programático (nunca bloqueado como popup)
-    function downloadArquivo(url, nome) {
-      if (!url) return;
+    // ── ABRIR PASTA NO SYNOLOGY ───────────────────────────────────
+    var VIDEOS_FOLDER = "http://gofile.me/7f88o/WGDSRUvlZ";
+
+    function abrirPastaVideos() {
+      if (!VIDEOS_FOLDER) return;
       var a = document.createElement('a');
-      a.href   = url;
+      a.href   = VIDEOS_FOLDER;
       a.target = '_blank';
       a.rel    = 'noopener';
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
+    }
+
+    // Oculta botão de download de vídeo se não houver link de pasta
+    if (!VIDEOS_FOLDER) {
+      var btns = document.querySelectorAll('.btn-download-original');
+      btns.forEach(function(b) { b.style.display = 'none'; });
     }
 
     // ── SWIPE NO CELULAR ───────────────────────────────────────────
