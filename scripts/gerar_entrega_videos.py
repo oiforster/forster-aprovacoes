@@ -218,9 +218,27 @@ def encontrar_pasta_videos(pasta_cliente, ano_mes):
 
 # ─── LEITURA DE ARQUIVOS ──────────────────────────────────────────────────────
 
+def _pasta_meta(pasta_videos):
+    """
+    Pasta para arquivos de metadados internos (_youtube.md, _gdrive.md, etc).
+    Fica em pasta_videos.parent/_meta, fora da pasta de vídeos visível pelo cliente.
+    Se não existir, retorna None (fallback para pasta_videos).
+    """
+    meta = pasta_videos.parent / '_meta'
+    return meta if meta.exists() else None
+
+def _ler_arquivo_md(pasta_videos, nome_arquivo):
+    """Resolve o caminho de um arquivo .md: busca em _meta/ primeiro, depois na pasta de vídeos."""
+    meta = _pasta_meta(pasta_videos)
+    if meta:
+        candidato = meta / nome_arquivo
+        if candidato.exists():
+            return candidato
+    return pasta_videos / nome_arquivo
+
 def ler_youtube_md(pasta_videos):
     """Lê _youtube.md → dict { 'REEL 01 – Nome': 'VIDEO_ID' }."""
-    arquivo = pasta_videos / '_youtube.md'
+    arquivo = _ler_arquivo_md(pasta_videos, '_youtube.md')
     if not arquivo.exists():
         return {}
     ids = {}
@@ -244,7 +262,7 @@ def ler_contexto_md(pasta_videos):
     Lê _contexto.md → dict { 'REEL 01 – Nome': 'descrição' }.
     Formato: REEL 01 – Nome do Vídeo: Descrição para o cliente ver
     """
-    arquivo = pasta_videos / '_contexto.md'
+    arquivo = _ler_arquivo_md(pasta_videos, '_contexto.md')
     if not arquivo.exists():
         return {}
     contextos = {}
@@ -263,7 +281,7 @@ def ler_contexto_md(pasta_videos):
 
 def ler_synology_md(pasta_videos):
     """Lê _synology.md → dict { 'REEL 01 – Nome': 'https://...' }"""
-    arquivo = pasta_videos / '_synology.md'
+    arquivo = _ler_arquivo_md(pasta_videos, '_synology.md')
     if not arquivo.exists():
         return {}
     links = {}
@@ -294,7 +312,7 @@ def ler_gdrive_md(pasta_videos):
         Finder → botão direito no arquivo no Google Drive → Compartilhar →
         Copiar link → extrair o ID da URL (parte após /d/ ou id=)
     """
-    arquivo = pasta_videos / '_gdrive.md'
+    arquivo = _ler_arquivo_md(pasta_videos, '_gdrive.md')
     if not arquivo.exists():
         return {}
     ids = {}
@@ -365,8 +383,10 @@ def gerar_thumbnail_base64(frame_path, max_size=300):
 
 
 def gerar_template_contexto(pasta_videos, videos):
-    """Cria _contexto.md com template para Samuel preencher."""
-    arquivo = pasta_videos / '_contexto.md'
+    """Cria _contexto.md em _meta/ (ou pasta_videos como fallback)."""
+    destino = pasta_videos.parent / '_meta'
+    destino.mkdir(exist_ok=True)
+    arquivo = destino / '_contexto.md'
     with open(arquivo, 'w', encoding='utf-8') as f:
         f.write('# Contexto por vídeo (opcional)\n')
         f.write('# Preencha uma descrição breve para o cliente ver na página de aprovação.\n')
@@ -1012,46 +1032,6 @@ CSS = """
       font-family: inherit;
     }
 
-    /* OVERLAY DE VÍDEO (salvar na galeria) */
-    #video-dl-overlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.97);
-      z-index: 550;
-      display: none;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-    }
-    #video-dl-close {
-      position: absolute;
-      top: 16px;
-      right: 16px;
-      background: rgba(255,255,255,0.15);
-      color: #fff;
-      border: none;
-      border-radius: 50%;
-      width: 44px;
-      height: 44px;
-      font-size: 20px;
-      cursor: pointer;
-    }
-    #video-dl-player {
-      width: min(90vw, 400px);
-      max-height: 65vh;
-      border-radius: 8px;
-      background: #000;
-    }
-    #video-dl-hint {
-      color: rgba(255,255,255,0.65);
-      font-size: 13px;
-      text-align: center;
-      margin-top: 14px;
-      max-width: 300px;
-      line-height: 1.6;
-    }
-
 """
 
 JS_TEMPLATE = """
@@ -1262,31 +1242,16 @@ JS_TEMPLATE = """
         window.location.href = downloadUrl;
         return;
       }}
-      // iPhone: abre overlay com <video> — long-press → Salvar vídeo → Fotos
+      // iOS: Google Drive não faz stream de .mov em <video> no Safari.
+      // Abre o visualizador do Drive em nova aba → ⋮ → Fazer download.
       try {{
         var u = new URL(downloadUrl);
         var fileId = u.searchParams.get('id');
-        var videoSrc = 'https://drive.google.com/uc?id=' + fileId + '&confirm=t';
-        var overlay = document.getElementById('video-dl-overlay');
-        var player  = document.getElementById('video-dl-player');
-        player.src = videoSrc;
-        overlay.style.display = 'flex';
+        window.open('https://drive.google.com/file/d/' + fileId + '/view', '_blank');
       }} catch(e) {{
         window.location.href = downloadUrl;
       }}
     }}
-
-    function fecharVideoDownload() {{
-      var overlay = document.getElementById('video-dl-overlay');
-      var player  = document.getElementById('video-dl-player');
-      overlay.style.display = 'none';
-      player.pause();
-      player.src = '';
-    }}
-
-    document.addEventListener('keydown', function(e) {{
-      if (e.key === 'Escape') fecharVideoDownload();
-    }});
 """
 
 def gerar_html_card(video_info):
@@ -1520,11 +1485,6 @@ def gerar_pagina_html(cliente, ano_mes, videos_info, whatsapp_link,
     <div class="footer-pendente" id="footer-pendente">Revise todos os vídeos antes de enviar.</div>
   </div>
 
-  <div id="video-dl-overlay">
-    <button id="video-dl-close" onclick="fecharVideoDownload()">✕</button>
-    <video id="video-dl-player" controls playsinline></video>
-    <p id="video-dl-hint">Segure o dedo sobre o vídeo para salvar na galeria</p>
-  </div>
 
 </body>
 </html>"""
@@ -1594,7 +1554,7 @@ def main():
 
     # 5. _contexto.md
     if not args.sem_contexto:
-        arquivo_contexto = pasta_videos / '_contexto.md'
+        arquivo_contexto = _ler_arquivo_md(pasta_videos, '_contexto.md')
         if not arquivo_contexto.exists():
             template = gerar_template_contexto(pasta_videos, arquivos)
             print(f"\n  📝 _contexto.md criado com template em:\n     {template}")
