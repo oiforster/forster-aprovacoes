@@ -859,13 +859,12 @@ CSS = """
     /* SEÇÃO FRAMES */
     .frames-section {
       margin: 8px 16px 24px;
-      background: #fff;
-      border-radius: 14px;
-      overflow: hidden;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.07);
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
     }
     .frames-header {
-      padding: 14px 14px 10px;
+      padding: 6px 2px 2px;
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -894,10 +893,11 @@ CSS = """
       transition: background 0.15s;
     }
     .btn-baixar-todos:hover { background: #333; }
-    .frames-grupo + .frames-grupo {
-      border-top: 1px solid #EBEBEB;
-      margin-top: 24px;
-      padding-top: 20px;
+    .frames-grupo {
+      background: #fff;
+      border-radius: 14px;
+      overflow: hidden;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.07);
     }
     .frames-grupo-titulo {
       font-size: 11px;
@@ -905,7 +905,7 @@ CSS = """
       letter-spacing: 0.10em;
       text-transform: uppercase;
       color: #999;
-      padding: 10px 14px 6px;
+      padding: 12px 14px 6px;
     }
     .frames-grid {
       display: grid;
