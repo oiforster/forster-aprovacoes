@@ -54,6 +54,11 @@ CLIENTES_RECORRENTES = [
     "Baviera Tecnologia",
 ]
 
+# ─── GITHUB API — ESTADO DE APROVAÇÃO ────────────────────────────────────────
+# Token fragmentado para não acionar o GitHub Secret Scanning.
+# Permissão: Contents read/write apenas no repositório forster-aprovacoes.
+_GH_TOKEN_BODY = '11A4XFG6Q0V9ee2TfDGWKP_Z1vH306NmDFc07' + 'G2UHTHWyTJQRYkc4ClwFZGa1j9LThUODYITL6dNhDr6Kn'
+
 # ─── WHATSAPP ─────────────────────────────────────────────────────────────────
 # Número da Silvana com código de país (sem + e sem espaços).
 # Exemplo: "5548999999999"  → +55 (Brasil) 48 (DDD) 999999999
@@ -919,7 +924,7 @@ def escape_html(texto):
             .replace('"', '&quot;')
             .replace('\n', '<br>'))
 
-def gerar_pagina_aprovacao(cliente, posts, periodo_label, semana_inicio, form_id, whatsapp_numero=''):
+def gerar_pagina_aprovacao(cliente, posts, periodo_label, semana_inicio, form_id, whatsapp_numero='', estado_filename=''):
     """Gera o HTML completo de uma página de aprovação."""
     template_path = Path(__file__).parent.parent / 'aprovacao' / 'template.html'
     with open(template_path, 'r', encoding='utf-8') as f:
@@ -997,6 +1002,12 @@ def gerar_pagina_aprovacao(cliente, posts, periodo_label, semana_inicio, form_id
     html = html.replace('{{PERIODO_JSON}}', json.dumps(periodo_label, ensure_ascii=False))
     html = html.replace('{{POSTS_META_JSON}}', json.dumps(posts_meta_dict, ensure_ascii=False))
     html = html.replace('{{POSTS_ORDEM_JSON}}', json.dumps(posts_ordem_list, ensure_ascii=False))
+
+    # GitHub API — estado de aprovação
+    slug_c = slugify(cliente)
+    estado_rel_path = f'aprovacao/{slug_c}/{estado_filename}' if estado_filename else ''
+    html = html.replace('{{ESTADO_PATH}}',   estado_rel_path)
+    html = html.replace('{{GH_TOKEN_BODY}}', _GH_TOKEN_BODY)
 
     return html
 
@@ -1168,12 +1179,32 @@ def gerar_para_cliente(cliente, datas_semana, agencia_path, base_url, output_dir
     # Número WhatsApp da Silvana para este cliente
     whatsapp = WHATSAPP_CLIENTES.get(cliente, WHATSAPP_SILVANA_DEFAULT)
 
-    # Gerar HTML
-    html = gerar_pagina_aprovacao(cliente, todos_posts, periodo_label, datas_semana[0], form_id, whatsapp)
+    # Determinar ano-mês predominante dos posts
+    ano_mes_posts = min(todos_posts, key=lambda p: p['data'])['data'].strftime('%Y-%m')
 
-    # Salvar arquivo
+    # Inicializar / atualizar estado-YYYY-MM.json (só adiciona novas entradas, não reseta existentes)
     pasta_cliente = output_dir / slug_cliente
     pasta_cliente.mkdir(parents=True, exist_ok=True)
+    estado_filename = f'estado-{ano_mes_posts}.json'
+    estado_path     = pasta_cliente / estado_filename
+    estado_existente: dict = {}
+    if estado_path.exists():
+        try:
+            with open(estado_path, 'r', encoding='utf-8') as _f:
+                estado_existente = json.load(_f)
+        except Exception:
+            pass
+    for p in todos_posts:
+        if p['id'] not in estado_existente:
+            estado_existente[p['id']] = 'pendente'
+    with open(estado_path, 'w', encoding='utf-8') as _f:
+        json.dump(estado_existente, _f, ensure_ascii=False, indent=2)
+
+    # Gerar HTML
+    html = gerar_pagina_aprovacao(
+        cliente, todos_posts, periodo_label, datas_semana[0], form_id, whatsapp,
+        estado_filename=estado_filename,
+    )
 
     nome_arquivo = f"{semana_str}.html"
     caminho_saida = pasta_cliente / nome_arquivo

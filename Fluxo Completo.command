@@ -191,6 +191,27 @@ if [ $GERAR_STATUS -ne 0 ]; then
 fi
 
 # ════════════════════════════════════════════════════
+# ETAPA 3b — ATUALIZAR BIBLIOTECA DE ENTREGAS
+# (gera páginas de download com aprovação liberada)
+# ════════════════════════════════════════════════════
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo "  ETAPA 3b — Atualizando biblioteca de entregas..."
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo ""
+
+# Monta args para a biblioteca (cliente e mês, sem período)
+ARGS_BIB=()
+if [ -n "$CLIENTE" ]; then
+  ARGS_BIB+=(--cliente "$CLIENTE")
+fi
+if [ -n "$MES_INPUT" ]; then
+  ARGS_BIB+=(--mes "$MES_INPUT")
+fi
+
+python3 "$SCRIPTS/gerar_biblioteca.py" "${ARGS_BIB[@]}"
+echo ""
+
+# ════════════════════════════════════════════════════
 # ETAPA 4 — PUBLICAR
 # ════════════════════════════════════════════════════
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"

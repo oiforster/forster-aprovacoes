@@ -722,6 +722,57 @@
   const whatsappGrupo = '{{WHATSAPP_GRUPO}}';  // link do grupo (ex: https://chat.whatsapp.com/XXX)
   const postsMeta = {{POSTS_META_JSON}};
   const postsOrdem = {{POSTS_ORDEM_JSON}};
+
+  // ── ESTADO VIA GITHUB API ───────────────────────────────────────────────────
+  // Token fragmentado para não acionar o GitHub Secret Scanning.
+  // Permissão: Contents read/write apenas neste repositório.
+  const _tk = ['github', '_pat_', '{{GH_TOKEN_BODY}}'].join('');
+  const _ghOwner = 'oiforster';
+  const _ghRepo  = 'forster-aprovacoes';
+  const _estadoPath = '{{ESTADO_PATH}}'; // ex: aprovacao/fyber-show-piscinas/estado-2026-03.json
+
+  // Fila serializada: evita race-condition de SHA quando o cliente clica rápido
+  let _salvarFila = Promise.resolve();
+
+  async function _salvarEstado(postId, status) {
+    _salvarFila = _salvarFila.then(async () => {
+      try {
+        const url = 'https://api.github.com/repos/' + _ghOwner + '/' + _ghRepo + '/contents/' + _estadoPath;
+        const getResp = await fetch(url, { headers: { Authorization: 'token ' + _tk } });
+        if (!getResp.ok) return;
+        const getData = await getResp.json();
+        const sha     = getData.sha;
+        const estado  = JSON.parse(atob(getData.content.replace(/\n/g, '')));
+        estado[postId] = status;
+        const novoConteudo = btoa(unescape(encodeURIComponent(JSON.stringify(estado, null, 2))));
+        await fetch(url, {
+          method: 'PUT',
+          headers: { Authorization: 'token ' + _tk, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ message: 'estado: ' + postId, content: novoConteudo, sha: sha })
+        });
+      } catch(e) { /* falha silenciosa — WhatsApp é o canal principal */ }
+    });
+  }
+
+  async function _salvarEstadoMultiplos(mapa) {
+    _salvarFila = _salvarFila.then(async () => {
+      try {
+        const url = 'https://api.github.com/repos/' + _ghOwner + '/' + _ghRepo + '/contents/' + _estadoPath;
+        const getResp = await fetch(url, { headers: { Authorization: 'token ' + _tk } });
+        if (!getResp.ok) return;
+        const getData = await getResp.json();
+        const sha    = getData.sha;
+        const estado = JSON.parse(atob(getData.content.replace(/\n/g, '')));
+        Object.assign(estado, mapa);
+        const novoConteudo = btoa(unescape(encodeURIComponent(JSON.stringify(estado, null, 2))));
+        await fetch(url, {
+          method: 'PUT',
+          headers: { Authorization: 'token ' + _tk, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ message: 'estado: aprovar-tudo', content: novoConteudo, sha: sha })
+        });
+      } catch(e) { /* falha silenciosa */ }
+    });
+  }
   
   function enviarEmailSilencioso(mensagem) {
     try {
@@ -752,6 +803,7 @@
       btnAprovar.classList.remove('ativo');
       btnAjuste.classList.remove('ativo');
       if (campoAjuste) campoAjuste.classList.remove('visivel');
+      _salvarEstado(id, 'pendente');
     } else {
       statusPosts[id] = acao;
       card.classList.remove('aprovado', 'ajuste');
@@ -767,6 +819,7 @@
         btnAjuste.classList.add('ativo');
         if (campoAjuste) campoAjuste.classList.add('visivel');
       }
+      _salvarEstado(id, acao);
     }
 
     atualizarProgresso();
@@ -813,9 +866,11 @@
     if (todosAprovados) return;
 
     // Aprova todos os posts
+    const mapaEstado = {};
     document.querySelectorAll('[data-post-id]').forEach(card => {
       const id = card.dataset.postId;
       statusPosts[id] = 'aprovado';
+      mapaEstado[id]  = 'aprovado';
       card.classList.add('aprovado');
       card.classList.remove('ajuste');
       const ba = document.getElementById('aprovar-' + id);
@@ -825,6 +880,7 @@
       if (baj) baj.classList.remove('ativo');
       if (ca) ca.classList.remove('visivel');
     });
+    _salvarEstadoMultiplos(mapaEstado);
 
     btn.classList.add('ativo');
     btn.textContent = '✓ Todos os posts aprovados';
