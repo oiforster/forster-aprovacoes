@@ -22,6 +22,7 @@ import tempfile
 import unicodedata
 import argparse
 import subprocess
+import urllib.parse
 from datetime import date
 from pathlib import Path
 
@@ -811,8 +812,60 @@ CSS = """
       font-weight: 600;
       text-decoration: none;
       letter-spacing: 0.01em;
+      border: none;
+      cursor: pointer;
+      font-family: inherit;
     }
     #lb-download:hover { background: rgba(255,255,255,0.25); }
+
+    /* BOTÕES QUE VIRAM <button> (reset de estilo de navegador) */
+    .btn-download-original,
+    .frame-download-btn {
+      border: none;
+      cursor: pointer;
+      font-family: inherit;
+    }
+
+    /* OVERLAY DE DOWNLOAD */
+    #dl-overlay {
+      display: none;
+      position: fixed;
+      bottom: 32px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 9999;
+      background: rgba(18,18,18,0.95);
+      color: #fff;
+      border-radius: 16px;
+      padding: 18px 24px;
+      min-width: 260px;
+      max-width: 88vw;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      box-shadow: 0 8px 40px rgba(0,0,0,0.45);
+      backdrop-filter: blur(6px);
+    }
+    #dl-msg {
+      font-size: 14px;
+      font-weight: 600;
+      text-align: center;
+      letter-spacing: 0.01em;
+    }
+    #dl-bar-track {
+      width: 100%;
+      height: 4px;
+      background: rgba(255,255,255,0.18);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+    #dl-bar {
+      height: 100%;
+      width: 0%;
+      background: #fff;
+      border-radius: 2px;
+      transition: width 0.15s ease;
+    }
 """
 
 JS_TEMPLATE = """
@@ -973,8 +1026,8 @@ JS_TEMPLATE = """
       document.getElementById('lb-counter').textContent = (lbIdx + 1) + ' / ' + lbTotal;
       var dl   = document.getElementById('lb-download');
       var link = lbLinks[lbIdx] || '';
-      if (link) {{ dl.href = link; dl.style.display = 'flex'; }}
-      else {{ dl.style.display = 'none'; }}
+      if (link) {{ dl.style.display = 'flex'; }}
+      else       {{ dl.style.display = 'none'; }}
       document.getElementById('lb-prev').style.opacity = lbIdx > 0 ? '1' : '0.25';
       document.getElementById('lb-next').style.opacity = lbIdx < lbTotal - 1 ? '1' : '0.25';
     }}
@@ -986,6 +1039,68 @@ JS_TEMPLATE = """
       if (e.key === 'ArrowRight') lightboxNavegar(1);
       if (e.key === 'Escape')     fecharLightbox();
     }});
+
+    // ── DOWNLOAD COM PROGRESSO ────────────────────────────────────
+    function downloadArquivo(url, nome) {{
+      if (!url) return;
+      var overlay = document.getElementById('dl-overlay');
+      var bar     = document.getElementById('dl-bar');
+      var msg     = document.getElementById('dl-msg');
+      overlay.style.display = 'flex';
+      bar.style.width = '5%';
+      msg.textContent = 'Baixando...';
+      var ext  = nome.split('.').pop().toLowerCase();
+      var tipos = {{ jpg:'image/jpeg', jpeg:'image/jpeg', png:'image/png',
+                     tif:'image/tiff', tiff:'image/tiff',
+                     mov:'video/quicktime', mp4:'video/mp4' }};
+      var mime = tipos[ext] || 'application/octet-stream';
+      fetch(url)
+        .then(function(r) {{
+          if (!r.ok) throw new Error('HTTP ' + r.status);
+          var total  = parseInt(r.headers.get('content-length') || '0');
+          var loaded = 0;
+          var chunks = [];
+          var reader = r.body.getReader();
+          function pump() {{
+            return reader.read().then(function(d) {{
+              if (d.done) return;
+              chunks.push(d.value);
+              loaded += d.value.length;
+              bar.style.width = total > 0
+                ? Math.min(95, Math.round(loaded / total * 100)) + '%'
+                : '60%';
+              return pump();
+            }});
+          }}
+          return pump().then(function() {{
+            bar.style.width = '100%';
+            var blob = new Blob(chunks, {{ type: mime }});
+            var file = new File([blob], nome, {{ type: mime }});
+            // iOS: usa Web Share API para abrir o painel de salvamento nativo
+            if (navigator.share && navigator.canShare && navigator.canShare({{ files: [file] }})) {{
+              overlay.style.display = 'none';
+              navigator.share({{ files: [file] }}).catch(function() {{}});
+              return;
+            }}
+            // Android / desktop: salva via blob download
+            var burl = URL.createObjectURL(blob);
+            var a    = document.createElement('a');
+            a.href     = burl;
+            a.download = nome;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            setTimeout(function() {{ URL.revokeObjectURL(burl); }}, 15000);
+            msg.textContent = '✓ Arquivo salvo';
+            setTimeout(function() {{ overlay.style.display = 'none'; }}, 2500);
+          }});
+        }})
+        .catch(function() {{
+          // CORS bloqueado ou erro de rede — fallback para nova aba
+          overlay.style.display = 'none';
+          window.open(url, '_blank');
+        }});
+    }}
 
     // ── SWIPE NO CELULAR ───────────────────────────────────────────
     (function() {{
@@ -1045,12 +1160,16 @@ def gerar_html_card(video_info):
 
     html_download = ''
     if synology_link:
-        html_download = f'''  <a class="btn-download-original" href="{synology_link}" target="_blank">
+        try:
+            filename_video = urllib.parse.unquote(synology_link.rstrip('/').split('/')[-1])
+        except Exception:
+            filename_video = titulo + '.mov'
+        html_download = f'''  <button class="btn-download-original" onclick="downloadArquivo({json.dumps(synology_link)}, {json.dumps(filename_video)})">
     <svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg">
       <path d="M7.5 1v9M4 7l3.5 3.5L11 7M2 13h11" stroke="#1A1A1A" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
     </svg>
-    Baixar vídeo original (.mov) ↗
-  </a>
+    Baixar vídeo original (.mov)
+  </button>
 '''
 
     return f'''
@@ -1114,10 +1233,11 @@ def gerar_html_frames_section(frames_info):
         download_html = ''
         if link:
             download_html = (
-                f'<a class="frame-download-btn" href="{link}" target="_blank" '
-                f'onclick="event.stopPropagation()" title="Baixar {escape_html(nome)}">'
+                f'<button class="frame-download-btn" '
+                f'onclick="event.stopPropagation(); downloadArquivo({json.dumps(link)}, {json.dumps(nome)})" '
+                f'title="Baixar {escape_html(nome)}">'
                 '⬇'
-                '</a>'
+                '</button>'
             )
 
         cells.append(
@@ -1221,12 +1341,12 @@ def gerar_pagina_html(cliente, ano_mes, videos_info, whatsapp_link,
     <div id="lb-footer">
       <span id="lb-nome"></span>
       <span id="lb-counter"></span>
-      <a id="lb-download" href="" target="_blank" style="display:none">
+      <button id="lb-download" onclick="downloadArquivo(lbLinks[lbIdx], lbNomes[lbIdx])" style="display:none">
         <svg width="16" height="16" viewBox="0 0 15 15" fill="none">
           <path d="M7.5 1v9M4 7l3.5 3.5L11 7M2 13h11" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
         Baixar este frame
-      </a>
+      </button>
     </div>
   </div>
 
@@ -1239,6 +1359,11 @@ def gerar_pagina_html(cliente, ano_mes, videos_info, whatsapp_link,
       Enviar resposta via WhatsApp
     </button>
     <div class="footer-pendente" id="footer-pendente">Revise todos os vídeos antes de enviar.</div>
+  </div>
+
+  <div id="dl-overlay">
+    <div id="dl-msg">Baixando...</div>
+    <div id="dl-bar-track"><div id="dl-bar"></div></div>
   </div>
 
 </body>
