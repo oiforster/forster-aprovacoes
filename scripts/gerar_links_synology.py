@@ -127,8 +127,19 @@ def logout(host: str, sid: str):
         pass
 
 
+def _gofile_to_direto(url: str) -> str:
+    """Converte URL gofile.me → URL de download direto no NAS.
+    Ex: http://gofile.me/7f88o/xX1071kdj → https://HOST:5001/fbdownload/xX1071kdj?bktype=sharing
+    """
+    if 'gofile.me' not in url:
+        return url
+    codigo = url.rstrip('/').split('/')[-1]
+    host = NAS_HOST_EXTERNAL.rstrip('/')
+    return f"{host}/fbdownload/{codigo}?bktype=sharing"
+
+
 def criar_link(host: str, sid: str, nas_path: str) -> str:
-    """Cria link de compartilhamento público e retorna a URL."""
+    """Cria link de compartilhamento e retorna URL de download direto."""
     resp = api_call(host, "entry.cgi", {
         "api":            "SYNO.FileStation.Sharing",
         "version":        "3",
@@ -142,7 +153,8 @@ def criar_link(host: str, sid: str, nas_path: str) -> str:
     if not resp.get("success"):
         code = resp.get("error", {}).get("code", "?")
         raise RuntimeError(f"Erro ao criar link (código {code}) para: {nas_path}")
-    return resp["data"]["links"][0]["url"]
+    url = resp["data"]["links"][0]["url"]
+    return _gofile_to_direto(url)
 
 # ─── _synology.md ─────────────────────────────────────────────────────────────
 
@@ -333,8 +345,13 @@ def main():
     print(f"  📂 Pasta : {pasta_videos}")
     print(f"  📹 Vídeos: {len(videos)}  |  🖼  Frames: {len(frames)}\n")
 
-    # 2. Ler links já existentes (para não duplicar)
+    # 2. Ler links já existentes e migrar gofile.me → download direto
     links = ler_synology_md(pasta_videos)
+    migrados = sum(1 for url in links.values() if 'gofile.me' in url)
+    if migrados > 0:
+        links = {k: _gofile_to_direto(v) for k, v in links.items()}
+        escrever_synology_md(pasta_videos, links)
+        print(f"  🔄 {migrados} links gofile.me migrados para download direto\n")
     novos = 0
 
     # 3. Conectar ao Synology (local primeiro, DDNS como fallback)

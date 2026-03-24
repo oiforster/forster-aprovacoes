@@ -777,38 +777,33 @@ CSS = """
       bottom: 0;
       left: 0;
       right: 0;
-      padding: 16px 16px 24px;
-      background: linear-gradient(transparent, rgba(0,0,0,0.75));
+      padding: 16px 16px 32px;
+      background: linear-gradient(transparent, rgba(0,0,0,0.85));
       display: flex;
+      flex-direction: column;
       align-items: center;
       gap: 10px;
-    }
-    #lb-nome {
-      flex: 1;
-      font-size: 12px;
-      color: rgba(255,255,255,0.65);
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
     }
     #lb-counter {
       font-size: 12px;
       color: rgba(255,255,255,0.5);
-      white-space: nowrap;
     }
     #lb-download {
-      display: inline-flex;
+      display: flex;
       align-items: center;
-      gap: 5px;
-      padding: 7px 13px;
-      background: rgba(255,255,255,0.15);
+      justify-content: center;
+      gap: 8px;
+      width: 100%;
+      padding: 14px 20px;
+      background: rgba(255,255,255,0.18);
       color: #fff;
-      border-radius: 7px;
-      font-size: 12px;
+      border-radius: 12px;
+      font-size: 15px;
       font-weight: 600;
       text-decoration: none;
-      white-space: nowrap;
+      letter-spacing: 0.01em;
     }
+    #lb-download:hover { background: rgba(255,255,255,0.25); }
 """
 
 JS_TEMPLATE = """
@@ -1187,6 +1182,26 @@ def gerar_pagina_html(cliente, ano_mes, videos_info, whatsapp_link,
     {cards_html}
   </div>
 
+  <div id="yt-overlay"></div>
+
+  <div id="frame-lightbox">
+    <button id="lb-close" onclick="fecharLightbox()">✕</button>
+    <button id="lb-prev"  onclick="lightboxNavegar(-1)">‹</button>
+    <img id="lb-img" src="" alt="">
+    <button id="lb-next"  onclick="lightboxNavegar(1)">›</button>
+    <div id="lb-footer">
+      <span id="lb-counter"></span>
+      <a id="lb-download" href="" target="_blank">
+        <svg width="16" height="16" viewBox="0 0 15 15" fill="none">
+          <path d="M7.5 1v9M4 7l3.5 3.5L11 7M2 13h11" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        Baixar este frame
+      </a>
+    </div>
+  </div>
+
+  <script>{js}</script>
+
 {frames_html}
 
   <div class="footer-enviar">
@@ -1196,21 +1211,6 @@ def gerar_pagina_html(cliente, ano_mes, videos_info, whatsapp_link,
     <div class="footer-pendente" id="footer-pendente">Revise todos os vídeos antes de enviar.</div>
   </div>
 
-  <div id="yt-overlay"></div>
-
-  <div id="frame-lightbox">
-    <button id="lb-close" onclick="fecharLightbox()">✕</button>
-    <button id="lb-prev"  onclick="lightboxNavegar(-1)">‹</button>
-    <img id="lb-img" src="" alt="">
-    <button id="lb-next"  onclick="lightboxNavegar(1)">›</button>
-    <div id="lb-footer">
-      <span id="lb-nome"></span>
-      <span id="lb-counter"></span>
-      <a id="lb-download" href="" target="_blank">⬇ Baixar</a>
-    </div>
-  </div>
-
-  <script>{js}</script>
 </body>
 </html>"""
 
