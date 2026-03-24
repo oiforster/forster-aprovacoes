@@ -894,6 +894,19 @@ CSS = """
       transition: background 0.15s;
     }
     .btn-baixar-todos:hover { background: #333; }
+    .frames-grupo + .frames-grupo {
+      border-top: 1px solid #EBEBEB;
+      margin-top: 4px;
+      padding-top: 4px;
+    }
+    .frames-grupo-titulo {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.10em;
+      text-transform: uppercase;
+      color: #999;
+      padding: 10px 14px 6px;
+    }
     .frames-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
@@ -1334,12 +1347,13 @@ def gerar_html_frames_section(frames_info):
       nome       → nome do arquivo
       thumbnail  → data URI base64 ou None (fallback offline)
       drive_url  → URL lh3.googleusercontent.com/d/ID para o lightbox (full-res)
+      grupo      → nome da subpasta de origem (ex: 'REEL 01 – ...') ou ''
+      folder_link → (especial) URL da pasta no Drive para botão "Baixar todos"
     """
     if not frames_info:
         return ''
 
     folder_link   = ''
-    cells         = []
     lb_links      = {}
     lb_nomes      = {}
     lb_drive_urls = {}
@@ -1349,23 +1363,43 @@ def gerar_html_frames_section(frames_info):
         if fi.get('folder_link'):
             folder_link = fi['folder_link']
 
+    # Índice lightbox sequencial; agrupa preservando ordem de inserção
+    grupos: dict = {}
     for idx, fi in enumerate(frame_items):
-        nome      = fi['nome']
-        thumbnail = fi.get('thumbnail')
-        drive_url = fi.get('drive_url', '')
+        lb_links[idx]      = ''
+        lb_nomes[idx]      = fi['nome']
+        lb_drive_urls[idx] = fi.get('drive_url', '')
 
-        lb_links[idx]      = ''  # mantido por compatibilidade
-        lb_nomes[idx]      = nome
-        lb_drive_urls[idx] = drive_url
+        grupo = fi.get('grupo', '')
+        if grupo not in grupos:
+            grupos[grupo] = []
+        grupos[grupo].append((idx, fi))
 
-        if thumbnail:
-            img_html = f'<img id="lb-src-{idx}" src="{thumbnail}" alt="{escape_html(nome)}" loading="lazy">'
-        else:
-            img_html = f'<span id="lb-src-{idx}" style="display:none"></span><div class="frame-sem-preview">🖼</div>'
+    # Renderiza um bloco por grupo
+    grupos_html_parts = []
+    for grupo, items in grupos.items():
+        cells = []
+        for idx, fi in items:
+            thumbnail = fi.get('thumbnail')
+            nome      = fi['nome']
+            if thumbnail:
+                img_html = f'<img id="lb-src-{idx}" src="{thumbnail}" alt="{escape_html(nome)}" loading="lazy">'
+            else:
+                img_html = (f'<span id="lb-src-{idx}" style="display:none"></span>'
+                            f'<div class="frame-sem-preview">🖼</div>')
+            cells.append(
+                f'<div class="frame-cell" onclick="abrirLightbox({idx})">{img_html}</div>'
+            )
 
-        cells.append(
-            f'<div class="frame-cell" onclick="abrirLightbox({idx})">'
-            f'{img_html}</div>'
+        titulo_html = (f'<div class="frames-grupo-titulo">{escape_html(grupo)}</div>\n    '
+                       if grupo else '')
+        grid = '\n    '.join(cells)
+        grupos_html_parts.append(
+            f'  <div class="frames-grupo">\n'
+            f'    {titulo_html}<div class="frames-grid">\n'
+            f'    {grid}\n'
+            f'    </div>\n'
+            f'  </div>'
         )
 
     btn_todos = ''
@@ -1376,7 +1410,7 @@ def gerar_html_frames_section(frames_info):
             '</a>'
         )
 
-    grid_html    = '\n    '.join(cells)
+    grupos_html  = '\n'.join(grupos_html_parts)
     total_frames = len(frame_items)
 
     return f'''
@@ -1385,9 +1419,7 @@ def gerar_html_frames_section(frames_info):
       <span class="frames-titulo-texto">Frames</span>
       {btn_todos}
     </div>
-    <div class="frames-grid">
-    {grid_html}
-    </div>
+{grupos_html}
   </div>
   <script>
     lbTotal = {total_frames};
@@ -1643,10 +1675,13 @@ def main():
                 print(f"      ⚠️  {frame.name} (só thumbnail — sem Drive URL)")
             else:
                 print(f"      ❌ {frame.name} (sem thumbnail e sem Drive URL)")
+            # Grupo = nome da subpasta dentro de pasta_frames (ex: "REEL 01 – ...")
+            grupo = frame.parent.name if frame.parent != pasta_frames else ''
             frames_info.append({
                 'nome':      frame.name,
                 'thumbnail': thumbnail,
                 'drive_url': frame_drive_url,
+                'grupo':     grupo,
             })
 
     # 8. Gerar HTML
