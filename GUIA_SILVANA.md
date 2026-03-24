@@ -71,7 +71,7 @@ O nome precisa bater exatamente com o arquivo `.mov` na pasta `Videos/`. O Samue
 ## Usar o Fluxo Completo
 
 No Finder, navegue até:
-`Google Drive → Meu Drive → Forster Filmes → CLAUDE_COWORK → Agência → _Interno → forster-aprovacoes`
+`Documents → forster-aprovacoes`
 
 Dê **duplo clique** em `Fluxo Completo.command`.
 

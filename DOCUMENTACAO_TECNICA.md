@@ -415,16 +415,29 @@ Quando `WHATSAPP_GRUPO` está preenchido: a mensagem de aprovação é copiada p
 ### `chmod +x` perdido após git reset
 O Synology Drive (assim como o Google Drive) não preserva permissões Unix. Após qualquer `git reset --hard` ou clone novo, rodar `chmod +x` manualmente nos `.command`:
 ```bash
-chmod +x ~/Library/CloudStorage/SynologyDrive-Agencia/_Interno/forster-aprovacoes/*.command
+chmod +x ~/Documents/forster-aprovacoes/*.command
 ```
 
-### git corrompido ao operar pela VM do Claude
-A VM do Claude escreve objetos git via Google Drive com encoding diferente, corrompendo o índice. **Regra:** todo `git add/commit/push` deve ser feito pelo Terminal do Mac, nunca pela VM. O repositório foi migrado para o Synology Drive justamente para minimizar esse risco — mas a regra continua valendo.
+### git corrompido — repositório dentro de pasta sincronizada
+Repositório git dentro de pasta sincronizada (Synology Drive, Google Drive) entre dois Macs corrompeu o índice repetidamente. **Solução definitiva (março/2026):** repositório migrado para `~/Documents/forster-aprovacoes` em cada Mac — pasta local, fora de qualquer sync automático. GitHub é a única fonte de verdade compartilhada.
+
+**Regra:** todo `git add/commit/push` deve ser feito a partir de `~/Documents/forster-aprovacoes`, nunca de dentro do Synology Drive.
+
+### Fluxo git padrão (ambos os Macs)
+Antes de começar qualquer trabalho no repositório, puxar as atualizações:
+```bash
+cd ~/Documents/forster-aprovacoes && git pull
+```
+
+Após gerar ou editar arquivos:
+```bash
+cd ~/Documents/forster-aprovacoes && git add ARQUIVO && git commit -m "descrição" && git push
+```
 
 ### `git pull` travando por arquivos não rastreados ou branches divergentes
-O `Entrega de Vídeos.command` usa `git fetch origin main && git reset --hard origin/main` em vez de `git pull` para evitar esse problema. O `Fluxo Completo.command` usa `git pull` convencional — se travar, rodar manualmente:
+Se travar, forçar sincronização com o remoto:
 ```bash
-cd ~/Library/CloudStorage/SynologyDrive-Agencia/_Interno/forster-aprovacoes
+cd ~/Documents/forster-aprovacoes
 git fetch origin main
 git reset --hard origin/main
 ```
