@@ -798,77 +798,22 @@ CSS = """
       font-size: 12px;
       color: rgba(255,255,255,0.5);
     }
-    #lb-download {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      width: 100%;
-      padding: 14px 20px;
-      background: rgba(255,255,255,0.18);
-      color: #fff;
-      border-radius: 12px;
-      font-size: 15px;
-      font-weight: 600;
-      text-decoration: none;
+    #lb-save-hint {
+      display: none;
+      font-size: 13px;
+      color: rgba(255,255,255,0.65);
+      text-align: center;
+      padding: 6px 16px 2px;
       letter-spacing: 0.01em;
-      border: none;
-      cursor: pointer;
-      font-family: inherit;
     }
-    #lb-download:hover { background: rgba(255,255,255,0.25); }
 
     /* BOTÕES QUE VIRAM <button> (reset de estilo de navegador) */
-    .btn-download-original,
-    .frame-download-btn {
+    .btn-download-original {
       border: none;
       cursor: pointer;
       font-family: inherit;
     }
 
-    /* OVERLAY DE DOWNLOAD — tela cheia com imagem em tamanho real */
-    #dl-overlay {
-      display: none;
-      position: fixed;
-      inset: 0;
-      z-index: 9999;
-      background: rgba(0,0,0,0.97);
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 0;
-    }
-    #dl-img {
-      max-width: 100vw;
-      max-height: 80vh;
-      object-fit: contain;
-      display: block;
-    }
-    #dl-hint {
-      color: rgba(255,255,255,0.75);
-      font-size: 14px;
-      font-weight: 500;
-      text-align: center;
-      padding: 18px 24px 8px;
-      line-height: 1.5;
-    }
-    #dl-close {
-      position: absolute;
-      top: 16px;
-      right: 16px;
-      background: rgba(255,255,255,0.15);
-      border: none;
-      color: #fff;
-      font-size: 20px;
-      width: 38px;
-      height: 38px;
-      border-radius: 50%;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-family: inherit;
-    }
 """
 
 JS_TEMPLATE = """
@@ -1022,15 +967,27 @@ JS_TEMPLATE = """
     }}
 
     function _lbAtualizar() {{
-      var srcEl = document.getElementById('lb-src-' + lbIdx);
-      if (srcEl && srcEl.src) document.getElementById('lb-img').src = srcEl.src;
+      var link  = lbLinks[lbIdx] || '';
+      var img   = document.getElementById('lb-img');
+      var hint  = document.getElementById('lb-save-hint');
+
+      // Carrega o arquivo em alta resolução direto do Synology.
+      // Fallback para o thumbnail base64 se não houver link.
+      if (link) {{
+        img.style.opacity = '0.4';
+        img.onload = function() {{ img.style.opacity = '1'; }};
+        img.src = link;
+        hint.style.display = 'block';
+      }} else {{
+        var srcEl = document.getElementById('lb-src-' + lbIdx);
+        if (srcEl && srcEl.src) img.src = srcEl.src;
+        img.style.opacity = '1';
+        hint.style.display = 'none';
+      }}
+
       var nomeEl = document.getElementById('lb-nome');
       if (nomeEl) nomeEl.textContent = lbNomes[lbIdx] || '';
       document.getElementById('lb-counter').textContent = (lbIdx + 1) + ' / ' + lbTotal;
-      var dl   = document.getElementById('lb-download');
-      var link = lbLinks[lbIdx] || '';
-      if (link) {{ dl.style.display = 'flex'; }}
-      else       {{ dl.style.display = 'none'; }}
       document.getElementById('lb-prev').style.opacity = lbIdx > 0 ? '1' : '0.25';
       document.getElementById('lb-next').style.opacity = lbIdx < lbTotal - 1 ? '1' : '0.25';
     }}
@@ -1043,29 +1000,18 @@ JS_TEMPLATE = """
       if (e.key === 'Escape')     fecharLightbox();
     }});
 
-    // ── DOWNLOAD DE ARQUIVO ───────────────────────────────────────
+    // ── DOWNLOAD DE VÍDEO ─────────────────────────────────────────
+    // Imagens: salvar pelo lightbox (pressionar e segurar na imagem)
+    // Vídeos: abre em nova aba com anchor programático (nunca bloqueado como popup)
     function downloadArquivo(url, nome) {{
       if (!url) return;
-      var ext = nome.split('.').pop().toLowerCase();
-      var isVideo = ['mov', 'mp4', 'm4v'].indexOf(ext) !== -1;
-
-      if (isVideo) {{
-        // Vídeo: abre em nova aba — chamada síncrona, não é bloqueada pelo browser
-        window.open(url, '_blank');
-        return;
-      }}
-
-      // Imagem: mostra overlay em tela cheia
-      // O usuário pressiona e segura para salvar na galeria (iOS e Android)
-      var overlay = document.getElementById('dl-overlay');
-      var dlImg   = document.getElementById('dl-img');
-      dlImg.src   = url;
-      overlay.style.display = 'flex';
-    }}
-
-    function fecharDlOverlay() {{
-      document.getElementById('dl-overlay').style.display = 'none';
-      document.getElementById('dl-img').src = '';
+      var a = document.createElement('a');
+      a.href   = url;
+      a.target = '_blank';
+      a.rel    = 'noopener';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
     }}
 
     // ── SWIPE NO CELULAR ───────────────────────────────────────────
@@ -1130,7 +1076,10 @@ def gerar_html_card(video_info):
             filename_video = urllib.parse.unquote(synology_link.rstrip('/').split('/')[-1])
         except Exception:
             filename_video = titulo + '.mov'
-        html_download = f'''  <button class="btn-download-original" onclick="downloadArquivo({json.dumps(synology_link)}, {json.dumps(filename_video)})">
+        # json.dumps produz aspas duplas — precisa escapar para não quebrar o atributo HTML
+        url_attr  = json.dumps(synology_link).replace('"', '&quot;')
+        file_attr = json.dumps(filename_video).replace('"', '&quot;')
+        html_download = f'''  <button class="btn-download-original" onclick="downloadArquivo({url_attr}, {file_attr})">
     <svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg">
       <path d="M7.5 1v9M4 7l3.5 3.5L11 7M2 13h11" stroke="#1A1A1A" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
     </svg>
@@ -1196,19 +1145,9 @@ def gerar_html_frames_section(frames_info):
         else:
             img_html = f'<span id="lb-src-{idx}" style="display:none"></span><div class="frame-sem-preview">🖼</div>'
 
-        download_html = ''
-        if link:
-            download_html = (
-                f'<button class="frame-download-btn" '
-                f'onclick="event.stopPropagation(); downloadArquivo({json.dumps(link)}, {json.dumps(nome)})" '
-                f'title="Baixar {escape_html(nome)}">'
-                '⬇'
-                '</button>'
-            )
-
         cells.append(
             f'<div class="frame-cell" onclick="abrirLightbox({idx})">'
-            f'{img_html}{download_html}</div>'
+            f'{img_html}</div>'
         )
 
     btn_todos = ''
@@ -1307,12 +1246,7 @@ def gerar_pagina_html(cliente, ano_mes, videos_info, whatsapp_link,
     <div id="lb-footer">
       <span id="lb-nome"></span>
       <span id="lb-counter"></span>
-      <button id="lb-download" onclick="downloadArquivo(lbLinks[lbIdx], lbNomes[lbIdx])" style="display:none">
-        <svg width="16" height="16" viewBox="0 0 15 15" fill="none">
-          <path d="M7.5 1v9M4 7l3.5 3.5L11 7M2 13h11" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-        Baixar este frame
-      </button>
+      <div id="lb-save-hint">Segure o dedo sobre a imagem para salvar na galeria</div>
     </div>
   </div>
 
@@ -1327,11 +1261,6 @@ def gerar_pagina_html(cliente, ano_mes, videos_info, whatsapp_link,
     <div class="footer-pendente" id="footer-pendente">Revise todos os vídeos antes de enviar.</div>
   </div>
 
-  <div id="dl-overlay">
-    <button id="dl-close" onclick="fecharDlOverlay()">✕</button>
-    <img id="dl-img" src="" alt="">
-    <div id="dl-hint">Pressione e segure a imagem para salvar na galeria</div>
-  </div>
 
 </body>
 </html>"""
