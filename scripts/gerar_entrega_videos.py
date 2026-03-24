@@ -47,6 +47,12 @@ OUTPUT_DIR = Path(__file__).parent.parent / 'aprovacao'
 
 GITHUB_BASE = "https://oiforster.github.io/forster-aprovacoes/aprovacao"
 
+# Caminhos base para conversão Synology → Google Drive
+SYNOLOGY_BASE = Path.home() / 'Library' / 'CloudStorage' / 'SynologyDrive-Agencia'
+GDRIVE_BASE = (Path.home() / 'Library' / 'CloudStorage' /
+               'GoogleDrive-oiforster@gmail.com' /
+               'Meu Drive' / 'Forster Filmes' / 'CLAUDE_COWORK')
+
 # ─── UTILITÁRIOS ─────────────────────────────────────────────────────────────
 
 def slugify(texto):
@@ -301,6 +307,95 @@ def listar_videos(pasta_videos):
         and '(capa)' not in f.name.lower()
         and re.match(r'^REEL\s+\d+', f.name, re.IGNORECASE)
     ])
+
+# ─── GOOGLE DRIVE ─────────────────────────────────────────────────────────────
+
+def _get_gdrive_file_id(filepath, _tentativas=2):
+    """
+    Obtém o File ID do Google Drive via xattr do macOS.
+    Se o arquivo estiver em modo Streaming (não baixado ainda), força
+    a leitura para acionar a sincronização e tenta de novo.
+    Retorna o ID (string) ou None.
+    """
+    import time as _time
+    xattr_keys = [
+        'com.google.drivefs.item-id#S',   # Drive File Stream (mais comum)
+        'com.google.drivefs.item-id',      # variante sem sufixo
+        'com.google.cloudsync.itemid',     # versões antigas do Drive
+    ]
+    for tentativa in range(_tentativas):
+        for xattr_key in xattr_keys:
+            try:
+                result = subprocess.run(
+                    ['xattr', '-p', xattr_key, str(filepath)],
+                    capture_output=True, text=True, timeout=5
+                )
+                file_id = result.stdout.strip()
+                if file_id:
+                    return file_id
+            except Exception:
+                pass
+        if tentativa == 0:
+            # Força leitura para acionar download do Drive Streaming
+            try:
+                with open(filepath, 'rb') as f:
+                    f.read(4096)
+                _time.sleep(1.5)
+            except Exception:
+                break  # arquivo inacessível — não tenta de novo
+    return None
+
+
+def gdrive_embed_url(filepath):
+    """
+    URL para exibição de imagem full-res via Google Drive (sem CORS).
+    Usar em <img src> para frames no lightbox.
+    Long-press no iPhone/Android salva o original na galeria.
+    Retorna URL ou None.
+    """
+    file_id = _get_gdrive_file_id(filepath)
+    if file_id:
+        return f"https://lh3.googleusercontent.com/d/{file_id}"
+    return None
+
+
+def gdrive_video_download_url(filepath):
+    """
+    URL de download direto de vídeo via Google Drive.
+    Um clique → download sem player, sem redirecionamento.
+    &confirm=t bypassa aviso de vírus do Google para arquivos grandes.
+    Retorna URL ou None.
+    """
+    file_id = _get_gdrive_file_id(filepath)
+    if file_id:
+        return f"https://drive.google.com/uc?export=download&id={file_id}&confirm=t"
+    return None
+
+
+def synology_para_gdrive(synology_path):
+    """
+    Converte um path do Synology Drive para o path equivalente no Google Drive.
+    Synology: ~/CloudStorage/SynologyDrive-Agencia/...
+    GDrive:   ~/CloudStorage/GoogleDrive-.../Meu Drive/Forster Filmes/CLAUDE_COWORK/Agência/...
+    Retorna Path ou None se não encontrado.
+    """
+    try:
+        rel = Path(synology_path).relative_to(SYNOLOGY_BASE)
+    except ValueError:
+        return None
+    # Tenta NFC primeiro
+    gdrive_path = GDRIVE_BASE / 'Agência' / rel
+    if gdrive_path.exists():
+        return gdrive_path
+    # Tenta NFD (encoding que o Google Drive usa no macOS)
+    try:
+        agencia_nfd = unicodedata.normalize('NFD', 'Agência')
+        gdrive_path_nfd = GDRIVE_BASE / agencia_nfd / rel
+        if gdrive_path_nfd.exists():
+            return gdrive_path_nfd
+    except Exception:
+        pass
+    return None
 
 # ─── GERAÇÃO DE HTML ─────────────────────────────────────────────────────────
 
@@ -946,10 +1041,11 @@ JS_TEMPLATE = """
     document.addEventListener('DOMContentLoaded', atualizar);
 
     // ── LIGHTBOX DE FRAMES ────────────────────────────────────────
-    var lbIdx   = 0;
-    var lbTotal = 0;
-    var lbLinks = {{}};
-    var lbNomes = {{}};
+    var lbIdx       = 0;
+    var lbTotal     = 0;
+    var lbLinks     = {{}};
+    var lbNomes     = {{}};
+    var lbDriveUrls = {{}};
 
     function abrirLightbox(idx) {{
       lbIdx = idx;
@@ -967,10 +1063,16 @@ JS_TEMPLATE = """
     }}
 
     function _lbAtualizar() {{
-      // Usa sempre o thumbnail embutido no HTML (funciona offline e fora da rede local).
-      // O NAS não é acessível de redes externas para carregamento direto de imagem.
-      var srcEl = document.getElementById('lb-src-' + lbIdx);
-      if (srcEl && srcEl.src) document.getElementById('lb-img').src = srcEl.src;
+      var img = document.getElementById('lb-img');
+      // Prefere URL do Google Drive (full-res, long-press salva na galeria).
+      // Fallback: thumbnail base64 embutido no HTML (funciona offline).
+      var driveUrl = lbDriveUrls[lbIdx];
+      if (driveUrl) {{
+        img.src = driveUrl;
+      }} else {{
+        var srcEl = document.getElementById('lb-src-' + lbIdx);
+        if (srcEl && srcEl.src) img.src = srcEl.src;
+      }}
 
       var hint = document.getElementById('lb-save-hint');
       if (hint) hint.style.display = 'block';
@@ -989,26 +1091,6 @@ JS_TEMPLATE = """
       if (e.key === 'ArrowRight') lightboxNavegar(1);
       if (e.key === 'Escape')     fecharLightbox();
     }});
-
-    // ── ABRIR PASTA NO SYNOLOGY ───────────────────────────────────
-    var VIDEOS_FOLDER = {videos_folder_js};
-
-    function abrirPastaVideos() {{
-      if (!VIDEOS_FOLDER) return;
-      var a = document.createElement('a');
-      a.href   = VIDEOS_FOLDER;
-      a.target = '_blank';
-      a.rel    = 'noopener';
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-    }}
-
-    // Oculta botão de download de vídeo se não houver link de pasta
-    if (!VIDEOS_FOLDER) {{
-      var btns = document.querySelectorAll('.btn-download-original');
-      btns.forEach(function(b) {{ b.style.display = 'none'; }});
-    }}
 
     // ── SWIPE NO CELULAR ───────────────────────────────────────────
     (function() {{
@@ -1031,12 +1113,12 @@ JS_TEMPLATE = """
 """
 
 def gerar_html_card(video_info):
-    vid_id        = video_info['id']
-    titulo        = video_info['titulo']
-    contexto      = video_info.get('contexto', '')
-    youtube_id    = video_info.get('youtube_id')
-    numero        = video_info['numero']
-    synology_link = video_info.get('synology_link', '')
+    vid_id    = video_info['id']
+    titulo    = video_info['titulo']
+    contexto  = video_info.get('contexto', '')
+    youtube_id = video_info.get('youtube_id')
+    numero    = video_info['numero']
+    drive_url = video_info.get('drive_url', '')
 
     html_numero = f'<div class="video-numero">REEL {numero:02d}</div>'
 
@@ -1066,15 +1148,18 @@ def gerar_html_card(video_info):
     <div class="sem-video-label">⏳ Vídeo ainda não enviado ao YouTube</div>
   </div>'''
 
-    # Botão de download: abre a pasta com todos os vídeos (VIDEOS_FOLDER).
-    # O link é uma variável JS injetada na página — mesmo botão para todos os cards.
-    html_download = '''  <button class="btn-download-original" onclick="abrirPastaVideos()">
+    # Botão de download: abre o vídeo original diretamente no Google Drive.
+    # Se não houver Drive URL disponível, o botão é omitido.
+    if drive_url:
+        html_download = f'''  <a class="btn-download-original" href="{drive_url}" target="_blank" rel="noopener">
     <svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg">
       <path d="M7.5 1v9M4 7l3.5 3.5L11 7M2 13h11" stroke="#1A1A1A" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
     </svg>
-    Baixar vídeos originais
-  </button>
+    Baixar vídeo original
+  </a>
 '''
+    else:
+        html_download = ''
 
     return f'''
 <div class="post-card" id="card-{vid_id}" data-video-id="{vid_id}">
@@ -1104,17 +1189,17 @@ def gerar_html_frames_section(frames_info):
     """
     frames_info: lista de dicts com keys:
       nome       → nome do arquivo
-      thumbnail  → data URI base64 ou None
-      link       → URL Synology para download individual ou None
-    O último item pode ter 'folder_link' para o botão "Baixar todos".
+      thumbnail  → data URI base64 ou None (fallback offline)
+      drive_url  → URL lh3.googleusercontent.com/d/ID para o lightbox (full-res)
     """
     if not frames_info:
         return ''
 
-    folder_link = ''
-    cells       = []
-    lb_links    = {}
-    lb_nomes    = {}
+    folder_link   = ''
+    cells         = []
+    lb_links      = {}
+    lb_nomes      = {}
+    lb_drive_urls = {}
 
     frame_items = [fi for fi in frames_info if not fi.get('folder_link')]
     for fi in frames_info:
@@ -1124,10 +1209,11 @@ def gerar_html_frames_section(frames_info):
     for idx, fi in enumerate(frame_items):
         nome      = fi['nome']
         thumbnail = fi.get('thumbnail')
-        link      = fi.get('link', '')
+        drive_url = fi.get('drive_url', '')
 
-        lb_links[idx] = link
-        lb_nomes[idx] = nome
+        lb_links[idx]      = ''  # mantido por compatibilidade
+        lb_nomes[idx]      = nome
+        lb_drive_urls[idx] = drive_url
 
         if thumbnail:
             img_html = f'<img id="lb-src-{idx}" src="{thumbnail}" alt="{escape_html(nome)}" loading="lazy">'
@@ -1164,11 +1250,12 @@ def gerar_html_frames_section(frames_info):
     lbTotal = {total_frames};
     lbLinks = {json.dumps(lb_links)};
     lbNomes = {json.dumps(lb_nomes)};
+    lbDriveUrls = {json.dumps(lb_drive_urls)};
   </script>'''
 
 
 def gerar_pagina_html(cliente, ano_mes, videos_info, whatsapp_link,
-                      frames_info=None, videos_folder_link=''):
+                      frames_info=None):
     ano, mes_num = ano_mes.split('-')
     mes_display = f"{MESES_PT[int(mes_num)]} de {ano}"
     slug = slugify(cliente)
@@ -1191,7 +1278,6 @@ def gerar_pagina_html(cliente, ano_mes, videos_info, whatsapp_link,
         mes_display_escaped=mes_display.replace("'", "\\'"),
         url_pagina=url_pagina,
         whatsapp_link=whatsapp_link,
-        videos_folder_js=json.dumps(videos_folder_link),
     )
 
     return f"""<!DOCTYPE html>
@@ -1325,10 +1411,9 @@ def main():
         else:
             print(f"\n  📝 _contexto.md encontrado — lendo descrições...")
 
-    # 6. Ler YouTube IDs, contextos e links Synology
-    youtube_ids   = ler_youtube_md(pasta_videos)
-    contextos     = ler_contexto_md(pasta_videos)
-    synology_links = ler_synology_md(pasta_videos)
+    # 6. Ler YouTube IDs e contextos
+    youtube_ids = ler_youtube_md(pasta_videos)
+    contextos   = ler_contexto_md(pasta_videos)
 
     sem_yt = [f.stem for f in arquivos if f.stem not in youtube_ids]
     if sem_yt:
@@ -1336,13 +1421,8 @@ def main():
         for nome in sem_yt:
             print(f"      {nome}")
 
-    sem_syn = [f.stem for f in arquivos if f.stem not in synology_links]
-    if sem_syn:
-        print(f"\n  ℹ️  Sem link Synology (rode gerar_links_synology.py para download direto):")
-        for nome in sem_syn:
-            print(f"      {nome}")
-
-    # 7. Montar lista de vídeos
+    # 7. Montar lista de vídeos + URLs do Google Drive por vídeo
+    print(f"\n  ☁️  Buscando File IDs no Google Drive...")
     videos_info = []
     for arquivo in arquivos:
         reel_nome = arquivo.stem
@@ -1357,55 +1437,55 @@ def main():
                 contexto = desc
                 break
 
-        # Busca link Synology com mesma tolerância
-        synology_link = ''
-        for chave, url in synology_links.items():
-            if slugify(chave) == slugify(reel_nome):
-                synology_link = url
-                break
+        # URL de download via Google Drive
+        drive_url = ''
+        gdrive_path = synology_para_gdrive(arquivo)
+        if gdrive_path:
+            drive_url = gdrive_video_download_url(gdrive_path) or ''
+        if drive_url:
+            print(f"      ✅ {arquivo.name} → Drive OK")
+        else:
+            print(f"      ⚠️  {arquivo.name} → sem URL Drive (vídeo sem botão de download)")
 
         videos_info.append({
-            'id':            f"reel-{numero:02d}",
-            'numero':        numero,
-            'titulo':        titulo,
-            'contexto':      contexto,
-            'youtube_id':    youtube_ids.get(reel_nome),
-            'synology_link': synology_link,
+            'id':         f"reel-{numero:02d}",
+            'numero':     numero,
+            'titulo':     titulo,
+            'contexto':   contexto,
+            'youtube_id': youtube_ids.get(reel_nome),
+            'drive_url':  drive_url,
         })
 
-    # 7b. Montar lista de frames (com thumbnails base64)
+    # 7b. Montar lista de frames (thumbnail base64 como fallback + Drive URL full-res)
     frames_info = []
     frames, pasta_frames = listar_frames(pasta_videos)
     if frames:
         print(f"\n  🖼  Gerando thumbnails de {len(frames)} frame(s)...")
-        folder_link = synology_links.get('FRAMES_FOLDER', '')
         for frame in frames:
-            # Chave usa path relativo à pasta frames (mirrors gerar_links_synology.py)
-            rel = frame.relative_to(pasta_frames).as_posix()
-            chave_link = f'FRAME_{rel}'
-            link       = synology_links.get(chave_link, '')
-            thumbnail  = gerar_thumbnail_base64(frame, 600)
-            if thumbnail:
-                print(f"      ✅ {frame.name}")
+            thumbnail = gerar_thumbnail_base64(frame, 600)
+            # URL full-res via Google Drive (preferida no lightbox)
+            frame_drive_url = ''
+            gdrive_frame = synology_para_gdrive(frame)
+            if gdrive_frame:
+                frame_drive_url = gdrive_embed_url(gdrive_frame) or ''
+            if frame_drive_url:
+                print(f"      ✅ {frame.name} (Drive + thumbnail)")
+            elif thumbnail:
+                print(f"      ⚠️  {frame.name} (só thumbnail — sem Drive URL)")
             else:
-                print(f"      ⚠️  {frame.name} (thumbnail não gerado)")
+                print(f"      ❌ {frame.name} (sem thumbnail e sem Drive URL)")
             frames_info.append({
                 'nome':      frame.name,
                 'thumbnail': thumbnail,
-                'link':      link,
+                'drive_url': frame_drive_url,
             })
-        # Adiciona o folder link como item especial no fim
-        if folder_link:
-            frames_info.append({'folder_link': folder_link})
 
     # 8. Gerar HTML
     # Clientes recorrentes: usa o link configurado ou vazio
     # Clientes pontuais: usa o link padrão (mesmo da Silvana/Baviera)
-    whatsapp_link      = WHATSAPP_LINKS.get(cliente, WHATSAPP_PADRAO_PONTUAL if pontual else '')
-    videos_folder_link = synology_links.get('VIDEOS_FOLDER', '')
+    whatsapp_link = WHATSAPP_LINKS.get(cliente, WHATSAPP_PADRAO_PONTUAL if pontual else '')
     html = gerar_pagina_html(cliente, ano_mes, videos_info, whatsapp_link,
-                             frames_info=frames_info,
-                             videos_folder_link=videos_folder_link)
+                             frames_info=frames_info)
 
     slug = slugify(cliente)
     pasta_saida = OUTPUT_DIR / slug

@@ -1,7 +1,7 @@
 #!/bin/bash
 # ─────────────────────────────────────────────────────────────
 #  Forster Filmes — Entrega de Vídeos para Aprovação
-#  Synology links → YouTube → Gera página → Publica
+#  YouTube → Gera página (Google Drive) → Publica
 #  Duplo clique para rodar.
 # ─────────────────────────────────────────────────────────────
 
@@ -60,7 +60,7 @@ fi
 
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo "   FORSTER FILMES — Entrega de Vídeos"
-echo "   YouTube → Gerar página → Publicar"
+echo "   YouTube → Gerar página (Google Drive) → Publicar"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo ""
 
@@ -188,42 +188,15 @@ if [ -n "$MES_INPUT" ]; then
 fi
 
 ARGS_VIDEOS=("${ARGS_BASE[@]}")
-
-# ════════════════════════════════════════════════════
-# ETAPA 1 — LINKS DE DOWNLOAD SYNOLOGY
-# ════════════════════════════════════════════════════
-echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-echo "  ETAPA 1/4 — Gerando links de download (Synology)..."
-echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-echo ""
-
-ARGS_SYN=("${ARGS_BASE[@]}")
 if [ "$PONTUAL" = true ]; then
-  ARGS_SYN+=(--pontual)
-fi
-
-python3 "$SCRIPTS/gerar_links_synology.py" "${ARGS_SYN[@]}"
-SYN_STATUS=$?
-echo ""
-
-if [ $SYN_STATUS -ne 0 ]; then
-  echo "  ⚠️  Não foi possível gerar os links do Synology."
-  echo "     Os vídeos serão entregues sem botão de download direto."
-  echo ""
-  read -p "  Continuar mesmo assim? (s/N): " CONTINUAR_SYN
-  echo ""
-  if [[ ! "$CONTINUAR_SYN" =~ ^[Ss]$ ]]; then
-    echo "  Operação cancelada."
-    read -p "Pressione Enter para fechar..."
-    exit 1
-  fi
+  ARGS_VIDEOS+=(--pontual)
 fi
 
 # ════════════════════════════════════════════════════
-# ETAPA 2 — UPLOAD YOUTUBE
+# ETAPA 1 — UPLOAD YOUTUBE
 # ════════════════════════════════════════════════════
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-echo "  ETAPA 2/4 — Subindo vídeos ao YouTube..."
+echo "  ETAPA 1/3 — Subindo vídeos ao YouTube..."
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo ""
 
@@ -244,14 +217,15 @@ if [ $YOUTUBE_STATUS -ne 0 ]; then
 fi
 
 # ════════════════════════════════════════════════════
-# ETAPA 3 — GERAR PÁGINA DE ENTREGA
+# ETAPA 2 — GERAR PÁGINA DE ENTREGA
+# (busca File IDs do Google Drive via xattr automaticamente)
 # ════════════════════════════════════════════════════
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-echo "  ETAPA 3/4 — Gerando página de entrega..."
+echo "  ETAPA 2/3 — Gerando página de entrega..."
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo ""
 
-python3 "$SCRIPTS/gerar_aprovacoes.py" "${ARGS_VIDEOS[@]}"
+python3 "$SCRIPTS/gerar_entrega_videos.py" "${ARGS_VIDEOS[@]}"
 GERAR_STATUS=$?
 echo ""
 
@@ -262,10 +236,10 @@ if [ $GERAR_STATUS -ne 0 ]; then
 fi
 
 # ════════════════════════════════════════════════════
-# ETAPA 4 — PUBLICAR
+# ETAPA 3 — PUBLICAR
 # ════════════════════════════════════════════════════
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-echo "  ETAPA 4/4 — Publicar no site?"
+echo "  ETAPA 3/3 — Publicar no site?"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo ""
 read -p "  Publicar agora em oiforster.github.io? (S/n): " PUBLICAR
