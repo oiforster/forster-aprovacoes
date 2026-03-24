@@ -222,7 +222,7 @@ def _tem_reels(pasta: Path) -> bool:
         return False
 
 
-def encontrar_pasta_videos(pasta_cliente: Path, ano_mes: str) -> Path | None:
+def encontrar_pasta_videos(pasta_cliente: Path, ano_mes: str):
     entregas = pasta_cliente / '06_Entregas'
     if entregas.exists():
         for entry in sorted(entregas.iterdir()):
