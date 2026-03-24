@@ -142,7 +142,7 @@ def _gofile_to_direto(url: str) -> str:
         return url
     codigo = url.rstrip('/').split('/')[-1]
     host = NAS_HOST_EXTERNAL.rstrip('/')
-    return f"{host}/fbdownload/{codigo}?bktype=sharing"
+    return f"{host}/fbdownload/{codigo}"
 
 
 def criar_link(host: str, sid: str, nas_path: str) -> str:
