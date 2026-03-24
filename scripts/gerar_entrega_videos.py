@@ -227,16 +227,35 @@ def ler_synology_md(pasta_videos):
     return links
 
 
+def _encontrar_pasta_frames(pasta_videos):
+    """Localiza pasta de frames.
+    Ordem: 1) subpasta 'Frames' dentro dos vídeos; 2) pasta irmã com 'frame' no nome."""
+    candidato = pasta_videos / 'Frames'
+    if candidato.exists():
+        return candidato
+    parent = pasta_videos.parent
+    try:
+        for entry in sorted(parent.iterdir()):
+            if entry.is_dir() and 'frame' in entry.name.lower():
+                return entry
+    except PermissionError:
+        pass
+    return None
+
+
 def listar_frames(pasta_videos):
-    """Retorna (lista_de_frames, pasta_frames) ou ([], None) se não existir."""
-    pasta_frames = pasta_videos / 'Frames'
-    if not pasta_frames.exists():
+    """Retorna (lista_de_frames, pasta_frames) ou ([], None) se não existir.
+    Busca recursiva: suporta frames diretamente na pasta ou em subpastas por REEL."""
+    pasta_frames = _encontrar_pasta_frames(pasta_videos)
+    if not pasta_frames:
         return [], None
     ext = {'.jpg', '.jpeg', '.png', '.tif', '.tiff'}
-    frames = sorted([
-        f for f in pasta_frames.iterdir()
-        if f.suffix.lower() in ext and not f.name.startswith('.')
-    ])
+    frames = []
+    for dirpath, dirnames, filenames in os.walk(pasta_frames):
+        dirnames.sort()
+        for fname in sorted(filenames):
+            if not fname.startswith('.') and Path(fname).suffix.lower() in ext:
+                frames.append(Path(dirpath) / fname)
     return frames, pasta_frames
 
 
@@ -1153,7 +1172,9 @@ def main():
         print(f"\n  🖼  Gerando thumbnails de {len(frames)} frame(s)...")
         folder_link = synology_links.get('FRAMES_FOLDER', '')
         for frame in frames:
-            chave_link = f'FRAME_{frame.name}'
+            # Chave usa path relativo à pasta frames (mirrors gerar_links_synology.py)
+            rel = frame.relative_to(pasta_frames).as_posix()
+            chave_link = f'FRAME_{rel}'
             link       = synology_links.get(chave_link, '')
             thumbnail  = gerar_thumbnail_base64(frame)
             if thumbnail:

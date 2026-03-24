@@ -75,9 +75,12 @@ def slugify(texto):
 
 
 def local_to_nas(local_path: Path, local_agencia: Path) -> str:
-    """Converte path local (Synology Drive) para path interno da NAS."""
+    """Converte path local (Synology Drive) para path interno da NAS.
+    Normaliza para NFC: macOS armazena nomes em NFD (decomposed),
+    mas a API do DSM espera NFC (composed)."""
     rel = local_path.relative_to(local_agencia)
-    return NAS_BASE_PATH + '/' + rel.as_posix()
+    nas = NAS_BASE_PATH + '/' + rel.as_posix()
+    return unicodedata.normalize('NFC', nas)
 
 # ─── API SYNOLOGY ─────────────────────────────────────────────────────────────
 
@@ -251,16 +254,35 @@ def listar_videos(pasta: Path) -> list:
     ])
 
 
+def _encontrar_pasta_frames(pasta_videos: Path):
+    """Localiza pasta de frames.
+    Ordem: 1) subpasta 'Frames' dentro dos vídeos; 2) pasta irmã com 'frame' no nome."""
+    candidato = pasta_videos / 'Frames'
+    if candidato.exists():
+        return candidato
+    parent = pasta_videos.parent
+    try:
+        for entry in sorted(parent.iterdir()):
+            if entry.is_dir() and 'frame' in entry.name.lower():
+                return entry
+    except PermissionError:
+        pass
+    return None
+
+
 def listar_frames(pasta_videos: Path) -> tuple:
-    """Retorna (lista_de_frames, pasta_frames) ou ([], None) se não existir."""
-    pasta_frames = pasta_videos / 'Frames'
-    if not pasta_frames.exists():
+    """Retorna (lista_de_frames, pasta_frames) ou ([], None) se não existir.
+    Busca recursiva: suporta frames diretamente na pasta ou em subpastas por REEL."""
+    pasta_frames = _encontrar_pasta_frames(pasta_videos)
+    if not pasta_frames:
         return [], None
     ext = {'.jpg', '.jpeg', '.png', '.tif', '.tiff'}
-    frames = sorted([
-        f for f in pasta_frames.iterdir()
-        if f.suffix.lower() in ext and not f.name.startswith('.')
-    ])
+    frames = []
+    for dirpath, dirnames, filenames in os.walk(pasta_frames):
+        dirnames.sort()
+        for fname in sorted(filenames):
+            if not fname.startswith('.') and Path(fname).suffix.lower() in ext:
+                frames.append(Path(dirpath) / fname)
     return frames, pasta_frames
 
 # ─── MAIN ─────────────────────────────────────────────────────────────────────
@@ -370,21 +392,24 @@ def main():
                     print(f"      ❌ Pasta Frames: {e}")
 
             # Cada frame individualmente
+            # Chave usa path relativo à pasta frames (suporta subpastas por REEL)
             for f in frames:
-                chave = f'FRAME_{f.name}'
+                rel = f.relative_to(pasta_frames).as_posix()
+                chave = f'FRAME_{rel}'
+                display = rel if '/' in rel else f.name
                 if chave in links:
-                    print(f"      ↩  {f.name} (já existe)")
+                    print(f"      ↩  {display} (já existe)")
                     continue
                 try:
                     nas_path = local_to_nas(f, agencia)
                     url = criar_link(host, sid, nas_path)
                     links[chave] = url
                     novos += 1
-                    print(f"      ✅ {f.name}")
+                    print(f"      ✅ {display}")
                 except RuntimeError as e:
-                    print(f"      ❌ {f.name}: {e}")
+                    print(f"      ❌ {display}: {e}")
         else:
-            print(f"\n  ℹ️  Pasta Frames/ não encontrada — pulando frames")
+            print(f"\n  ℹ️  Pasta Frames/ não encontrada (ou vazia) — pulando frames")
 
     finally:
         logout(host, sid)
