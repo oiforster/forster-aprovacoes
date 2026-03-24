@@ -896,8 +896,8 @@ CSS = """
     .btn-baixar-todos:hover { background: #333; }
     .frames-grupo + .frames-grupo {
       border-top: 1px solid #EBEBEB;
-      margin-top: 4px;
-      padding-top: 4px;
+      margin-top: 24px;
+      padding-top: 20px;
     }
     .frames-grupo-titulo {
       font-size: 11px;
