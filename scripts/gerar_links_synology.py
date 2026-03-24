@@ -128,21 +128,13 @@ def logout(host: str, sid: str):
 
 
 def _gofile_to_direto(url: str) -> str:
-    """Converte URL gofile.me → URL de download direto no NAS.
+    """Retorna o URL de compartilhamento público do Synology como veio da API.
 
-    O endpoint /fbdownload/{code}?bktype=sharing é o URL de download da API do DSM.
-    Para arquivos de mídia (.mov, .mp4), o DSM 7.x pode exibir um player web
-    em vez de baixar direto — isso é comportamento nativo do DSM para sharing links.
-
-    Se ainda abrir o player do Synology, a solução definitiva é configurar o DSM para
-    não indexar a pasta de entregas no Video Station/Synology Photos:
-    Video Station → Configurações → desmarcar a pasta de entregas da biblioteca.
+    O endpoint /fbdownload/{code} retorna erro 119 quando acessado sem sessão DSM.
+    O URL gofile.me abre uma página intermediária do Synology com botão de download
+    (2 cliques). Não existe URL de download direto sem backend para autenticar.
     """
-    if 'gofile.me' not in url:
-        return url
-    codigo = url.rstrip('/').split('/')[-1]
-    host = NAS_HOST_EXTERNAL.rstrip('/')
-    return f"{host}/fbdownload/{codigo}"
+    return url
 
 
 def criar_link(host: str, sid: str, nas_path: str) -> str:
