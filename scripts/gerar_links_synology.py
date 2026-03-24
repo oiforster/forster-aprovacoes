@@ -129,7 +129,14 @@ def logout(host: str, sid: str):
 
 def _gofile_to_direto(url: str) -> str:
     """Converte URL gofile.me → URL de download direto no NAS.
-    Ex: http://gofile.me/7f88o/xX1071kdj → https://HOST:5001/fbdownload/xX1071kdj?bktype=sharing
+
+    O endpoint /fbdownload/{code}?bktype=sharing é o URL de download da API do DSM.
+    Para arquivos de mídia (.mov, .mp4), o DSM 7.x pode exibir um player web
+    em vez de baixar direto — isso é comportamento nativo do DSM para sharing links.
+
+    Se ainda abrir o player do Synology, a solução definitiva é configurar o DSM para
+    não indexar a pasta de entregas no Video Station/Synology Photos:
+    Video Station → Configurações → desmarcar a pasta de entregas da biblioteca.
     """
     if 'gofile.me' not in url:
         return url

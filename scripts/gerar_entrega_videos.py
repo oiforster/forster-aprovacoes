@@ -784,6 +784,15 @@ CSS = """
       align-items: center;
       gap: 10px;
     }
+    #lb-nome {
+      font-size: 13px;
+      color: rgba(255,255,255,0.7);
+      text-align: center;
+      max-width: 90%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
     #lb-counter {
       font-size: 12px;
       color: rgba(255,255,255,0.5);
@@ -943,8 +952,8 @@ JS_TEMPLATE = """
 
     function abrirLightbox(idx) {{
       lbIdx = idx;
-      _lbAtualizar();
       document.getElementById('frame-lightbox').style.display = 'flex';
+      _lbAtualizar();
     }}
 
     function fecharLightbox() {{
@@ -958,12 +967,13 @@ JS_TEMPLATE = """
 
     function _lbAtualizar() {{
       var srcEl = document.getElementById('lb-src-' + lbIdx);
-      if (srcEl) document.getElementById('lb-img').src = srcEl.src;
-      document.getElementById('lb-nome').textContent    = lbNomes[lbIdx] || '';
+      if (srcEl && srcEl.src) document.getElementById('lb-img').src = srcEl.src;
+      var nomeEl = document.getElementById('lb-nome');
+      if (nomeEl) nomeEl.textContent = lbNomes[lbIdx] || '';
       document.getElementById('lb-counter').textContent = (lbIdx + 1) + ' / ' + lbTotal;
       var dl   = document.getElementById('lb-download');
       var link = lbLinks[lbIdx] || '';
-      if (link) {{ dl.href = link; dl.style.display = 'inline-flex'; }}
+      if (link) {{ dl.href = link; dl.style.display = 'flex'; }}
       else {{ dl.style.display = 'none'; }}
       document.getElementById('lb-prev').style.opacity = lbIdx > 0 ? '1' : '0.25';
       document.getElementById('lb-next').style.opacity = lbIdx < lbTotal - 1 ? '1' : '0.25';
@@ -976,6 +986,25 @@ JS_TEMPLATE = """
       if (e.key === 'ArrowRight') lightboxNavegar(1);
       if (e.key === 'Escape')     fecharLightbox();
     }});
+
+    // ── SWIPE NO CELULAR ───────────────────────────────────────────
+    (function() {{
+      var lb = document.getElementById('frame-lightbox');
+      var swipeStartX = 0;
+      var swipeStartY = 0;
+      lb.addEventListener('touchstart', function(e) {{
+        swipeStartX = e.changedTouches[0].clientX;
+        swipeStartY = e.changedTouches[0].clientY;
+      }}, {{passive: true}});
+      lb.addEventListener('touchend', function(e) {{
+        var dx = e.changedTouches[0].clientX - swipeStartX;
+        var dy = e.changedTouches[0].clientY - swipeStartY;
+        // Só processa swipe horizontal (mais horizontal que vertical)
+        if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 40) {{
+          lightboxNavegar(dx < 0 ? 1 : -1);
+        }}
+      }}, {{passive: true}});
+    }})();
 """
 
 def gerar_html_card(video_info):
@@ -1190,8 +1219,9 @@ def gerar_pagina_html(cliente, ano_mes, videos_info, whatsapp_link,
     <img id="lb-img" src="" alt="">
     <button id="lb-next"  onclick="lightboxNavegar(1)">›</button>
     <div id="lb-footer">
+      <span id="lb-nome"></span>
       <span id="lb-counter"></span>
-      <a id="lb-download" href="" target="_blank">
+      <a id="lb-download" href="" target="_blank" style="display:none">
         <svg width="16" height="16" viewBox="0 0 15 15" fill="none">
           <path d="M7.5 1v9M4 7l3.5 3.5L11 7M2 13h11" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
