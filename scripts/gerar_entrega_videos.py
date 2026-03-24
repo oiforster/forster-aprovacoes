@@ -16,6 +16,7 @@ Uso:
 import os
 import re
 import sys
+import json
 import base64
 import tempfile
 import unicodedata
@@ -305,11 +306,15 @@ def listar_videos(pasta_videos):
 CSS = """
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
+    html { background: #E8E8E3; }
+
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
       background: #F5F5F0;
       color: #1A1A1A;
       min-height: 100vh;
+      max-width: 480px;
+      margin: 0 auto;
     }
 
     /* HEADER */
@@ -568,8 +573,10 @@ CSS = """
     .footer-enviar {
       position: fixed;
       bottom: 0;
-      left: 0;
-      right: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100%;
+      max-width: 480px;
       padding: 12px 16px 20px;
       background: #fff;
       box-shadow: 0 -1px 0 rgba(0,0,0,0.08);
@@ -680,6 +687,7 @@ CSS = """
       overflow: hidden;
       background: #E0E0DC;
       border-radius: 4px;
+      cursor: pointer;
     }
     .frame-cell img {
       width: 100%;
@@ -710,6 +718,95 @@ CSS = """
       justify-content: center;
       font-size: 24px;
       color: #bbb;
+    }
+
+    /* LIGHTBOX DE FRAMES */
+    #frame-lightbox {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.96);
+      z-index: 600;
+      display: none;
+      align-items: center;
+      justify-content: center;
+    }
+    #lb-close {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      background: rgba(255,255,255,0.15);
+      color: #fff;
+      border: none;
+      border-radius: 50%;
+      width: 44px;
+      height: 44px;
+      font-size: 20px;
+      cursor: pointer;
+      z-index: 10;
+    }
+    #lb-prev, #lb-next {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      background: rgba(255,255,255,0.12);
+      color: #fff;
+      border: none;
+      border-radius: 50%;
+      width: 48px;
+      height: 48px;
+      font-size: 28px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 10;
+      transition: opacity 0.15s;
+    }
+    #lb-prev { left: 10px; }
+    #lb-next { right: 10px; }
+    #lb-img {
+      max-width: 88vw;
+      max-height: 80vh;
+      object-fit: contain;
+      border-radius: 4px;
+      display: block;
+    }
+    #lb-footer {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: 16px 16px 24px;
+      background: linear-gradient(transparent, rgba(0,0,0,0.75));
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    #lb-nome {
+      flex: 1;
+      font-size: 12px;
+      color: rgba(255,255,255,0.65);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    #lb-counter {
+      font-size: 12px;
+      color: rgba(255,255,255,0.5);
+      white-space: nowrap;
+    }
+    #lb-download {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 7px 13px;
+      background: rgba(255,255,255,0.15);
+      color: #fff;
+      border-radius: 7px;
+      font-size: 12px;
+      font-weight: 600;
+      text-decoration: none;
+      white-space: nowrap;
     }
 """
 
@@ -841,6 +938,48 @@ JS_TEMPLATE = """
     }}
 
     document.addEventListener('DOMContentLoaded', atualizar);
+
+    // ── LIGHTBOX DE FRAMES ────────────────────────────────────────
+    var lbIdx   = 0;
+    var lbTotal = 0;
+    var lbLinks = {{}};
+    var lbNomes = {{}};
+
+    function abrirLightbox(idx) {{
+      lbIdx = idx;
+      _lbAtualizar();
+      document.getElementById('frame-lightbox').style.display = 'flex';
+    }}
+
+    function fecharLightbox() {{
+      document.getElementById('frame-lightbox').style.display = 'none';
+    }}
+
+    function lightboxNavegar(dir) {{
+      var novo = lbIdx + dir;
+      if (novo >= 0 && novo < lbTotal) {{ lbIdx = novo; _lbAtualizar(); }}
+    }}
+
+    function _lbAtualizar() {{
+      var srcEl = document.getElementById('lb-src-' + lbIdx);
+      if (srcEl) document.getElementById('lb-img').src = srcEl.src;
+      document.getElementById('lb-nome').textContent    = lbNomes[lbIdx] || '';
+      document.getElementById('lb-counter').textContent = (lbIdx + 1) + ' / ' + lbTotal;
+      var dl   = document.getElementById('lb-download');
+      var link = lbLinks[lbIdx] || '';
+      if (link) {{ dl.href = link; dl.style.display = 'inline-flex'; }}
+      else {{ dl.style.display = 'none'; }}
+      document.getElementById('lb-prev').style.opacity = lbIdx > 0 ? '1' : '0.25';
+      document.getElementById('lb-next').style.opacity = lbIdx < lbTotal - 1 ? '1' : '0.25';
+    }}
+
+    document.addEventListener('keydown', function(e) {{
+      var lb = document.getElementById('frame-lightbox');
+      if (!lb || lb.style.display === 'none') return;
+      if (e.key === 'ArrowLeft')  lightboxNavegar(-1);
+      if (e.key === 'ArrowRight') lightboxNavegar(1);
+      if (e.key === 'Escape')     fecharLightbox();
+    }});
 """
 
 def gerar_html_card(video_info):
@@ -916,40 +1055,49 @@ def gerar_html_card(video_info):
 def gerar_html_frames_section(frames_info):
     """
     frames_info: lista de dicts com keys:
-      nome       → nome do arquivo (ex: 'frame_01.jpg')
+      nome       → nome do arquivo
       thumbnail  → data URI base64 ou None
       link       → URL Synology para download individual ou None
-    frames_folder_link → URL Synology da pasta Frames/ (para 'baixar todos')
+    O último item pode ter 'folder_link' para o botão "Baixar todos".
     """
     if not frames_info:
         return ''
 
-    # Separa o folder link do resto (passado como último item com chave especial)
     folder_link = ''
-    cells = []
+    cells       = []
+    lb_links    = {}
+    lb_nomes    = {}
+
+    frame_items = [fi for fi in frames_info if not fi.get('folder_link')]
     for fi in frames_info:
         if fi.get('folder_link'):
             folder_link = fi['folder_link']
-            continue
+
+    for idx, fi in enumerate(frame_items):
         nome      = fi['nome']
         thumbnail = fi.get('thumbnail')
         link      = fi.get('link', '')
 
+        lb_links[idx] = link
+        lb_nomes[idx] = nome
+
         if thumbnail:
-            img_html = f'<img src="{thumbnail}" alt="{escape_html(nome)}" loading="lazy">'
+            img_html = f'<img id="lb-src-{idx}" src="{thumbnail}" alt="{escape_html(nome)}" loading="lazy">'
         else:
-            img_html = '<div class="frame-sem-preview">🖼</div>'
+            img_html = f'<span id="lb-src-{idx}" style="display:none"></span><div class="frame-sem-preview">🖼</div>'
 
         download_html = ''
         if link:
             download_html = (
-                f'<a class="frame-download-btn" href="{link}" target="_blank" title="Baixar {escape_html(nome)}">'
+                f'<a class="frame-download-btn" href="{link}" target="_blank" '
+                f'onclick="event.stopPropagation()" title="Baixar {escape_html(nome)}">'
                 '⬇'
                 '</a>'
             )
 
         cells.append(
-            f'<div class="frame-cell">{img_html}{download_html}</div>'
+            f'<div class="frame-cell" onclick="abrirLightbox({idx})">'
+            f'{img_html}{download_html}</div>'
         )
 
     btn_todos = ''
@@ -960,7 +1108,8 @@ def gerar_html_frames_section(frames_info):
             '</a>'
         )
 
-    grid_html = '\n    '.join(cells)
+    grid_html    = '\n    '.join(cells)
+    total_frames = len(frame_items)
 
     return f'''
   <div class="frames-section">
@@ -971,7 +1120,12 @@ def gerar_html_frames_section(frames_info):
     <div class="frames-grid">
     {grid_html}
     </div>
-  </div>'''
+  </div>
+  <script>
+    lbTotal = {total_frames};
+    lbLinks = {json.dumps(lb_links)};
+    lbNomes = {json.dumps(lb_nomes)};
+  </script>'''
 
 
 def gerar_pagina_html(cliente, ano_mes, videos_info, whatsapp_link,
@@ -1042,6 +1196,18 @@ def gerar_pagina_html(cliente, ano_mes, videos_info, whatsapp_link,
   </div>
 
   <div id="yt-overlay"></div>
+
+  <div id="frame-lightbox">
+    <button id="lb-close" onclick="fecharLightbox()">✕</button>
+    <button id="lb-prev"  onclick="lightboxNavegar(-1)">‹</button>
+    <img id="lb-img" src="" alt="">
+    <button id="lb-next"  onclick="lightboxNavegar(1)">›</button>
+    <div id="lb-footer">
+      <span id="lb-nome"></span>
+      <span id="lb-counter"></span>
+      <a id="lb-download" href="" target="_blank">⬇ Baixar</a>
+    </div>
+  </div>
 
   <script>{js}</script>
 </body>
