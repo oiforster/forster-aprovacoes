@@ -514,6 +514,46 @@
       font-family: inherit;
     }
 
+    /* OVERLAY DE VÍDEO (salvar na galeria) */
+    #video-dl-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.97);
+      z-index: 550;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    #video-dl-close {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      background: rgba(255,255,255,0.15);
+      color: #fff;
+      border: none;
+      border-radius: 50%;
+      width: 44px;
+      height: 44px;
+      font-size: 20px;
+      cursor: pointer;
+    }
+    #video-dl-player {
+      width: min(90vw, 400px);
+      max-height: 65vh;
+      border-radius: 8px;
+      background: #000;
+    }
+    #video-dl-hint {
+      color: rgba(255,255,255,0.65);
+      font-size: 13px;
+      text-align: center;
+      margin-top: 14px;
+      max-width: 300px;
+      line-height: 1.6;
+    }
+
 </style>
 </head>
 <body>
@@ -561,12 +601,12 @@
       </div>
     </div>
   </div>
-  <a class="btn-download-original" href="https://drive.google.com/uc?export=download&id=1INJ0V4Wt4200GEYcTvN3js71RGw-7XrL&confirm=t" target="_blank" rel="noopener">
+  <button class="btn-download-original" onclick="abrirVideoDownload('https://drive.google.com/uc?export=download&id=1INJ0V4Wt4200GEYcTvN3js71RGw-7XrL&confirm=t')">
     <svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg">
       <path d="M7.5 1v9M4 7l3.5 3.5L11 7M2 13h11" stroke="#1A1A1A" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
     </svg>
-    Baixar vídeo original
-  </a>
+    Salvar vídeo original
+  </button>
   <div class="post-divider"></div>
   <div class="post-acoes">
     <button class="btn-aprovar" id="aprovar-reel-01" onclick="marcarVideo('reel-01', 'aprovado')">✓ Aprovar</button>
@@ -903,6 +943,40 @@
         }
       }, {passive: true});
     })();
+
+    // ── OVERLAY DE VÍDEO (salvar na galeria) ──────────────────
+    function abrirVideoDownload(downloadUrl) {
+      var isIOS = /iPhone|iPad|iPod/.test(navigator.userAgent);
+      if (!isIOS) {
+        // Android/desktop: download direto (vai para pasta Downloads)
+        window.location.href = downloadUrl;
+        return;
+      }
+      // iPhone: abre overlay com <video> — long-press → Salvar vídeo → Fotos
+      try {
+        var u = new URL(downloadUrl);
+        var fileId = u.searchParams.get('id');
+        var videoSrc = 'https://drive.google.com/uc?id=' + fileId;
+        var overlay = document.getElementById('video-dl-overlay');
+        var player  = document.getElementById('video-dl-player');
+        player.src = videoSrc;
+        overlay.style.display = 'flex';
+      } catch(e) {
+        window.location.href = downloadUrl;
+      }
+    }
+
+    function fecharVideoDownload() {
+      var overlay = document.getElementById('video-dl-overlay');
+      var player  = document.getElementById('video-dl-player');
+      overlay.style.display = 'none';
+      player.pause();
+      player.src = '';
+    }
+
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') fecharVideoDownload();
+    });
 </script>
 
 
@@ -981,6 +1055,11 @@
     <div class="footer-pendente" id="footer-pendente">Revise todos os vídeos antes de enviar.</div>
   </div>
 
+  <div id="video-dl-overlay">
+    <button id="video-dl-close" onclick="fecharVideoDownload()">✕</button>
+    <video id="video-dl-player" controls playsinline></video>
+    <p id="video-dl-hint">Segure o dedo sobre o vídeo para salvar na galeria</p>
+  </div>
 
 </body>
 </html>

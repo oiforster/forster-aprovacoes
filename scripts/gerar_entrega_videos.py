@@ -49,9 +49,26 @@ GITHUB_BASE = "https://oiforster.github.io/forster-aprovacoes/aprovacao"
 
 # Caminhos base para conversão Synology → Google Drive
 SYNOLOGY_BASE = Path.home() / 'Library' / 'CloudStorage' / 'SynologyDrive-Agencia'
-GDRIVE_BASE = (Path.home() / 'Library' / 'CloudStorage' /
-               'GoogleDrive-oiforster@gmail.com' /
-               'Meu Drive' / 'Forster Filmes' / 'CLAUDE_COWORK')
+
+def _encontrar_gdrive_base():
+    """
+    Detecta automaticamente qual conta do Google Drive for Desktop
+    tem a pasta Forster Filmes / CLAUDE_COWORK montada.
+    Funciona em qualquer Mac independente do email da conta.
+    """
+    cloud = Path.home() / 'Library' / 'CloudStorage'
+    if not cloud.exists():
+        return None
+    for entry in sorted(cloud.iterdir()):
+        if not entry.name.startswith('GoogleDrive-'):
+            continue
+        for meu_drive in ['Meu Drive', 'My Drive']:
+            candidate = entry / meu_drive / 'Forster Filmes' / 'CLAUDE_COWORK'
+            if candidate.exists():
+                return candidate
+    return None
+
+GDRIVE_BASE = _encontrar_gdrive_base()
 
 # ─── UTILITÁRIOS ─────────────────────────────────────────────────────────────
 
@@ -379,6 +396,8 @@ def synology_para_gdrive(synology_path):
     GDrive:   ~/CloudStorage/GoogleDrive-.../Meu Drive/Forster Filmes/CLAUDE_COWORK/Agência/...
     Retorna Path ou None se não encontrado.
     """
+    if GDRIVE_BASE is None:
+        return None
     try:
         rel = Path(synology_path).relative_to(SYNOLOGY_BASE)
     except ValueError:
@@ -909,6 +928,46 @@ CSS = """
       font-family: inherit;
     }
 
+    /* OVERLAY DE VÍDEO (salvar na galeria) */
+    #video-dl-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.97);
+      z-index: 550;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    #video-dl-close {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      background: rgba(255,255,255,0.15);
+      color: #fff;
+      border: none;
+      border-radius: 50%;
+      width: 44px;
+      height: 44px;
+      font-size: 20px;
+      cursor: pointer;
+    }
+    #video-dl-player {
+      width: min(90vw, 400px);
+      max-height: 65vh;
+      border-radius: 8px;
+      background: #000;
+    }
+    #video-dl-hint {
+      color: rgba(255,255,255,0.65);
+      font-size: 13px;
+      text-align: center;
+      margin-top: 14px;
+      max-width: 300px;
+      line-height: 1.6;
+    }
+
 """
 
 JS_TEMPLATE = """
@@ -1110,6 +1169,40 @@ JS_TEMPLATE = """
         }}
       }}, {{passive: true}});
     }})();
+
+    // ── OVERLAY DE VÍDEO (salvar na galeria) ──────────────────
+    function abrirVideoDownload(downloadUrl) {{
+      var isIOS = /iPhone|iPad|iPod/.test(navigator.userAgent);
+      if (!isIOS) {{
+        // Android/desktop: download direto (vai para pasta Downloads)
+        window.location.href = downloadUrl;
+        return;
+      }}
+      // iPhone: abre overlay com <video> — long-press → Salvar vídeo → Fotos
+      try {{
+        var u = new URL(downloadUrl);
+        var fileId = u.searchParams.get('id');
+        var videoSrc = 'https://drive.google.com/uc?id=' + fileId;
+        var overlay = document.getElementById('video-dl-overlay');
+        var player  = document.getElementById('video-dl-player');
+        player.src = videoSrc;
+        overlay.style.display = 'flex';
+      }} catch(e) {{
+        window.location.href = downloadUrl;
+      }}
+    }}
+
+    function fecharVideoDownload() {{
+      var overlay = document.getElementById('video-dl-overlay');
+      var player  = document.getElementById('video-dl-player');
+      overlay.style.display = 'none';
+      player.pause();
+      player.src = '';
+    }}
+
+    document.addEventListener('keydown', function(e) {{
+      if (e.key === 'Escape') fecharVideoDownload();
+    }});
 """
 
 def gerar_html_card(video_info):
@@ -1151,12 +1244,12 @@ def gerar_html_card(video_info):
     # Botão de download: abre o vídeo original diretamente no Google Drive.
     # Se não houver Drive URL disponível, o botão é omitido.
     if drive_url:
-        html_download = f'''  <a class="btn-download-original" href="{drive_url}" target="_blank" rel="noopener">
+        html_download = f'''  <button class="btn-download-original" onclick="abrirVideoDownload('{drive_url}')">
     <svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg">
       <path d="M7.5 1v9M4 7l3.5 3.5L11 7M2 13h11" stroke="#1A1A1A" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
     </svg>
-    Baixar vídeo original
-  </a>
+    Salvar vídeo original
+  </button>
 '''
     else:
         html_download = ''
@@ -1337,6 +1430,11 @@ def gerar_pagina_html(cliente, ano_mes, videos_info, whatsapp_link,
     <div class="footer-pendente" id="footer-pendente">Revise todos os vídeos antes de enviar.</div>
   </div>
 
+  <div id="video-dl-overlay">
+    <button id="video-dl-close" onclick="fecharVideoDownload()">✕</button>
+    <video id="video-dl-player" controls playsinline></video>
+    <p id="video-dl-hint">Segure o dedo sobre o vídeo para salvar na galeria</p>
+  </div>
 
 </body>
 </html>"""
@@ -1373,6 +1471,11 @@ def main():
     except FileNotFoundError as e:
         print(f"  ❌ {e}")
         sys.exit(1)
+
+    if GDRIVE_BASE:
+        print(f"  ☁️  Google Drive: {GDRIVE_BASE}")
+    else:
+        print(f"  ⚠️  Google Drive: não encontrado — vídeos sem botão de download, frames em thumbnail")
 
     # 2. Achar pasta do cliente
     pasta_cliente = encontrar_pasta_cliente(cliente, agencia, pontual)
