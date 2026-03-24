@@ -1032,57 +1032,6 @@ CSS = """
       font-family: inherit;
     }
 
-    /* OVERLAY DE VÍDEO (iOS) */
-    #video-dl-overlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.97);
-      z-index: 550;
-      display: none;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-      gap: 16px;
-    }
-    #video-dl-close {
-      position: absolute;
-      top: 16px;
-      right: 16px;
-      background: rgba(255,255,255,0.15);
-      color: #fff;
-      border: none;
-      border-radius: 50%;
-      width: 44px;
-      height: 44px;
-      font-size: 20px;
-      cursor: pointer;
-    }
-    #video-dl-player {
-      width: min(90vw, 400px);
-      max-height: 65vh;
-      border-radius: 8px;
-      background: #111;
-    }
-    #video-dl-hint {
-      color: rgba(255,255,255,0.65);
-      font-size: 13px;
-      text-align: center;
-      max-width: 300px;
-      line-height: 1.6;
-      margin: 0;
-    }
-    #video-dl-fallback {
-      display: none;
-      padding: 12px 24px;
-      background: #fff;
-      color: #1A1A1A;
-      border-radius: 10px;
-      font-size: 14px;
-      font-weight: 700;
-      text-decoration: none;
-    }
-
 """
 
 JS_TEMPLATE = """
@@ -1285,54 +1234,25 @@ JS_TEMPLATE = """
       }}, {{passive: true}});
     }})();
 
-    // ── OVERLAY DE VÍDEO (iOS) ─────────────────────────────────
+    // ── DOWNLOAD DE VÍDEO ──────────────────────────────────────
     function abrirVideoDownload(downloadUrl) {{
       var isIOS = /iPhone|iPad|iPod/.test(navigator.userAgent);
       if (!isIOS) {{
-        // Android/desktop: download direto
+        // Mac/Android: download direto
         window.location.href = downloadUrl;
         return;
       }}
-      // iOS: tenta lh3 (CDN direto sem redirect de auth).
-      // Se o <video> carregar → long-press → "Salvar vídeo" → Fotos.
-      // Se falhar → mostra botão para abrir no Drive.
+      // iOS: H.265 não streama em nenhum player web.
+      // Abre visualizador do Drive em nova aba — iOS redireciona para
+      // o app Drive se instalado → ⋮ → Fazer download → Fotos.
       try {{
         var u = new URL(downloadUrl);
         var fileId = u.searchParams.get('id');
-        var overlay  = document.getElementById('video-dl-overlay');
-        var player   = document.getElementById('video-dl-player');
-        var hint     = document.getElementById('video-dl-hint');
-        var fallback = document.getElementById('video-dl-fallback');
-
-        player.style.display = 'block';
-        hint.textContent = 'Segure o dedo sobre o vídeo para salvar na galeria';
-        fallback.style.display = 'none';
-        fallback.href = 'https://drive.google.com/file/d/' + fileId + '/view';
-
-        player.onerror = function() {{
-          player.style.display = 'none';
-          hint.textContent = 'Não foi possível carregar aqui.';
-          fallback.style.display = 'inline-block';
-        }};
-
-        player.src = 'https://lh3.googleusercontent.com/d/' + fileId;
-        overlay.style.display = 'flex';
+        window.open('https://drive.google.com/file/d/' + fileId + '/view', '_blank');
       }} catch(e) {{
         window.location.href = downloadUrl;
       }}
     }}
-
-    function fecharVideoDownload() {{
-      var overlay = document.getElementById('video-dl-overlay');
-      var player  = document.getElementById('video-dl-player');
-      overlay.style.display = 'none';
-      player.pause();
-      player.src = '';
-    }}
-
-    document.addEventListener('keydown', function(e) {{
-      if (e.key === 'Escape') fecharVideoDownload();
-    }});
 """
 
 def gerar_html_card(video_info):
@@ -1566,12 +1486,6 @@ def gerar_pagina_html(cliente, ano_mes, videos_info, whatsapp_link,
     <div class="footer-pendente" id="footer-pendente">Revise todos os vídeos antes de enviar.</div>
   </div>
 
-  <div id="video-dl-overlay">
-    <button id="video-dl-close" onclick="fecharVideoDownload()">✕</button>
-    <video id="video-dl-player" controls playsinline preload="auto"></video>
-    <p id="video-dl-hint">Segure o dedo sobre o vídeo para salvar na galeria</p>
-    <a id="video-dl-fallback" target="_blank">Abrir no Google Drive ↗</a>
-  </div>
 
 </body>
 </html>"""
