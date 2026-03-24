@@ -205,7 +205,7 @@ def ler_youtube_md(pasta_videos):
             idx = linha.find(': http')
             if idx == -1:
                 continue
-            chave = linha[:idx].strip()
+            chave = unicodedata.normalize('NFC', linha[:idx].strip())
             url   = linha[idx+2:].strip()
             m = re.search(r'(?:youtu\.be/|[?&]v=)([a-zA-Z0-9_\-]{11})', url)
             if m:
@@ -1554,7 +1554,7 @@ def main():
     if ids_manuais:
         print(f"\n  📋 _gdrive.md encontrado — {len(ids_manuais)} ID(s) manual(is) carregado(s).")
 
-    sem_yt = [f.stem for f in arquivos if f.stem not in youtube_ids]
+    sem_yt = [f.stem for f in arquivos if unicodedata.normalize('NFC', f.stem) not in youtube_ids]
     if sem_yt:
         print(f"\n  ⚠️  Sem YouTube ID (rode subir_reels.py primeiro):")
         for nome in sem_yt:
@@ -1603,7 +1603,7 @@ def main():
             'numero':     numero,
             'titulo':     titulo,
             'contexto':   contexto,
-            'youtube_id': youtube_ids.get(reel_nome),
+            'youtube_id': youtube_ids.get(unicodedata.normalize('NFC', reel_nome)),
             'drive_url':  drive_url,
         })
 
