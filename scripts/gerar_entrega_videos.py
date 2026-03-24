@@ -70,6 +70,33 @@ def _encontrar_gdrive_base():
 
 GDRIVE_BASE = _encontrar_gdrive_base()
 
+def _encontrar_agencia_gdrive():
+    """
+    Detecta o nome real da pasta Agência dentro do GDRIVE_BASE.
+    Pode ser 'Agência', 'AGENCIA', 'Agencia' etc. dependendo de como
+    o Google Drive sincronizou a pasta original.
+    """
+    if GDRIVE_BASE is None:
+        return None
+    nomes = ['Agência', 'AGENCIA', 'Agencia', 'agencia']
+    for nome in nomes:
+        for variant in [nome,
+                        unicodedata.normalize('NFC', nome),
+                        unicodedata.normalize('NFD', nome)]:
+            p = GDRIVE_BASE / variant
+            if p.exists():
+                return p
+    # fallback: primeiro subdiretório que contém '_Clientes'
+    try:
+        for entry in sorted(GDRIVE_BASE.iterdir()):
+            if entry.is_dir() and (entry / '_Clientes').exists():
+                return entry
+    except Exception:
+        pass
+    return None
+
+GDRIVE_AGENCIA = _encontrar_agencia_gdrive()
+
 # ─── UTILITÁRIOS ─────────────────────────────────────────────────────────────
 
 def slugify(texto):
@@ -422,31 +449,37 @@ def gdrive_video_download_url(filepath):
     return None
 
 
+def gdrive_folder_url(synology_folder):
+    """
+    URL para abrir uma pasta no Google Drive (browser/app).
+    Converte o path Synology para Google Drive e obtém o folder ID via xattr.
+    Retorna URL ou None.
+    """
+    gdrive_path = synology_para_gdrive(synology_folder)
+    if not gdrive_path:
+        return None
+    folder_id = _get_gdrive_file_id(gdrive_path)
+    if folder_id:
+        return f"https://drive.google.com/drive/folders/{folder_id}"
+    return None
+
+
 def synology_para_gdrive(synology_path):
     """
     Converte um path do Synology Drive para o path equivalente no Google Drive.
     Synology: ~/CloudStorage/SynologyDrive-Agencia/...
-    GDrive:   ~/CloudStorage/GoogleDrive-.../Meu Drive/Forster Filmes/CLAUDE_COWORK/Agência/...
+    GDrive:   ~/CloudStorage/GoogleDrive-.../Meu Drive/Forster Filmes/CLAUDE_COWORK/<Agência|AGENCIA>/...
     Retorna Path ou None se não encontrado.
     """
-    if GDRIVE_BASE is None:
+    if GDRIVE_AGENCIA is None:
         return None
     try:
         rel = Path(synology_path).relative_to(SYNOLOGY_BASE)
     except ValueError:
         return None
-    # Tenta NFC primeiro
-    gdrive_path = GDRIVE_BASE / 'Agência' / rel
+    gdrive_path = GDRIVE_AGENCIA / rel
     if gdrive_path.exists():
         return gdrive_path
-    # Tenta NFD (encoding que o Google Drive usa no macOS)
-    try:
-        agencia_nfd = unicodedata.normalize('NFD', 'Agência')
-        gdrive_path_nfd = GDRIVE_BASE / agencia_nfd / rel
-        if gdrive_path_nfd.exists():
-            return gdrive_path_nfd
-    except Exception:
-        pass
     return None
 
 # ─── GERAÇÃO DE HTML ─────────────────────────────────────────────────────────
@@ -536,6 +569,24 @@ CSS = """
     }
     .btn-aprovar-tudo:hover { background: #333; }
     .btn-aprovar-tudo.ativo { background: #4CAF50; }
+
+    .btn-salvar-todos-videos {
+      display: block;
+      width: 100%;
+      padding: 12px;
+      background: transparent;
+      color: #1A1A1A;
+      border: 1.5px solid #D0D0CA;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 600;
+      letter-spacing: 0.01em;
+      text-align: center;
+      text-decoration: none;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .btn-salvar-todos-videos:hover { background: #EBEBEB; }
 
     /* LISTA DE VÍDEOS */
     .posts-lista {
@@ -1215,7 +1266,7 @@ JS_TEMPLATE = """
       try {{
         var u = new URL(downloadUrl);
         var fileId = u.searchParams.get('id');
-        var videoSrc = 'https://drive.google.com/uc?id=' + fileId;
+        var videoSrc = 'https://drive.google.com/uc?id=' + fileId + '&confirm=t';
         var overlay = document.getElementById('video-dl-overlay');
         var player  = document.getElementById('video-dl-player');
         player.src = videoSrc;
@@ -1381,7 +1432,7 @@ def gerar_html_frames_section(frames_info):
 
 
 def gerar_pagina_html(cliente, ano_mes, videos_info, whatsapp_link,
-                      frames_info=None):
+                      frames_info=None, pasta_reels_url=None):
     ano, mes_num = ano_mes.split('-')
     mes_display = f"{MESES_PT[int(mes_num)]} de {ano}"
     slug = slugify(cliente)
@@ -1392,6 +1443,11 @@ def gerar_pagina_html(cliente, ano_mes, videos_info, whatsapp_link,
 
     cards_html = ''.join(gerar_html_card(v) for v in videos_info)
     frames_html = gerar_html_frames_section(frames_info or [])
+    html_btn_salvar_videos = (
+        f'<a class="btn-salvar-todos-videos" href="{pasta_reels_url}" target="_blank">'
+        '⬇ Salvar todos os vídeos originais'
+        '</a>'
+    ) if pasta_reels_url else ''
 
     # Prepara link WhatsApp (grupo ou número direto)
     if not whatsapp_link:
@@ -1432,6 +1488,7 @@ def gerar_pagina_html(cliente, ano_mes, videos_info, whatsapp_link,
     <button class="btn-aprovar-tudo" id="btn-aprovar-tudo" onclick="aprovarTudo()">
       ✓ Aprovar todos os vídeos
     </button>
+    {html_btn_salvar_videos}
   </div>
 
   <div class="posts-lista">
@@ -1635,8 +1692,17 @@ def main():
     # Clientes recorrentes: usa o link configurado ou vazio
     # Clientes pontuais: usa o link padrão (mesmo da Silvana/Baviera)
     whatsapp_link = WHATSAPP_LINKS.get(cliente, WHATSAPP_PADRAO_PONTUAL if pontual else '')
+
+    # Folder URLs para botões "Salvar todos"
+    pasta_reels_url = gdrive_folder_url(pasta_videos)
+    if pasta_frames and not any(fi.get('folder_link') for fi in frames_info):
+        pasta_frames_url = gdrive_folder_url(pasta_frames)
+        if pasta_frames_url:
+            frames_info.append({'folder_link': pasta_frames_url})
+
     html = gerar_pagina_html(cliente, ano_mes, videos_info, whatsapp_link,
-                             frames_info=frames_info)
+                             frames_info=frames_info,
+                             pasta_reels_url=pasta_reels_url)
 
     slug = slugify(cliente)
     pasta_saida = OUTPUT_DIR / slug
