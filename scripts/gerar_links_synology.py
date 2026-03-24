@@ -127,18 +127,27 @@ def logout(host: str, sid: str):
         pass
 
 
-def _gofile_to_direto(url: str) -> str:
-    """Retorna o URL de compartilhamento público do Synology como veio da API.
+def _construir_url_download(gofile_url: str, filename: str) -> str:
+    """Converte URL gofile.me da API → URL de download direto do Synology.
 
-    O endpoint /fbdownload/{code} retorna erro 119 quando acessado sem sessão DSM.
-    O URL gofile.me abre uma página intermediária do Synology com botão de download
-    (2 cliques). Não existe URL de download direto sem backend para autenticar.
+    A API retorna algo como: https://gofile.me/RELAY/CODE
+    O URL de download direto é: https://HOST:5001/fsdownload/CODE/ENCODED_FILENAME
+
+    Descoberto via inspeção de rede do Chrome ao clicar em "Transferir" na
+    página de compartilhamento do Synology (/sharing/CODE).
     """
-    return url
+    code = gofile_url.rstrip('/').split('/')[-1]
+    host = NAS_HOST_EXTERNAL.rstrip('/')
+    encoded = urllib.parse.quote(filename, safe='')
+    return f"{host}/fsdownload/{code}/{encoded}"
 
 
-def criar_link(host: str, sid: str, nas_path: str) -> str:
-    """Cria link de compartilhamento e retorna URL de download direto."""
+def criar_link(host: str, sid: str, nas_path: str, is_folder: bool = False) -> str:
+    """Cria link de compartilhamento e retorna URL de download direto.
+
+    Para pastas (is_folder=True), retorna o URL gofile.me original —
+    o /fsdownload/ só funciona para arquivos individuais.
+    """
     resp = api_call(host, "entry.cgi", {
         "api":            "SYNO.FileStation.Sharing",
         "version":        "3",
@@ -153,7 +162,10 @@ def criar_link(host: str, sid: str, nas_path: str) -> str:
         code = resp.get("error", {}).get("code", "?")
         raise RuntimeError(f"Erro ao criar link (código {code}) para: {nas_path}")
     url = resp["data"]["links"][0]["url"]
-    return _gofile_to_direto(url)
+    if is_folder:
+        return url  # pasta: mantém gofile.me (abre página de download zip)
+    filename = nas_path.rstrip('/').split('/')[-1]
+    return _construir_url_download(url, filename)
 
 # ─── _synology.md ─────────────────────────────────────────────────────────────
 
@@ -344,13 +356,17 @@ def main():
     print(f"  📂 Pasta : {pasta_videos}")
     print(f"  📹 Vídeos: {len(videos)}  |  🖼  Frames: {len(frames)}\n")
 
-    # 2. Ler links já existentes e migrar gofile.me → download direto
+    # 2. Ler links já existentes e limpar URLs com endpoint incorreto
     links = ler_synology_md(pasta_videos)
-    migrados = sum(1 for url in links.values() if 'gofile.me' in url)
-    if migrados > 0:
-        links = {k: _gofile_to_direto(v) for k, v in links.items()}
-        escrever_synology_md(pasta_videos, links)
-        print(f"  🔄 {migrados} links gofile.me migrados para download direto\n")
+    a_regenerar = []
+    for k, v in list(links.items()):
+        # /fbdownload/ = endpoint errado (erro 119)
+        # gofile.me sem ser FRAMES_FOLDER = ainda não convertido para download direto
+        if '/fbdownload/' in v or ('gofile.me' in v and k != 'FRAMES_FOLDER'):
+            a_regenerar.append(k)
+            del links[k]
+    if a_regenerar:
+        print(f"  🔄 {len(a_regenerar)} links com endpoint incorreto removidos — serão regenerados\n")
     novos = 0
 
     # 3. Conectar ao Synology (local primeiro, DDNS como fallback)
@@ -400,7 +416,7 @@ def main():
             if 'FRAMES_FOLDER' not in links:
                 try:
                     nas_folder = local_to_nas(pasta_frames, agencia)
-                    url_folder = criar_link(host, sid, nas_folder)
+                    url_folder = criar_link(host, sid, nas_folder, is_folder=True)
                     links['FRAMES_FOLDER'] = url_folder
                     novos += 1
                     print(f"      📁 Pasta completa: link criado")
