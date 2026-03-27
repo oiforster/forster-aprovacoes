@@ -218,22 +218,18 @@ def _encontrar_pasta_videos(pasta_cliente, ano_mes):
                 videos = entry / 'Videos'
                 if videos.exists() and _tem_reels(videos):
                     return videos
-                # Sem subpasta Videos — tenta direto
                 if _tem_reels(entry):
                     return entry
 
     # 2) Pontuais: YYYY-MM* na raiz do cliente, com subpastas flexíveis
     for entry in sorted(pasta_cliente.iterdir()):
         if entry.is_dir() and entry.name.startswith(ano_mes):
-            # Tenta subpastas comuns
             for sub in ['Videos', '01 - Reels', 'Reels']:
                 pasta = entry / sub
                 if pasta.exists() and _tem_reels(pasta):
                     return pasta
-            # Tenta direto na pasta do mês
             if _tem_reels(entry):
                 return entry
-            # Busca recursiva (1 nível)
             for sub in entry.iterdir():
                 if sub.is_dir() and _tem_reels(sub):
                     return sub
