@@ -70,33 +70,6 @@ def _encontrar_gdrive_base():
 
 GDRIVE_BASE = _encontrar_gdrive_base()
 
-def _encontrar_agencia_gdrive():
-    """
-    Detecta o nome real da pasta Agência dentro do GDRIVE_BASE.
-    Pode ser 'Agência', 'AGENCIA', 'Agencia' etc. dependendo de como
-    o Google Drive sincronizou a pasta original.
-    """
-    if GDRIVE_BASE is None:
-        return None
-    nomes = ['Agência', 'AGENCIA', 'Agencia', 'agencia']
-    for nome in nomes:
-        for variant in [nome,
-                        unicodedata.normalize('NFC', nome),
-                        unicodedata.normalize('NFD', nome)]:
-            p = GDRIVE_BASE / variant
-            if p.exists():
-                return p
-    # fallback: primeiro subdiretório que contém '_Clientes'
-    try:
-        for entry in sorted(GDRIVE_BASE.iterdir()):
-            if entry.is_dir() and (entry / '_Clientes').exists():
-                return entry
-    except Exception:
-        pass
-    return None
-
-GDRIVE_AGENCIA = _encontrar_agencia_gdrive()
-
 # ─── UTILITÁRIOS ─────────────────────────────────────────────────────────────
 
 def slugify(texto):
@@ -218,27 +191,9 @@ def encontrar_pasta_videos(pasta_cliente, ano_mes):
 
 # ─── LEITURA DE ARQUIVOS ──────────────────────────────────────────────────────
 
-def _pasta_meta(pasta_videos):
-    """
-    Pasta para arquivos de metadados internos (_youtube.md, _gdrive.md, etc).
-    Fica em pasta_videos.parent/_meta, fora da pasta de vídeos visível pelo cliente.
-    Se não existir, retorna None (fallback para pasta_videos).
-    """
-    meta = pasta_videos.parent / '_meta'
-    return meta if meta.exists() else None
-
-def _ler_arquivo_md(pasta_videos, nome_arquivo):
-    """Resolve o caminho de um arquivo .md: busca em _meta/ primeiro, depois na pasta de vídeos."""
-    meta = _pasta_meta(pasta_videos)
-    if meta:
-        candidato = meta / nome_arquivo
-        if candidato.exists():
-            return candidato
-    return pasta_videos / nome_arquivo
-
 def ler_youtube_md(pasta_videos):
     """Lê _youtube.md → dict { 'REEL 01 – Nome': 'VIDEO_ID' }."""
-    arquivo = _ler_arquivo_md(pasta_videos, '_youtube.md')
+    arquivo = pasta_videos / '_youtube.md'
     if not arquivo.exists():
         return {}
     ids = {}
@@ -250,7 +205,7 @@ def ler_youtube_md(pasta_videos):
             idx = linha.find(': http')
             if idx == -1:
                 continue
-            chave = unicodedata.normalize('NFC', linha[:idx].strip())
+            chave = linha[:idx].strip()
             url   = linha[idx+2:].strip()
             m = re.search(r'(?:youtu\.be/|[?&]v=)([a-zA-Z0-9_\-]{11})', url)
             if m:
@@ -262,7 +217,7 @@ def ler_contexto_md(pasta_videos):
     Lê _contexto.md → dict { 'REEL 01 – Nome': 'descrição' }.
     Formato: REEL 01 – Nome do Vídeo: Descrição para o cliente ver
     """
-    arquivo = _ler_arquivo_md(pasta_videos, '_contexto.md')
+    arquivo = pasta_videos / '_contexto.md'
     if not arquivo.exists():
         return {}
     contextos = {}
@@ -281,7 +236,7 @@ def ler_contexto_md(pasta_videos):
 
 def ler_synology_md(pasta_videos):
     """Lê _synology.md → dict { 'REEL 01 – Nome': 'https://...' }"""
-    arquivo = _ler_arquivo_md(pasta_videos, '_synology.md')
+    arquivo = pasta_videos / '_synology.md'
     if not arquivo.exists():
         return {}
     links = {}
@@ -295,39 +250,6 @@ def ler_synology_md(pasta_videos):
                 continue
             links[linha[:idx].strip()] = linha[idx + 2:].strip()
     return links
-
-
-def ler_gdrive_md(pasta_videos):
-    """
-    Lê _gdrive.md → dict { slugify('REEL 01 – Nome'): 'FILE_ID' }.
-    Fallback manual para quando o xattr do Google Drive não está disponível
-    (arquivo em modo streaming / não baixado).
-
-    Formato do arquivo:
-        # IDs manuais do Google Drive
-        REEL 02 – O que é Osteopatia: 1aBcDeFgHiJkLmNoPqRsTuVwXyZ
-        REEL 03 - Fisioterapia e Especialidades: 2bCdEfGhIjKlMnOpQrStUvWxYz
-
-    Como obter o File ID:
-        Finder → botão direito no arquivo no Google Drive → Compartilhar →
-        Copiar link → extrair o ID da URL (parte após /d/ ou id=)
-    """
-    arquivo = _ler_arquivo_md(pasta_videos, '_gdrive.md')
-    if not arquivo.exists():
-        return {}
-    ids = {}
-    with open(arquivo, 'r', encoding='utf-8') as f:
-        for linha in f:
-            linha = linha.strip()
-            if not linha or linha.startswith('#'):
-                continue
-            # Formato: REEL NN – Nome: FILE_ID
-            m = re.match(r'^(REEL\s+\d+\s*[–\-]\s*.+?):\s*(\S+)$', linha, re.IGNORECASE)
-            if m:
-                chave   = m.group(1).strip()
-                file_id = m.group(2).strip()
-                ids[slugify(chave)] = file_id
-    return ids
 
 
 def _encontrar_pasta_frames(pasta_videos):
@@ -383,10 +305,8 @@ def gerar_thumbnail_base64(frame_path, max_size=300):
 
 
 def gerar_template_contexto(pasta_videos, videos):
-    """Cria _contexto.md em _meta/ (ou pasta_videos como fallback)."""
-    destino = pasta_videos.parent / '_meta'
-    destino.mkdir(exist_ok=True)
-    arquivo = destino / '_contexto.md'
+    """Cria _contexto.md com template para Samuel preencher."""
+    arquivo = pasta_videos / '_contexto.md'
     with open(arquivo, 'w', encoding='utf-8') as f:
         f.write('# Contexto por vídeo (opcional)\n')
         f.write('# Preencha uma descrição breve para o cliente ver na página de aprovação.\n')
@@ -469,37 +389,32 @@ def gdrive_video_download_url(filepath):
     return None
 
 
-def gdrive_folder_url(synology_folder):
-    """
-    URL para abrir uma pasta no Google Drive (browser/app).
-    Converte o path Synology para Google Drive e obtém o folder ID via xattr.
-    Retorna URL ou None.
-    """
-    gdrive_path = synology_para_gdrive(synology_folder)
-    if not gdrive_path:
-        return None
-    folder_id = _get_gdrive_file_id(gdrive_path)
-    if folder_id:
-        return f"https://drive.google.com/drive/folders/{folder_id}"
-    return None
-
-
 def synology_para_gdrive(synology_path):
     """
     Converte um path do Synology Drive para o path equivalente no Google Drive.
     Synology: ~/CloudStorage/SynologyDrive-Agencia/...
-    GDrive:   ~/CloudStorage/GoogleDrive-.../Meu Drive/Forster Filmes/CLAUDE_COWORK/<Agência|AGENCIA>/...
+    GDrive:   ~/CloudStorage/GoogleDrive-.../Meu Drive/Forster Filmes/CLAUDE_COWORK/Agência/...
     Retorna Path ou None se não encontrado.
     """
-    if GDRIVE_AGENCIA is None:
+    if GDRIVE_BASE is None:
         return None
     try:
         rel = Path(synology_path).relative_to(SYNOLOGY_BASE)
     except ValueError:
         return None
-    gdrive_path = GDRIVE_AGENCIA / rel
-    if gdrive_path.exists():
-        return gdrive_path
+    # Tenta variantes do nome da pasta raiz (Agência NFC, NFD, AGENCIA)
+    candidatos = [
+        'Agência',
+        unicodedata.normalize('NFD', 'Agência'),
+        'AGENCIA',
+    ]
+    for nome in candidatos:
+        gdrive_path = GDRIVE_BASE / nome / rel
+        try:
+            if gdrive_path.exists():
+                return gdrive_path
+        except Exception:
+            continue
     return None
 
 # ─── GERAÇÃO DE HTML ─────────────────────────────────────────────────────────
@@ -589,24 +504,6 @@ CSS = """
     }
     .btn-aprovar-tudo:hover { background: #333; }
     .btn-aprovar-tudo.ativo { background: #4CAF50; }
-
-    .btn-salvar-todos-videos {
-      display: block;
-      width: 100%;
-      padding: 12px;
-      background: transparent;
-      color: #1A1A1A;
-      border: 1.5px solid #D0D0CA;
-      border-radius: 10px;
-      font-size: 14px;
-      font-weight: 600;
-      letter-spacing: 0.01em;
-      text-align: center;
-      text-decoration: none;
-      cursor: pointer;
-      transition: background 0.15s;
-    }
-    .btn-salvar-todos-videos:hover { background: #EBEBEB; }
 
     /* LISTA DE VÍDEOS */
     .posts-lista {
@@ -859,12 +756,13 @@ CSS = """
     /* SEÇÃO FRAMES */
     .frames-section {
       margin: 8px 16px 24px;
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
+      background: #fff;
+      border-radius: 14px;
+      overflow: hidden;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.07);
     }
     .frames-header {
-      padding: 6px 2px 2px;
+      padding: 14px 14px 10px;
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -893,20 +791,6 @@ CSS = """
       transition: background 0.15s;
     }
     .btn-baixar-todos:hover { background: #333; }
-    .frames-grupo {
-      background: #fff;
-      border-radius: 14px;
-      overflow: hidden;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.07);
-    }
-    .frames-grupo-titulo {
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: 0.10em;
-      text-transform: uppercase;
-      color: #999;
-      padding: 12px 14px 6px;
-    }
     .frames-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
@@ -1045,12 +929,73 @@ CSS = """
       font-family: inherit;
     }
 
+    /* OVERLAY DE VÍDEO (salvar na galeria) */
+    #video-dl-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.97);
+      z-index: 550;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    #video-dl-close {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      background: rgba(255,255,255,0.15);
+      color: #fff;
+      border: none;
+      border-radius: 50%;
+      width: 44px;
+      height: 44px;
+      font-size: 20px;
+      cursor: pointer;
+    }
+    #video-dl-player {
+      width: min(90vw, 400px);
+      max-height: 65vh;
+      border-radius: 8px;
+      background: #000;
+    }
+    #video-dl-hint {
+      color: rgba(255,255,255,0.65);
+      font-size: 13px;
+      text-align: center;
+      margin-top: 14px;
+      max-width: 300px;
+      line-height: 1.6;
+    }
+    .video-dl-label {
+      color: rgba(255,255,255,0.5);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 8px;
+      text-align: center;
+    }
+
 """
 
 JS_TEMPLATE = """
     var TOTAL = {total};
     var estados = {{}};
     var observacoes = {{}};
+
+    function enviarEmailSilencioso(mensagem) {{
+      try {{
+        emailjs.send('service_a00b37r', 'template_lyk4lff', {{
+          title: 'Aprovação de Vídeos — {cliente_escaped} — {mes_display_escaped}',
+          name: '{cliente_escaped}',
+          message: mensagem,
+          email: ''
+        }});
+      }} catch(e) {{
+        // silencioso — não interrompe o fluxo
+      }}
+    }}
 
     function atualizar() {{
       var revisados = Object.keys(estados).length;
@@ -1169,6 +1114,10 @@ JS_TEMPLATE = """
       linhas.push('🔗 ' + url);
 
       var msg = linhas.join('\\n');
+
+      // Disparo silencioso do email de redundância
+      enviarEmailSilencioso(msg);
+
       var link = '{whatsapp_link}';
       var sep = link.includes('?') ? '&' : '?';
       window.open(link + sep + 'text=' + encodeURIComponent(msg), '_blank');
@@ -1247,25 +1196,55 @@ JS_TEMPLATE = """
       }}, {{passive: true}});
     }})();
 
-    // ── DOWNLOAD DE VÍDEO ──────────────────────────────────────
-    function abrirVideoDownload(downloadUrl) {{
+    // ── OVERLAY DE VÍDEO + CAPA (salvar na galeria) ──────────────────
+    function abrirVideoDownload(downloadUrl, capaUrl) {{
       var isIOS = /iPhone|iPad|iPod/.test(navigator.userAgent);
       if (!isIOS) {{
-        // Mac/Android: download direto
+        // Android/desktop: download direto (vai para pasta Downloads)
         window.location.href = downloadUrl;
+        // Capa: abre em nova aba após pequeno delay para não bloquear o primeiro download
+        if (capaUrl) {{
+          setTimeout(function() {{ window.open(capaUrl, '_blank'); }}, 800);
+        }}
         return;
       }}
-      // iOS: H.265 não streama em nenhum player web.
-      // Abre visualizador do Drive em nova aba — iOS redireciona para
-      // o app Drive se instalado → ⋮ → Fazer download → Fotos.
+      // iPhone: abre overlay com <video> + <img> da capa — long-press → Salvar → Fotos
       try {{
         var u = new URL(downloadUrl);
         var fileId = u.searchParams.get('id');
-        window.open('https://drive.google.com/file/d/' + fileId + '/view', '_blank');
+        var videoSrc = 'https://drive.google.com/uc?id=' + fileId;
+        var overlay = document.getElementById('video-dl-overlay');
+        var player  = document.getElementById('video-dl-player');
+        var capaImg = document.getElementById('video-dl-capa');
+        var capaLabel = document.getElementById('video-dl-capa-label');
+        player.src = videoSrc;
+        if (capaUrl && capaImg) {{
+          capaImg.src = capaUrl;
+          capaImg.style.display = 'block';
+          if (capaLabel) capaLabel.style.display = 'block';
+        }} else if (capaImg) {{
+          capaImg.style.display = 'none';
+          if (capaLabel) capaLabel.style.display = 'none';
+        }}
+        overlay.style.display = 'flex';
       }} catch(e) {{
         window.location.href = downloadUrl;
       }}
     }}
+
+    function fecharVideoDownload() {{
+      var overlay = document.getElementById('video-dl-overlay');
+      var player  = document.getElementById('video-dl-player');
+      var capaImg = document.getElementById('video-dl-capa');
+      overlay.style.display = 'none';
+      player.pause();
+      player.src = '';
+      if (capaImg) capaImg.src = '';
+    }}
+
+    document.addEventListener('keydown', function(e) {{
+      if (e.key === 'Escape') fecharVideoDownload();
+    }});
 """
 
 def gerar_html_card(video_info):
@@ -1275,6 +1254,7 @@ def gerar_html_card(video_info):
     youtube_id = video_info.get('youtube_id')
     numero    = video_info['numero']
     drive_url = video_info.get('drive_url', '')
+    capa_drive_url = video_info.get('capa_drive_url', '')
 
     html_numero = f'<div class="video-numero">REEL {numero:02d}</div>'
 
@@ -1307,11 +1287,12 @@ def gerar_html_card(video_info):
     # Botão de download: abre o vídeo original diretamente no Google Drive.
     # Se não houver Drive URL disponível, o botão é omitido.
     if drive_url:
-        html_download = f'''  <button class="btn-download-original" onclick="abrirVideoDownload('{drive_url}')">
+        capa_arg = f", '{capa_drive_url}'" if capa_drive_url else ", ''"
+        html_download = f'''  <button class="btn-download-original" onclick="abrirVideoDownload('{drive_url}'{capa_arg})">
     <svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg">
       <path d="M7.5 1v9M4 7l3.5 3.5L11 7M2 13h11" stroke="#1A1A1A" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
     </svg>
-    Salvar vídeo original
+    Salvar vídeo e capa
   </button>
 '''
     else:
@@ -1347,13 +1328,12 @@ def gerar_html_frames_section(frames_info):
       nome       → nome do arquivo
       thumbnail  → data URI base64 ou None (fallback offline)
       drive_url  → URL lh3.googleusercontent.com/d/ID para o lightbox (full-res)
-      grupo      → nome da subpasta de origem (ex: 'REEL 01 – ...') ou ''
-      folder_link → (especial) URL da pasta no Drive para botão "Baixar todos"
     """
     if not frames_info:
         return ''
 
     folder_link   = ''
+    cells         = []
     lb_links      = {}
     lb_nomes      = {}
     lb_drive_urls = {}
@@ -1363,43 +1343,23 @@ def gerar_html_frames_section(frames_info):
         if fi.get('folder_link'):
             folder_link = fi['folder_link']
 
-    # Índice lightbox sequencial; agrupa preservando ordem de inserção
-    grupos: dict = {}
     for idx, fi in enumerate(frame_items):
-        lb_links[idx]      = ''
-        lb_nomes[idx]      = fi['nome']
-        lb_drive_urls[idx] = fi.get('drive_url', '')
+        nome      = fi['nome']
+        thumbnail = fi.get('thumbnail')
+        drive_url = fi.get('drive_url', '')
 
-        grupo = fi.get('grupo', '')
-        if grupo not in grupos:
-            grupos[grupo] = []
-        grupos[grupo].append((idx, fi))
+        lb_links[idx]      = ''  # mantido por compatibilidade
+        lb_nomes[idx]      = nome
+        lb_drive_urls[idx] = drive_url
 
-    # Renderiza um bloco por grupo
-    grupos_html_parts = []
-    for grupo, items in grupos.items():
-        cells = []
-        for idx, fi in items:
-            thumbnail = fi.get('thumbnail')
-            nome      = fi['nome']
-            if thumbnail:
-                img_html = f'<img id="lb-src-{idx}" src="{thumbnail}" alt="{escape_html(nome)}" loading="lazy">'
-            else:
-                img_html = (f'<span id="lb-src-{idx}" style="display:none"></span>'
-                            f'<div class="frame-sem-preview">🖼</div>')
-            cells.append(
-                f'<div class="frame-cell" onclick="abrirLightbox({idx})">{img_html}</div>'
-            )
+        if thumbnail:
+            img_html = f'<img id="lb-src-{idx}" src="{thumbnail}" alt="{escape_html(nome)}" loading="lazy">'
+        else:
+            img_html = f'<span id="lb-src-{idx}" style="display:none"></span><div class="frame-sem-preview">🖼</div>'
 
-        titulo_html = (f'<div class="frames-grupo-titulo">{escape_html(grupo)}</div>\n    '
-                       if grupo else '')
-        grid = '\n    '.join(cells)
-        grupos_html_parts.append(
-            f'  <div class="frames-grupo">\n'
-            f'    {titulo_html}<div class="frames-grid">\n'
-            f'    {grid}\n'
-            f'    </div>\n'
-            f'  </div>'
+        cells.append(
+            f'<div class="frame-cell" onclick="abrirLightbox({idx})">'
+            f'{img_html}</div>'
         )
 
     btn_todos = ''
@@ -1410,7 +1370,7 @@ def gerar_html_frames_section(frames_info):
             '</a>'
         )
 
-    grupos_html  = '\n'.join(grupos_html_parts)
+    grid_html    = '\n    '.join(cells)
     total_frames = len(frame_items)
 
     return f'''
@@ -1419,7 +1379,9 @@ def gerar_html_frames_section(frames_info):
       <span class="frames-titulo-texto">Frames</span>
       {btn_todos}
     </div>
-{grupos_html}
+    <div class="frames-grid">
+    {grid_html}
+    </div>
   </div>
   <script>
     lbTotal = {total_frames};
@@ -1430,7 +1392,7 @@ def gerar_html_frames_section(frames_info):
 
 
 def gerar_pagina_html(cliente, ano_mes, videos_info, whatsapp_link,
-                      frames_info=None, pasta_reels_url=None):
+                      frames_info=None):
     ano, mes_num = ano_mes.split('-')
     mes_display = f"{MESES_PT[int(mes_num)]} de {ano}"
     slug = slugify(cliente)
@@ -1441,11 +1403,6 @@ def gerar_pagina_html(cliente, ano_mes, videos_info, whatsapp_link,
 
     cards_html = ''.join(gerar_html_card(v) for v in videos_info)
     frames_html = gerar_html_frames_section(frames_info or [])
-    html_btn_salvar_videos = (
-        f'<a class="btn-salvar-todos-videos" href="{pasta_reels_url}" target="_blank">'
-        '⬇ Salvar todos os vídeos originais'
-        '</a>'
-    ) if pasta_reels_url else ''
 
     # Prepara link WhatsApp (grupo ou número direto)
     if not whatsapp_link:
@@ -1467,6 +1424,9 @@ def gerar_pagina_html(cliente, ano_mes, videos_info, whatsapp_link,
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Aprovação de Vídeos — {escape_html(cliente)}</title>
   <style>{CSS}</style>
+  <!-- EmailJS SDK -->
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+  <script>emailjs.init({{ publicKey: '-xrMYz7vRGvZg8ZOY' }});</script>
 </head>
 <body>
 
@@ -1486,7 +1446,6 @@ def gerar_pagina_html(cliente, ano_mes, videos_info, whatsapp_link,
     <button class="btn-aprovar-tudo" id="btn-aprovar-tudo" onclick="aprovarTudo()">
       ✓ Aprovar todos os vídeos
     </button>
-    {html_btn_salvar_videos}
   </div>
 
   <div class="posts-lista">
@@ -1518,6 +1477,14 @@ def gerar_pagina_html(cliente, ano_mes, videos_info, whatsapp_link,
     <div class="footer-pendente" id="footer-pendente">Revise todos os vídeos antes de enviar.</div>
   </div>
 
+  <div id="video-dl-overlay">
+    <button id="video-dl-close" onclick="fecharVideoDownload()">✕</button>
+    <p id="video-dl-hint">Segure o dedo sobre cada item para salvar na galeria</p>
+    <p class="video-dl-label">Vídeo</p>
+    <video id="video-dl-player" controls playsinline></video>
+    <p class="video-dl-label" id="video-dl-capa-label" style="display:none;margin-top:18px;">Capa</p>
+    <img id="video-dl-capa" src="" alt="Capa do vídeo" style="display:none;width:min(90vw,400px);border-radius:8px;">
+  </div>
 
 </body>
 </html>"""
@@ -1587,7 +1554,7 @@ def main():
 
     # 5. _contexto.md
     if not args.sem_contexto:
-        arquivo_contexto = _ler_arquivo_md(pasta_videos, '_contexto.md')
+        arquivo_contexto = pasta_videos / '_contexto.md'
         if not arquivo_contexto.exists():
             template = gerar_template_contexto(pasta_videos, arquivos)
             print(f"\n  📝 _contexto.md criado com template em:\n     {template}")
@@ -1597,14 +1564,11 @@ def main():
         else:
             print(f"\n  📝 _contexto.md encontrado — lendo descrições...")
 
-    # 6. Ler YouTube IDs, contextos e IDs manuais do Google Drive
-    youtube_ids  = ler_youtube_md(pasta_videos)
-    contextos    = ler_contexto_md(pasta_videos)
-    ids_manuais  = ler_gdrive_md(pasta_videos)
-    if ids_manuais:
-        print(f"\n  📋 _gdrive.md encontrado — {len(ids_manuais)} ID(s) manual(is) carregado(s).")
+    # 6. Ler YouTube IDs e contextos
+    youtube_ids = ler_youtube_md(pasta_videos)
+    contextos   = ler_contexto_md(pasta_videos)
 
-    sem_yt = [f.stem for f in arquivos if unicodedata.normalize('NFC', f.stem) not in youtube_ids]
+    sem_yt = [f.stem for f in arquivos if f.stem not in youtube_ids]
     if sem_yt:
         print(f"\n  ⚠️  Sem YouTube ID (rode subir_reels.py primeiro):")
         for nome in sem_yt:
@@ -1627,34 +1591,38 @@ def main():
                 break
 
         # URL de download via Google Drive
-        drive_url   = ''
-        drive_fonte = ''
+        drive_url = ''
         gdrive_path = synology_para_gdrive(arquivo)
         if gdrive_path:
             drive_url = gdrive_video_download_url(gdrive_path) or ''
-            if drive_url:
-                drive_fonte = 'xattr'
-
-        # Fallback: File ID manual via _gdrive.md (quando xattr não disponível)
-        if not drive_url:
-            file_id_manual = ids_manuais.get(slugify(reel_nome))
-            if file_id_manual:
-                drive_url   = f"https://drive.google.com/uc?export=download&id={file_id_manual}&confirm=t"
-                drive_fonte = '_gdrive.md'
-
         if drive_url:
-            sufixo = f' ({drive_fonte})' if drive_fonte == '_gdrive.md' else ''
-            print(f"      ✅ {arquivo.name} → Drive OK{sufixo}")
+            print(f"      ✅ {arquivo.name} → Drive OK")
         else:
             print(f"      ⚠️  {arquivo.name} → sem URL Drive (vídeo sem botão de download)")
+
+        # Capa do vídeo: REEL NN – Nome (capa).jpg na mesma pasta
+        capa_drive_url = ''
+        capa_ext = ['.jpg', '.jpeg', '.png']
+        for ext in capa_ext:
+            capa_path = arquivo.parent / f"{arquivo.stem} (capa){ext}"
+            if capa_path.exists():
+                gdrive_capa = synology_para_gdrive(capa_path)
+                if gdrive_capa:
+                    capa_drive_url = gdrive_embed_url(gdrive_capa) or ''
+                if capa_drive_url:
+                    print(f"      ✅ {capa_path.name} → capa Drive OK")
+                else:
+                    print(f"      ⚠️  {capa_path.name} → sem URL Drive (capa sem download)")
+                break
 
         videos_info.append({
             'id':         f"reel-{numero:02d}",
             'numero':     numero,
             'titulo':     titulo,
             'contexto':   contexto,
-            'youtube_id': youtube_ids.get(unicodedata.normalize('NFC', reel_nome)),
+            'youtube_id': youtube_ids.get(reel_nome),
             'drive_url':  drive_url,
+            'capa_drive_url': capa_drive_url,
         })
 
     # 7b. Montar lista de frames (thumbnail base64 como fallback + Drive URL full-res)
@@ -1675,30 +1643,18 @@ def main():
                 print(f"      ⚠️  {frame.name} (só thumbnail — sem Drive URL)")
             else:
                 print(f"      ❌ {frame.name} (sem thumbnail e sem Drive URL)")
-            # Grupo = nome da subpasta dentro de pasta_frames (ex: "REEL 01 – ...")
-            grupo = frame.parent.name if frame.parent != pasta_frames else ''
             frames_info.append({
                 'nome':      frame.name,
                 'thumbnail': thumbnail,
                 'drive_url': frame_drive_url,
-                'grupo':     grupo,
             })
 
     # 8. Gerar HTML
     # Clientes recorrentes: usa o link configurado ou vazio
     # Clientes pontuais: usa o link padrão (mesmo da Silvana/Baviera)
     whatsapp_link = WHATSAPP_LINKS.get(cliente, WHATSAPP_PADRAO_PONTUAL if pontual else '')
-
-    # Folder URLs para botões "Salvar todos"
-    pasta_reels_url = gdrive_folder_url(pasta_videos)
-    if pasta_frames and not any(fi.get('folder_link') for fi in frames_info):
-        pasta_frames_url = gdrive_folder_url(pasta_frames)
-        if pasta_frames_url:
-            frames_info.append({'folder_link': pasta_frames_url})
-
     html = gerar_pagina_html(cliente, ano_mes, videos_info, whatsapp_link,
-                             frames_info=frames_info,
-                             pasta_reels_url=pasta_reels_url)
+                             frames_info=frames_info)
 
     slug = slugify(cliente)
     pasta_saida = OUTPUT_DIR / slug

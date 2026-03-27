@@ -195,25 +195,58 @@ def encontrar_pasta_cliente(cliente, agencia_path):
                     return entry
     return None
 
+def _encontrar_pasta_videos(pasta_cliente, ano_mes):
+    """Encontra a pasta com vídeos REEL. Suporta recorrentes e pontuais."""
+    extensoes = {'.mov', '.mp4', '.m4v'}
+
+    def _tem_reels(pasta):
+        try:
+            return any(
+                f.suffix.lower() in extensoes
+                and '(capa)' not in f.name.lower()
+                and re.match(r'^REEL\s+\d+', f.name, re.IGNORECASE)
+                for f in pasta.iterdir() if f.is_file()
+            )
+        except (PermissionError, OSError):
+            return False
+
+    # 1) Recorrentes: 06_Entregas/YYYY-MM*/Videos/
+    pasta_entregas = pasta_cliente / '06_Entregas'
+    if pasta_entregas.exists():
+        for entry in sorted(pasta_entregas.iterdir()):
+            if entry.is_dir() and entry.name.startswith(ano_mes):
+                videos = entry / 'Videos'
+                if videos.exists() and _tem_reels(videos):
+                    return videos
+                # Sem subpasta Videos — tenta direto
+                if _tem_reels(entry):
+                    return entry
+
+    # 2) Pontuais: YYYY-MM* na raiz do cliente, com subpastas flexíveis
+    for entry in sorted(pasta_cliente.iterdir()):
+        if entry.is_dir() and entry.name.startswith(ano_mes):
+            # Tenta subpastas comuns
+            for sub in ['Videos', '01 - Reels', 'Reels']:
+                pasta = entry / sub
+                if pasta.exists() and _tem_reels(pasta):
+                    return pasta
+            # Tenta direto na pasta do mês
+            if _tem_reels(entry):
+                return entry
+            # Busca recursiva (1 nível)
+            for sub in entry.iterdir():
+                if sub.is_dir() and _tem_reels(sub):
+                    return sub
+
+    return None
+
 def processar_cliente(youtube, cliente, ano_mes, agencia_path):
     pasta_cliente = encontrar_pasta_cliente(cliente, agencia_path)
     if not pasta_cliente:
         return
 
-    pasta_entregas = pasta_cliente / '06_Entregas'
-    if not pasta_entregas.exists():
-        return
-
-    pasta_mes = None
-    for entry in pasta_entregas.iterdir():
-        if entry.is_dir() and entry.name.startswith(ano_mes):
-            pasta_mes = entry
-            break
-    if not pasta_mes:
-        return
-
-    pasta_videos = pasta_mes / 'Videos'
-    if not pasta_videos.exists():
+    pasta_videos = _encontrar_pasta_videos(pasta_cliente, ano_mes)
+    if not pasta_videos:
         return
 
     # Encontra vídeos com padrão "REEL NN – Nome.mov"
@@ -285,7 +318,12 @@ def main():
 
     clientes = CLIENTES_RECORRENTES
     if args.cliente:
-        clientes = [c for c in clientes if args.cliente.lower() in c.lower()]
+        filtrados = [c for c in clientes if args.cliente.lower() in c.lower()]
+        if filtrados:
+            clientes = filtrados
+        else:
+            # Cliente não está na lista de recorrentes — tenta como pontual
+            clientes = [args.cliente]
 
     for cliente in clientes:
         processar_cliente(youtube, cliente, ano_mes, agencia_path)
