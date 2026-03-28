@@ -287,6 +287,9 @@ def encontrar_pasta_entrega(data, pasta_cliente):
     """
     Encontra a pasta 06_Entregas/YYYY-MM* do mês correspondente.
     Retorna (pasta_posts_fixos, pasta_videos) ou (None, None).
+
+    Fallback: se não encontrar a pasta do mês, tenta o mês anterior
+    (cobre caso de artes de dois meses na mesma pasta de entrega).
     """
     pasta_entregas = pasta_cliente / '06_Entregas'
     if not pasta_entregas.exists():
@@ -296,6 +299,18 @@ def encontrar_pasta_entrega(data, pasta_cliente):
     for entry in pasta_entregas.iterdir():
         if entry.is_dir() and entry.name.startswith(prefixo_mes):
             return entry / 'Posts_Fixos', entry / 'Videos'
+
+    # Fallback: mês anterior (artes de abril podem estar na pasta de março)
+    mes_anterior = (data.replace(day=1) - timedelta(days=1)).strftime('%Y-%m')
+    for entry in pasta_entregas.iterdir():
+        if entry.is_dir() and entry.name.startswith(mes_anterior):
+            # Só usa se a arte realmente existir nessa pasta
+            pasta_pf = entry / 'Posts_Fixos'
+            if pasta_pf.exists():
+                dia_mes = data.strftime('%d-%m')
+                for arq in pasta_pf.iterdir():
+                    if arq.name.startswith(dia_mes):
+                        return pasta_pf, entry / 'Videos'
 
     return None, None
 
