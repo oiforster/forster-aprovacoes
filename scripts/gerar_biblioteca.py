@@ -1022,7 +1022,8 @@ def gerar_para_cliente(cliente, agencia, filtro_mes=None):
         print(f"  ⚠️  Nenhum mês de entrega encontrado")
         return
 
-    output_cliente = OUTPUT_DIR / slug
+    # Biblioteca fica em {slug}/entregas/ para não sobrescrever o index.html de aprovação
+    output_cliente = OUTPUT_DIR / slug / 'entregas'
     output_cliente.mkdir(parents=True, exist_ok=True)
 
     meses_info = []
@@ -1078,8 +1079,8 @@ def gerar_para_cliente(cliente, agencia, filtro_mes=None):
         html_index = gerar_index(cliente, meses_info, slug)
         with open(output_cliente / 'index.html', 'w', encoding='utf-8') as f:
             f.write(html_index)
-        print(f"\n  ✅ Índice gerado: {slug}/index.html")
-        print(f"  🔗 URL: https://aprovar.forsterfilmes.com/{slug}/")
+        print(f"\n  ✅ Índice gerado: {slug}/entregas/index.html")
+        print(f"  🔗 URL: https://aprovar.forsterfilmes.com/{slug}/entregas/")
 
 def main():
     parser = argparse.ArgumentParser(description='Gera biblioteca de entregas por cliente recorrente')
