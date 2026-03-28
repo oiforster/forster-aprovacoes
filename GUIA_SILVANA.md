@@ -1,7 +1,7 @@
 # Guia de Aprovações — Silvana
 
 Sistema de aprovação de conteúdo da Forster Filmes.
-Última atualização: 2026-03-28 — domínio próprio `aprovar.forsterfilmes.com`; mensagem de WhatsApp agora aparece no final do fluxo.
+Última atualização: 2026-03-28 — domínio próprio `aprovar.forsterfilmes.com`; auto-sync; normalização automática de nomes de artes; opção "Mês completo"; busca de artes em todas as pastas de entrega.
 
 ---
 
@@ -30,8 +30,8 @@ As artes ficam dentro da pasta de entrega mensal do cliente, em `Posts_Fixos/`:
     │   ├── 09-04_2.jpg        ← slide 2
     │   └── 09-04_3.jpg        ← slide 3
     └── Videos/
-        ├── REEL 01 – Nome do Vídeo.mov
-        ├── REEL 01 – Nome do Vídeo (capa).jpg
+        ├── REEL 01 - Nome do Vídeo.mov
+        ├── REEL 01 - Nome do Vídeo (capa).jpg
         └── _youtube.md        ← gerado automaticamente
 ```
 
@@ -42,11 +42,11 @@ As artes ficam dentro da pasta de entrega mensal do cliente, em `Posts_Fixos/`:
 | Post único (card, foto) | `DD-MM.jpg` | `07-04.jpg` |
 | Slide 1 de carrossel | `DD-MM_1.jpg` | `09-04_1.jpg` |
 | Slide 2 em diante | `DD-MM_N.jpg` | `09-04_2.jpg` |
-| Capa de Reel (para YouTube) | `REEL NN – Nome (capa).jpg` | `REEL 01 – Abertura (capa).jpg` |
+| Capa de Reel (para YouTube) | `REEL NN - Nome (capa).jpg` | `REEL 01 - Abertura (capa).jpg` |
 
 **Formatos aceitos:** `.jpg`, `.jpeg`, `.png`, `.webp`
 
-> A pasta `Posts_Fixos/` precisa estar compartilhada no Google Drive com "qualquer pessoa com o link pode visualizar". Fazer isso uma vez por cliente na primeira entrega.
+**Renomeação automática:** se os arquivos tiverem nomes com espaços, acentos ou dia da semana (ex: `04-04 (Sáb).jpg`), o sistema renomeia automaticamente para o padrão limpo (`04-04.jpg`) ao rodar o fluxo. Slides em subpastas são movidos para a raiz de `Posts_Fixos/`.
 
 ---
 
@@ -58,7 +58,7 @@ No arquivo de conteúdo mensal, no bloco do post que é um Reel, preencher o cam
 #### 28/03 (Sáb) — Reel — Contagem regressiva
 
 **Vídeo:**
-REEL 12 – Dia da Mulher
+REEL 12 - Dia da Mulher
 
 **Legenda:**
 Texto da legenda aqui.
@@ -80,18 +80,19 @@ Uma janela do Terminal abre e faz uma série de perguntas:
 **1. Para qual cliente?**
 Digite o número da lista ou o nome (parcial aceito). Enter = todos.
 
-**2. Qual mês?**
-Digite `2026-04` ou Enter para o mês atual.
-
-**3. Qual período para aprovação?**
+**2. Qual período para aprovação?**
 ```
 1. Próxima semana (padrão)
 2. Semana atual
 3. Período personalizado
+4. Mês completo
 ```
 - Opção `1` ou Enter: gera para a semana que começa na próxima segunda
 - Opção `2`: gera para a semana atual (de segunda a domingo)
 - Opção `3`: você digita a data de início e fim manualmente (aceita `23/03/2026` ou `2026-03-23`)
+- Opção `4`: você digita o mês (ex: `2026-04`) e o sistema gera do dia 1 ao último dia
+
+**O mês é inferido automaticamente** a partir do período escolhido — não precisa digitar separadamente.
 
 **4. Continuar com erros?**
 Se algum arquivo de arte estiver faltando ou mal nomeado, o sistema avisa. Você pode corrigir e rodar de novo, ou digitar `s` para continuar mesmo assim (útil quando as artes de datas futuras ainda não chegaram).
@@ -217,7 +218,7 @@ Legenda do carrossel.
 #### 28/03 (Sáb) — Reel — Contagem regressiva
 
 **Vídeo:**
-REEL 12 – Dia da Mulher
+REEL 12 - Dia da Mulher
 
 **Legenda:**
 Legenda do Reel.
@@ -225,12 +226,16 @@ Legenda do Reel.
 
 ---
 
-## Subir apenas os Reels ao YouTube (sem gerar aprovações)
+## Sincronização automática
 
-Duplo clique em `Subir Reels YouTube.command`. Seleciona cliente e mês, sobe os vídeos e atualiza o `_youtube.md`.
+Ao dar duplo clique em qualquer `.command`, o sistema **puxa automaticamente a versão mais recente** do GitHub antes de rodar. Isso significa que tanto no Mac do Samuel quanto no da Silvana, os scripts estão sempre atualizados — não precisa fazer nada manualmente.
 
 ---
 
-## Gerar apenas as aprovações (sem validação nem YouTube)
+## Problemas comuns
 
-Duplo clique em `Gerar Aprovações.command`. Útil quando os Reels já foram subidos e você só quer regar as páginas ou republicar.
+**"Erro no upload ao YouTube"** — normal no Mac da Silvana se não tiver as credenciais do YouTube. Digite `s` para continuar — as aprovações são geradas normalmente, só sem os vídeos embedados.
+
+**Arte não encontrada** — verifique se o nome do arquivo segue o padrão `DD-MM.jpg`. O sistema renomeia automaticamente nomes com espaços ou acentos, mas precisa que o prefixo `DD-MM` esteja correto.
+
+**"Continuar com erros?"** — se os erros são de artes que ainda não chegaram ou vídeos que ainda não foram editados, pode continuar com `s`. O post aparece na página sem imagem.

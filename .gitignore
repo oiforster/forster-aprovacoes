@@ -5,3 +5,4 @@ __pycache__/
 scripts/youtube_credentials.json
 scripts/youtube_token.json
 scripts/synology_config.json
+*_BACKUP_*

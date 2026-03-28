@@ -250,7 +250,7 @@ echo "━━━━━━━━━━━━━━━━━━━━━━━━�
 echo "  ETAPA 3/3 — Publicar no site?"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo ""
-read -p "  Publicar agora em oiforster.github.io? (S/n): " PUBLICAR
+read -p "  Publicar agora em aprovar.forsterfilmes.com? (S/n): " PUBLICAR
 echo ""
 
 if [[ "$PUBLICAR" =~ ^[Nn]$ ]]; then

@@ -124,27 +124,33 @@ aprovar.forsterfilmes.com/fyber-show-piscinas/           ← outro cliente (slug
 Arquivo bash executável por duplo clique. Encadeia as 4 etapas do processo:
 
 0. **Auto-sync** — `git fetch origin main` + compara hashes + `git reset --hard` se desatualizado
-1. **Validação** — `validar_arquivos.py` verifica se os arquivos de arte estão na pasta e com os nomes corretos
-2. **YouTube** — `subir_reels.py` sobe os Reels como unlisted e atualiza o `_youtube.md`
-3. **Geração** — `gerar_aprovacoes.py` gera os HTMLs de aprovação
-4. **Publicação** — `git add . && git commit && git push` (pergunta antes de publicar)
+1. **Dependências** — verifica e instala google-api-python-client etc. (com `--break-system-packages` para Homebrew Python)
+2. **Validação** — `validar_arquivos.py` normaliza nomes de artes + verifica se estão na pasta
+3. **YouTube** — `subir_reels.py` sobe os Reels como unlisted e atualiza o `_youtube.md`
+4. **Geração** — `gerar_aprovacoes.py` gera os HTMLs de aprovação
+5. **Publicação** — `git add . && git commit && git push` (pergunta antes de publicar)
 
 **Opções interativas:**
 - Qual cliente? (número, nome parcial ou Enter para todos)
-- Qual mês? (YYYY-MM ou Enter para o atual)
 - Qual período?
   - `1` Próxima semana (padrão)
   - `2` Semana atual
   - `3` Período personalizado (inserir início e fim em DD/MM/AAAA ou AAAA-MM-DD)
+  - `4` Mês completo (inserir YYYY-MM)
+- O mês é inferido automaticamente do período (só pergunta na opção 1)
 - Em caso de erro na validação: continuar mesmo assim? (s/N)
 - Em caso de erro no YouTube: continuar gerando páginas? (s/N)
 - Publicar no site? (S/n)
 
-**Atenção:** após cada `git reset --hard` ou atualização do repositório, o macOS perde o bit de execução (o Google Drive não preserva permissões Unix). Nesse caso, rodar no Terminal:
+**Normalização automática de artes:** na etapa de validação, `validar_arquivos.py` renomeia arquivos em `Posts_Fixos/` para o padrão limpo (`DD-MM.jpg`, `DD-MM_1.jpg`). Remove espaços, acentos, parênteses e dia da semana. Move slides de subpastas para a raiz.
+
+**Busca de artes cross-mês:** tanto o validador quanto o gerador procuram artes em todas as pastas de entrega, não só na do mês do post. Cobre casos de períodos que cruzam meses (ex: 31/03 a 09/04 com artes em pastas de março e abril).
+
+**Fallback de .md cross-mês:** quando o período inclui um mês para o qual não existe `.md` de Conteúdo Mensal, o sistema tenta o mês anterior (ex: posts de abril no `.md` de março).
+
+**Atenção:** após cada `git reset --hard` ou atualização do repositório, o macOS pode perder o bit de execução. Nesse caso, rodar no Terminal:
 ```bash
-chmod +x ~/Library/...forster-aprovacoes/"Fluxo Completo.command"
-chmod +x ~/Library/...forster-aprovacoes/"Subir Reels YouTube.command"
-chmod +x ~/Library/...forster-aprovacoes/"Gerar Aprovações.command"
+chmod +x ~/Documents/forster-aprovacoes/*.command
 ```
 
 ---
@@ -167,9 +173,11 @@ Arquivo bash executável por duplo clique. Voltado para entrega de vídeos avuls
 - Continuar se YouTube falhar? (s/N)
 - Publicar no site? (S/n)
 
-**Diferença do `Fluxo Completo.command`:** sem etapa de validação de artes; inclui clientes pontuais; inclui etapa de links Synology.
+**Diferença do `Fluxo Completo.command`:** sem etapa de validação de artes; inclui clientes pontuais; inclui etapa de links Synology; não tem menu de período (usa mês).
 
 **Ambos os `.command` fazem auto-sync** antes de qualquer operação — garantem que Samuel e Silvana sempre rodem a versão mais recente do repositório.
+
+**Ambos instalam dependências automaticamente** (google-api-python-client etc.) com `--break-system-packages` para compatibilidade com Homebrew Python.
 
 ---
 
@@ -278,6 +286,10 @@ Script principal. Lê os arquivos `.md` de Conteúdo Mensal e gera as páginas H
 **Layout:** uma página por período (mês ou semana personalizada), posts em ordem cronológica, sem navegação por semanas.
 
 **Comentários HTML no `.md`:** o parser interrompe a leitura de uma seção ao encontrar `<!--`. Isso permite incluir notas internas (como instruções para o Claude da Silvana) no final do arquivo sem que vazem para a página de aprovação.
+
+**Synology vs Google Drive:** quando os arquivos estão no SynologyDrive, o script pula xattr (não existe no Synology) e vai direto para cópia local — sem warnings. xattr só é tentado para arquivos em paths do Google Drive.
+
+**Nomes limpos no repo:** ao copiar artes para o repo, os nomes são normalizados para `DD-MM.jpg` / `DD-MM_N.jpg` — sem espaços, acentos ou parênteses que quebrariam URLs no GitHub Pages.
 
 **Fallback para clientes pontuais:** quando o cliente não está em `CLIENTES_RECORRENTES` e não tem `.md` de Conteúdo Mensal, usa `gerar_para_cliente_reels()` que lê `_youtube.md` diretamente.
 

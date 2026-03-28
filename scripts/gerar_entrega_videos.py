@@ -45,7 +45,7 @@ WHATSAPP_LINKS: dict = {
 
 OUTPUT_DIR = Path(__file__).parent.parent / 'aprovacao'
 
-GITHUB_BASE = "https://oiforster.github.io/forster-aprovacoes/aprovacao"
+GITHUB_BASE = "https://aprovar.forsterfilmes.com"
 
 # Caminhos base para conversão Synology → Google Drive
 SYNOLOGY_BASE = Path.home() / 'Library' / 'CloudStorage' / 'SynologyDrive-Agencia'
