@@ -373,26 +373,30 @@ def encontrar_arte(data, pasta_estrategia, output_dir=None):
     if not slides and len(candidatos) > 1:
         slides = candidatos
 
-    if slides:
-        urls = []
-        for slide in slides:
-            url = gdrive_id_para_url(slide)
-            if url:
-                urls.append(url)
-            else:
-                urls = []
-                break
-        if urls:
-            return urls
-    else:
-        url = gdrive_id_para_url(candidatos[0])
-        if url:
-            return url
+    # Se o arquivo está no Synology, pula xattr (não existe) e vai direto para cópia
+    eh_synology = 'SynologyDrive' in str(pasta_artes)
 
-    print(f"    ⚠️  Arquivo encontrado para {data.strftime('%d/%m')} mas xattr não disponível — tentando _links.md")
-    links = ler_links_md(pasta_artes)
-    if prefixo in links:
-        return links[prefixo]
+    if not eh_synology:
+        if slides:
+            urls = []
+            for slide in slides:
+                url = gdrive_id_para_url(slide)
+                if url:
+                    urls.append(url)
+                else:
+                    urls = []
+                    break
+            if urls:
+                return urls
+        else:
+            url = gdrive_id_para_url(candidatos[0])
+            if url:
+                return url
+
+        # Tenta _links.md como segundo fallback
+        links = ler_links_md(pasta_artes)
+        if prefixo in links:
+            return links[prefixo]
 
     # Fallback final: copia o arquivo para o repo e serve diretamente
     if output_dir:
