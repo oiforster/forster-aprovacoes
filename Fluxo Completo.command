@@ -48,7 +48,7 @@ if faltando:
     print("  Instalando dependências...")
     for mod, pkg in faltando:
         print(f"    → {pkg}")
-        resultado = subprocess.run([sys.executable, "-m", "pip", "install", "--user", "--quiet", pkg],
+        resultado = subprocess.run([sys.executable, "-m", "pip", "install", "--user", "--quiet", "--break-system-packages", pkg],
             capture_output=True, text=True
         )
         if resultado.returncode != 0:
