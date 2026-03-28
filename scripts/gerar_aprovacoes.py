@@ -1318,12 +1318,21 @@ def main():
     print("=" * 60)
     print(f"✅ {len(resultados)} página(s) gerada(s) em: {OUTPUT_DIR}\n")
 
+    linhas_whatsapp = []
     for r in resultados:
         print(f"📱 {r['cliente']}")
         print(f"   Arquivo: {r['arquivo']}")
         print(f"\n   Mensagem WhatsApp:")
         print("   " + r['mensagem'].replace('\n', '\n   '))
         print()
+        linhas_whatsapp.append(f"📱 {r['cliente']}\n\n{r['mensagem']}")
+
+    # Salva mensagens para o Fluxo Completo reler no final
+    try:
+        with open('/tmp/forster_whatsapp_msg.txt', 'w') as f:
+            f.write('\n\n---\n\n'.join(linhas_whatsapp))
+    except Exception:
+        pass
 
     print("=" * 60)
     print("⬆️  Para publicar: git add . && git commit -m 'Aprovações' && git push")

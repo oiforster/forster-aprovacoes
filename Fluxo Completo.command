@@ -243,8 +243,16 @@ fi
 
 echo ""
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-echo "  Fluxo concluído! Copie a mensagem acima"
-echo "  e envie no WhatsApp do cliente."
+echo "  📱 MENSAGEM PARA ENVIAR NO WHATSAPP"
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo ""
+if [ -f /tmp/forster_whatsapp_msg.txt ]; then
+  cat /tmp/forster_whatsapp_msg.txt
+  rm /tmp/forster_whatsapp_msg.txt
+else
+  echo "  (mensagem não encontrada — veja acima na Etapa 3)"
+fi
+echo ""
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo ""
 read -p "Pressione Enter para fechar..."
