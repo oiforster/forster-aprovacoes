@@ -90,13 +90,27 @@ template.html estava em aprovacao/template.html → movido para a raiz do repo.
 
 ---
 
+## O QUE FOI FEITO (sessão 2026-03-28 — Mac do Samuel)
+
+### 10. Auto-sync em todos os .command
+Ambos os `.command` agora fazem `git fetch` + comparação de hashes antes de rodar.
+Se estiver desatualizado, faz `git reset --hard origin/main` automaticamente.
+Garantia de que Samuel e Silvana sempre rodem a versão mais recente.
+
+### 11. Fix: comentários HTML vazando na página
+O parser do `gerar_aprovacoes.py` agora interrompe a leitura de uma seção ao encontrar `<!--`.
+Resolvia o bug em que as notas internas do template (bloco de instruções para o Claude) apareciam no último post da página.
+
+### 12. URL corrigida no Entrega de Vídeos.command
+Trocada `oiforster.github.io/forster-aprovacoes` por `aprovar.forsterfilmes.com`.
+
+---
+
 ## PENDÊNCIAS PARA O SAMUEL
 
 ### Prioridade alta
 
-1. **Ativar SSL do domínio próprio**
-   Acessar: github.com/oiforster/forster-aprovacoes → Settings → Pages → Custom domain
-   Digitar `aprovar.forsterfilmes.com` e salvar. Aguardar o cadeado verde (até 1h).
+1. ~~**Ativar SSL do domínio próprio**~~ ✅ DNS configurado, aguardando propagação + cadeado verde. Quando aparecer, marcar "Enforce HTTPS".
 
 2. **Instalar dependências YouTube no Mac da Silvana** (se ela precisar subir Reels)
    pip3 install --user google-api-python-client google-auth-oauthlib

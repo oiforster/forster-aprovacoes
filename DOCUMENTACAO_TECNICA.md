@@ -4,7 +4,7 @@
 **Criado em:** março de 2026
 **Repositório:** https://github.com/oiforster/forster-aprovacoes
 **Site:** https://aprovar.forsterfilmes.com
-**Última atualização:** 2026-03-28 — Domínio próprio; URLs limpas; slugs personalizados; imagens copiadas pro repo; layout cronológico sem tabs de semana; biblioteca separada em `/entregas/`
+**Última atualização:** 2026-03-28 — Domínio próprio; URLs limpas; slugs personalizados; imagens copiadas pro repo; layout cronológico sem tabs de semana; biblioteca separada em `/entregas/`; auto-sync em todos os `.command`; fix: comentários HTML no `.md` não vazam mais para a página
 
 ---
 
@@ -123,6 +123,7 @@ aprovar.forsterfilmes.com/fyber-show-piscinas/           ← outro cliente (slug
 
 Arquivo bash executável por duplo clique. Encadeia as 4 etapas do processo:
 
+0. **Auto-sync** — `git fetch origin main` + compara hashes + `git reset --hard` se desatualizado
 1. **Validação** — `validar_arquivos.py` verifica se os arquivos de arte estão na pasta e com os nomes corretos
 2. **YouTube** — `subir_reels.py` sobe os Reels como unlisted e atualiza o `_youtube.md`
 3. **Geração** — `gerar_aprovacoes.py` gera os HTMLs de aprovação
@@ -166,7 +167,9 @@ Arquivo bash executável por duplo clique. Voltado para entrega de vídeos avuls
 - Continuar se YouTube falhar? (s/N)
 - Publicar no site? (S/n)
 
-**Diferença do `Fluxo Completo.command`:** sem etapa de validação de artes; inclui clientes pontuais; sync via `reset --hard`; inclui etapa de links Synology.
+**Diferença do `Fluxo Completo.command`:** sem etapa de validação de artes; inclui clientes pontuais; inclui etapa de links Synology.
+
+**Ambos os `.command` fazem auto-sync** antes de qualquer operação — garantem que Samuel e Silvana sempre rodem a versão mais recente do repositório.
 
 ---
 
@@ -273,6 +276,8 @@ Script principal. Lê os arquivos `.md` de Conteúdo Mensal e gera as páginas H
 ```
 
 **Layout:** uma página por período (mês ou semana personalizada), posts em ordem cronológica, sem navegação por semanas.
+
+**Comentários HTML no `.md`:** o parser interrompe a leitura de uma seção ao encontrar `<!--`. Isso permite incluir notas internas (como instruções para o Claude da Silvana) no final do arquivo sem que vazem para a página de aprovação.
 
 **Fallback para clientes pontuais:** quando o cliente não está em `CLIENTES_RECORRENTES` e não tem `.md` de Conteúdo Mensal, usa `gerar_para_cliente_reels()` que lê `_youtube.md` diretamente.
 

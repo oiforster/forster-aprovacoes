@@ -558,7 +558,13 @@ def parse_conteudo_mensal(arquivo_path, datas_semana=None, pasta_estrategia=None
                 secao_atual_data = None
                 secao_atual_texto = []
         elif secao_atual_data is not None:
-            secao_atual_texto.append(linha)
+            # Interrompe ao encontrar comentário HTML (notas internas do .md)
+            if linha.strip().startswith('<!--'):
+                secoes_conteudo[secao_atual_data] = '\n'.join(secao_atual_texto).strip()
+                secao_atual_data = None
+                secao_atual_texto = []
+            else:
+                secao_atual_texto.append(linha)
 
     # Salva última seção
     if secao_atual_data:
