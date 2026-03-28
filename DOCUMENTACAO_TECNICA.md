@@ -1,10 +1,10 @@
 # Sistema de Aprovação de Conteúdo — Documentação Técnica
 
-**Projeto:** forster-aprovacoes  
-**Criado em:** março de 2026  
-**Repositório:** https://github.com/oiforster/forster-aprovacoes  
-**Site:** https://oiforster.github.io/forster-aprovacoes  
-**Última atualização:** março de 2026 — Migração para Synology Drive; `Entrega de Vídeos.command`; suporte a Clientes Pontuais; Open Graph
+**Projeto:** forster-aprovacoes
+**Criado em:** março de 2026
+**Repositório:** https://github.com/oiforster/forster-aprovacoes
+**Site:** https://aprovar.forsterfilmes.com
+**Última atualização:** 2026-03-28 — Domínio próprio `aprovar.forsterfilmes.com`; URLs limpas por cliente e mês; slugs personalizados; scripts funcionam em qualquer Mac (Path.home())
 
 ---
 
@@ -66,14 +66,18 @@ _arq   _reels  _aprov                            ↓ fallback se sem .md:
 
 ```
 forster-aprovacoes/
-├── aprovacao/
-│   ├── template.html                    ← template base de todas as páginas
-│   └── [slug-cliente]/
-│       ├── index.html                   ← sempre aponta para a versão mais recente
-│       ├── YYYY-MM-DD.html              ← página gerada por semana/período (recorrentes)
-│       └── YYYY-MM.html                 ← página gerada por mês (pontuais via _youtube.md)
+├── CNAME                                ← domínio: aprovar.forsterfilmes.com
+├── template.html                        ← template base de todas as páginas
+├── [slug-cliente]/                      ← uma pasta por cliente (primeiro nível da URL)
+│   ├── index.html                       ← sempre aponta para a versão mais recente
+│   ├── YYYY-MM-DD.html                  ← aprovação por semana/período (recorrentes)
+│   ├── YYYY-MM.html                     ← entrega pontual via _youtube.md
+│   ├── [mes-ano]/
+│   │   └── index.html                   ← biblioteca do mês (URL limpa sem .html)
+│   └── estado-YYYY-MM.json             ← estado de aprovação de cada post (lido pelo JS)
 ├── scripts/
-│   ├── gerar_aprovacoes.py              ← gerador de páginas HTML
+│   ├── gerar_aprovacoes.py              ← gerador de páginas de aprovação
+│   ├── gerar_biblioteca.py              ← gerador de biblioteca de entregas
 │   ├── subir_reels.py                   ← upload de Reels ao YouTube
 │   ├── validar_arquivos.py              ← validação de artes e nomes antes de gerar
 │   ├── youtube_credentials.json         ← NUNCA commitar (no .gitignore)
@@ -81,10 +85,18 @@ forster-aprovacoes/
 ├── index.html                           ← página inicial do site
 ├── GUIA_SILVANA.md                      ← manual de uso para a Silvana
 ├── DOCUMENTACAO_TECNICA.md              ← este arquivo
+├── PROMPT_HANDOFF_SAMUEL.md             ← prompt de contexto para o Claude do Samuel
 ├── Fluxo Completo.command               ← tudo em um duplo clique (clientes recorrentes)
-├── Entrega de Vídeos.command            ← YouTube + página + publicar (pontuais e avulsos)
-├── Subir Reels YouTube.command          ← upload YouTube standalone (legado)
-└── Gerar Aprovações.command             ← gerar + publicar sem YouTube (legado)
+└── Entrega de Vídeos.command            ← YouTube + página + publicar (pontuais e avulsos)
+```
+
+**Estrutura de URLs:**
+```
+aprovar.forsterfilmes.com/                          ← índice geral
+aprovar.forsterfilmes.com/catarata/                 ← aprovação mais recente do cliente
+aprovar.forsterfilmes.com/catarata/2026-04-01       ← aprovação da semana de 1/04
+aprovar.forsterfilmes.com/catarata/abril-2026       ← biblioteca de entregas de abril
+aprovar.forsterfilmes.com/fyber-show-piscinas/      ← outro cliente (slug automático)
 ```
 
 ---
@@ -376,14 +388,41 @@ Quando `WHATSAPP_GRUPO` está preenchido: a mensagem de aprovação é copiada p
 
 ---
 
+## Slugs de cliente (URLs personalizadas)
+
+Por padrão, o nome do cliente é convertido automaticamente para slug URL-safe:
+`"Fyber Show Piscinas"` → `fyber-show-piscinas`
+
+Para URLs mais curtas, existe um dicionário de sobrescritas em `gerar_aprovacoes.py` e `gerar_biblioteca.py`:
+
+```python
+SLUG_CLIENTES = {
+    "Catarata Center": "catarata",
+    # Adicionar outros conforme necessário:
+    # "Óticas Casa Marco": "oticas",
+}
+```
+
+Para adicionar ou alterar um slug:
+1. Editar `SLUG_CLIENTES` nos **dois scripts** (`gerar_aprovacoes.py` e `gerar_biblioteca.py`)
+2. Fazer `git mv` da pasta antiga para a nova: `git mv oticas-casa-marco oticas`
+3. Rodar o fluxo normalmente — os novos arquivos já serão gerados no caminho novo
+4. Commitar e publicar
+
+**Atenção:** mudar o slug de um cliente que já tem link enviado ao cliente vai quebrar o link antigo. Fazer a mudança antes de enviar o link do mês, ou comunicar o novo endereço.
+
+---
+
 ## Hospedagem
 
-**GitHub Pages** (desde março de 2026)
+**GitHub Pages com domínio próprio** (desde março de 2026)
 
-- URL: `https://oiforster.github.io/forster-aprovacoes/`
+- URL: `https://aprovar.forsterfilmes.com`
+- Repositório: `oiforster/forster-aprovacoes`
+- Domínio configurado via `CNAME` no repo + registro CNAME no GoDaddy (`aprovar → oiforster.github.io`)
 - Deploy: automático a cada `git push` na branch `main`
 - Gratuito, sem pausa por limite de banda
-- Anteriormente no Netlify (pausado por limite do plano gratuito)
+- URL legada `oiforster.github.io/forster-aprovacoes` redireciona automaticamente (GitHub faz o redirect)
 
 **Limites do GitHub Pages:**
 - Armazenamento: recomendado até 1GB por repositório

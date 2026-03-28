@@ -1,7 +1,7 @@
 # Guia de Aprovações — Silvana
 
 Sistema de aprovação de conteúdo da Forster Filmes.
-Última atualização: março de 2026 — email de redundância adicionado.
+Última atualização: 2026-03-28 — domínio próprio `aprovar.forsterfilmes.com`; mensagem de WhatsApp agora aparece no final do fluxo.
 
 ---
 
@@ -110,12 +110,14 @@ Olá! 😊
 
 Aqui estão os posts da semana de *30/03 a 5/04* para aprovação.
 
-👉 https://oiforster.github.io/forster-aprovacoes/aprovacao/oticas-casa-marco/
+👉 https://aprovar.forsterfilmes.com/oticas-casa-marco/
 
 Você pode aprovar cada post ou pedir ajuste com um toque. Se preferir, tem um botão para aprovar tudo de uma vez.
 
 Qualquer dúvida, é só chamar! 🙌
 ```
+
+A mensagem aparece **no final do fluxo**, depois do passo de publicação — fácil de copiar sem rolar o Terminal.
 
 Copie e envie no WhatsApp do cliente.
 
