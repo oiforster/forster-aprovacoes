@@ -397,6 +397,7 @@ def encontrar_arte(data, pasta_estrategia, output_dir=None):
     # Fallback final: copia o arquivo para o repo e serve diretamente
     if output_dir:
         import shutil
+        from urllib.parse import quote
         pasta_artes_local = Path(output_dir) / 'artes'
         pasta_artes_local.mkdir(parents=True, exist_ok=True)
         if slides:
@@ -404,7 +405,7 @@ def encontrar_arte(data, pasta_estrategia, output_dir=None):
             for slide in slides:
                 dest = pasta_artes_local / slide.name
                 shutil.copy2(slide, dest)
-                urls.append(f'artes/{slide.name}')
+                urls.append(f'artes/{quote(slide.name)}')
             print(f"    📁  Copiado {len(urls)} slide(s) para o repo")
             return urls
         else:
@@ -412,7 +413,7 @@ def encontrar_arte(data, pasta_estrategia, output_dir=None):
             dest = pasta_artes_local / arquivo.name
             shutil.copy2(arquivo, dest)
             print(f"    📁  Copiado {arquivo.name} para o repo")
-            return f'artes/{arquivo.name}'
+            return f'artes/{quote(arquivo.name)}'
 
     return None
 
