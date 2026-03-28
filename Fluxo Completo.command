@@ -233,7 +233,7 @@ else
   if [ $? -eq 0 ]; then
     echo ""
     echo "  ✅ Site atualizado!"
-    echo "  👉 https://oiforster.github.io/forster-aprovacoes"
+    echo "  👉 https://aprovar.forsterfilmes.com"
   else
     echo ""
     echo "  ❌ Erro ao publicar. Tente manualmente:"

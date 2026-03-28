@@ -87,8 +87,16 @@ WHATSAPP_GRUPOS: dict = {
     # "Óticas Casa Marco" → sem grupo, vai para o número da Silvana
 }
 
-# Caminho de saída (pasta do repositório)
-OUTPUT_DIR = Path(__file__).parent.parent / 'aprovacao'
+# Caminho de saída (raiz do repositório — cliente vira primeiro nível da URL)
+OUTPUT_DIR = Path(__file__).parent.parent
+
+# Slugs personalizados por cliente (sobrescreve o slugify automático)
+SLUG_CLIENTES = {
+    "Catarata Center": "catarata",
+}
+
+def slug_cliente(nome):
+    return SLUG_CLIENTES.get(nome, slugify(nome))
 
 # ─── MESES EM PORTUGUÊS ───────────────────────────────────────────────────────
 
@@ -1005,8 +1013,8 @@ def gerar_pagina_aprovacao(cliente, posts, periodo_label, semana_inicio, form_id
     html = html.replace('{{POSTS_ORDEM_JSON}}', json.dumps(posts_ordem_list, ensure_ascii=False))
 
     # GitHub API — estado de aprovação
-    slug_c = slugify(cliente)
-    estado_rel_path = f'aprovacao/{slug_c}/{estado_filename}' if estado_filename else ''
+    slug_c = slug_cliente(cliente)
+    estado_rel_path = f'{slug_c}/{estado_filename}' if estado_filename else ''
     html = html.replace('{{ESTADO_PATH}}',   estado_rel_path)
     html = html.replace('{{GH_TOKEN_BODY}}', _GH_TOKEN_BODY)
 
@@ -1109,9 +1117,9 @@ def gerar_para_cliente_reels(cliente, ano_mes, agencia_path, base_url, output_di
     print(f"  ✅ {len(posts)} vídeo(s) encontrado(s) via _youtube.md")
 
     # Monta metadados da página
-    slug_cliente  = slugify(cliente)
+    slug_c        = slug_cliente(cliente)
     periodo_label = f"{MESES_PT[mes].capitalize()} de {ano}"
-    form_id       = f"{slug_cliente}-{ano_mes}"
+    form_id       = f"{slug_c}-{ano_mes}"
     whatsapp      = WHATSAPP_GRUPOS.get(cliente) or f"https://wa.me/{WHATSAPP_CLIENTES.get(cliente, WHATSAPP_SILVANA_DEFAULT)}"
 
     html = gerar_pagina_aprovacao(cliente, posts, periodo_label, data_entrega, form_id, whatsapp)
@@ -1121,15 +1129,15 @@ def gerar_para_cliente_reels(cliente, ano_mes, agencia_path, base_url, output_di
     html = html.replace('Aprovar todos os posts', 'Aprovar todos os vídeos')
     html = html.replace('Todos os posts aprovados', 'Todos os vídeos aprovados')
 
-    # Salva em aprovacao/{slug}/YYYY-MM.html
-    pasta_saida = output_dir / slug_cliente
+    # Salva em {slug}/YYYY-MM.html
+    pasta_saida = output_dir / slug_c
     pasta_saida.mkdir(parents=True, exist_ok=True)
     caminho_saida = pasta_saida / f"{ano_mes}.html"
     with open(caminho_saida, 'w', encoding='utf-8') as f:
         f.write(html)
     print(f"  💾 {caminho_saida}")
 
-    url = f"{base_url}/aprovacao/{slug_cliente}/{ano_mes}.html"
+    url = f"{base_url}/{slug_c}/{ano_mes}.html"
     return caminho_saida, url
 
 # ─── FUNÇÃO PRINCIPAL ────────────────────────────────────────────────────────
@@ -1165,9 +1173,9 @@ def gerar_para_cliente(cliente, datas_semana, agencia_path, base_url, output_dir
     print(f"  ✅ {len(todos_posts)} post(s) encontrado(s)")
 
     # Gerar identificadores
-    slug_cliente = slugify(cliente)
+    slug_c = slug_cliente(cliente)
     semana_str = datas_semana[0].strftime('%Y-%m-%d')
-    form_id = f"{slug_cliente}-{semana_str}"
+    form_id = f"{slug_c}-{semana_str}"
 
     # Período para exibição
     if modo_mes:
@@ -1184,7 +1192,7 @@ def gerar_para_cliente(cliente, datas_semana, agencia_path, base_url, output_dir
     ano_mes_posts = min(todos_posts, key=lambda p: p['data'])['data'].strftime('%Y-%m')
 
     # Inicializar / atualizar estado-YYYY-MM.json (só adiciona novas entradas, não reseta existentes)
-    pasta_cliente = output_dir / slug_cliente
+    pasta_cliente = output_dir / slug_c
     pasta_cliente.mkdir(parents=True, exist_ok=True)
     estado_filename = f'estado-{ano_mes_posts}.json'
     estado_path     = pasta_cliente / estado_filename
@@ -1218,8 +1226,8 @@ def gerar_para_cliente(cliente, datas_semana, agencia_path, base_url, output_dir
     with open(index_path, 'w', encoding='utf-8') as f:
         f.write(html)
 
-    url = f"{base_url}/aprovacao/{slug_cliente}/{nome_arquivo}"
-    url_index = f"{base_url}/aprovacao/{slug_cliente}/"
+    url = f"{base_url}/{slug_c}/{nome_arquivo}"
+    url_index = f"{base_url}/{slug_c}/"
 
     mensagem = gerar_mensagem_whatsapp(cliente, periodo_label, url_index)
 
@@ -1232,8 +1240,8 @@ def main():
     parser.add_argument('--mes', help='Gerar mês completo (YYYY-MM)')
     parser.add_argument('--inicio', help='Início do período personalizado (YYYY-MM-DD)')
     parser.add_argument('--fim', help='Fim do período personalizado (YYYY-MM-DD)')
-    parser.add_argument('--base-url', default='https://oiforster.github.io/forster-aprovacoes',
-                        help='URL base do site Netlify')
+    parser.add_argument('--base-url', default='https://aprovar.forsterfilmes.com',
+                        help='URL base do site de aprovações')
     args = parser.parse_args()
 
     # Encontrar pasta da agência

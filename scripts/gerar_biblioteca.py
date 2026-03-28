@@ -55,9 +55,17 @@ MESES_URL = {
     9: 'setembro', 10: 'outubro', 11: 'novembro', 12: 'dezembro'
 }
 
-OUTPUT_DIR    = Path(__file__).parent.parent / 'aprovacao'
+OUTPUT_DIR    = Path(__file__).parent.parent
 SYNOLOGY_BASE = Path.home() / 'Library' / 'CloudStorage' / 'SynologyDrive-Agencia'
 GITHUB_RAW    = 'https://raw.githubusercontent.com/oiforster/forster-aprovacoes/main'
+
+# Slugs personalizados por cliente (sobrescreve o slugify automático)
+SLUG_CLIENTES = {
+    "Catarata Center": "catarata",
+}
+
+def slug_cliente(nome):
+    return SLUG_CLIENTES.get(nome, slugify(nome))
 
 # Token fragmentado (evita GitHub Secret Scanning)
 _GH_TOKEN_BODY = '11A4XFG6Q0V9ee2TfDGWKP_Z1vH306NmDFc07' + 'G2UHTHWyTJQRYkc4ClwFZGa1j9LThUODYITL6dNhDr6Kn'
@@ -714,7 +722,7 @@ def _js_lightbox():
     """
 
 def _js_aprovacao(slug, ano_mes):
-    estado_raw = f'{GITHUB_RAW}/aprovacao/{slug}/estado-{ano_mes}.json'
+    estado_raw = f'{GITHUB_RAW}/{slug}/estado-{ano_mes}.json'
     return f"""
   // Carrega estado de aprovação do GitHub e libera downloads dos itens aprovados
   (function() {{
@@ -996,7 +1004,7 @@ def gerar_index(cliente, meses_info, slug):
 # ─── FUNÇÃO PRINCIPAL ─────────────────────────────────────────────────────────
 
 def gerar_para_cliente(cliente, agencia, filtro_mes=None):
-    slug = slugify(cliente)
+    slug = slug_cliente(cliente)
     print(f"\n{'─'*50}")
     print(f"  {cliente}")
     print(f"{'─'*50}")
@@ -1049,16 +1057,18 @@ def gerar_para_cliente(cliente, agencia, filtro_mes=None):
             dl = '✅ Drive' if v.get('drive_id') else '— Drive'
             print(f"     {yt}  {dl}  {data_str}  {v['titulo'][:50]}")
 
-        # Gera página do mês
+        # Gera página do mês como {mes-ano}/index.html → URL limpa sem .html
         html = gerar_pagina_mes(cliente, ano_mes, videos_info, frames_info, slug)
-        nome_arquivo = f"{MESES_URL[mes_num]}-{ano_str}.html"
-        with open(output_cliente / nome_arquivo, 'w', encoding='utf-8') as f:
+        nome_pasta = f"{MESES_URL[mes_num]}-{ano_str}"
+        pasta_mes_out = output_cliente / nome_pasta
+        pasta_mes_out.mkdir(parents=True, exist_ok=True)
+        with open(pasta_mes_out / 'index.html', 'w', encoding='utf-8') as f:
             f.write(html)
-        print(f"     ✅ Gerado: {nome_arquivo}")
+        print(f"     ✅ Gerado: {nome_pasta}/index.html")
 
         meses_info.append({
             'ano_mes':      ano_mes,
-            'nome_arquivo': nome_arquivo,
+            'nome_arquivo': f"{nome_pasta}/",
             'label':        mes_label,
             'total_videos': len(videos_info),
         })
@@ -1068,8 +1078,8 @@ def gerar_para_cliente(cliente, agencia, filtro_mes=None):
         html_index = gerar_index(cliente, meses_info, slug)
         with open(output_cliente / 'index.html', 'w', encoding='utf-8') as f:
             f.write(html_index)
-        print(f"\n  ✅ Índice gerado: aprovacao/{slug}/index.html")
-        print(f"  🔗 URL: https://oiforster.github.io/forster-aprovacoes/aprovacao/{slug}/")
+        print(f"\n  ✅ Índice gerado: {slug}/index.html")
+        print(f"  🔗 URL: https://aprovar.forsterfilmes.com/{slug}/")
 
 def main():
     parser = argparse.ArgumentParser(description='Gera biblioteca de entregas por cliente recorrente')
