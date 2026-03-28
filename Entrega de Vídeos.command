@@ -14,10 +14,18 @@ cd "$REPO" || { echo "❌ Erro ao acessar a pasta do repositório."; exit 1; }
 
 clear
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-echo " ⬇️  SINCRONIZANDO COM A EQUIPE (GitHub)..."
+echo "  ⬇️  SINCRONIZANDO COM A EQUIPE (GitHub)..."
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-git fetch origin main
-git reset --hard origin/main
+git fetch origin main 2>/dev/null
+LOCAL=$(git rev-parse HEAD 2>/dev/null)
+REMOTE=$(git rev-parse origin/main 2>/dev/null)
+if [ "$LOCAL" != "$REMOTE" ]; then
+  echo "  Atualizando para a versão mais recente..."
+  git reset --hard origin/main
+  echo "  ✅ Atualizado."
+else
+  echo "  ✅ Já está na versão mais recente."
+fi
 echo ""
 
 # ── DEPENDÊNCIAS ─────────────────────────────────────
