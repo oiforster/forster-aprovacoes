@@ -299,7 +299,7 @@ def encontrar_pasta_entrega(data, pasta_cliente):
 
     return None, None
 
-def encontrar_arte(data, pasta_estrategia):
+def encontrar_arte(data, pasta_estrategia, output_dir=None):
     """
     Procura arte para um post em:
         06_Entregas/YYYY-MM Entrega [Cliente]/Posts_Fixos/
@@ -312,9 +312,12 @@ def encontrar_arte(data, pasta_estrategia):
         Carrossel:     DD-MM_1.jpg, DD-MM_2.jpg, DD-MM_3.jpg ...
 
     Retorna:
-        str   → URL de imagem única
+        str   → URL de imagem única (Drive ou relativa ao repo)
         list  → lista de URLs para carrossel
         None  → sem arte
+
+    Quando output_dir é fornecido e xattr não está disponível,
+    copia o arquivo para output_dir/artes/ e retorna URL relativa.
     """
     prefixo   = data.strftime('%d-%m')
     extensoes = {'.jpg', '.jpeg', '.png', '.webp'}
@@ -366,6 +369,26 @@ def encontrar_arte(data, pasta_estrategia):
     links = ler_links_md(pasta_artes)
     if prefixo in links:
         return links[prefixo]
+
+    # Fallback final: copia o arquivo para o repo e serve diretamente
+    if output_dir:
+        import shutil
+        pasta_artes_local = Path(output_dir) / 'artes'
+        pasta_artes_local.mkdir(parents=True, exist_ok=True)
+        if slides:
+            urls = []
+            for slide in slides:
+                dest = pasta_artes_local / slide.name
+                shutil.copy2(slide, dest)
+                urls.append(f'artes/{slide.name}')
+            print(f"    📁  Copiado {len(urls)} slide(s) para o repo")
+            return urls
+        else:
+            arquivo = candidatos[0]
+            dest = pasta_artes_local / arquivo.name
+            shutil.copy2(arquivo, dest)
+            print(f"    📁  Copiado {arquivo.name} para o repo")
+            return f'artes/{arquivo.name}'
 
     return None
 
@@ -431,7 +454,7 @@ def detectar_formato(texto):
         return 'Card'
     return 'Post'
 
-def parse_conteudo_mensal(arquivo_path, datas_semana=None, pasta_estrategia=None):
+def parse_conteudo_mensal(arquivo_path, datas_semana=None, pasta_estrategia=None, output_dir=None):
     """
     Lê um arquivo de Conteúdo Mensal e extrai os posts.
     Se datas_semana for fornecido, filtra só os posts dessas datas.
@@ -564,7 +587,7 @@ def parse_conteudo_mensal(arquivo_path, datas_semana=None, pasta_estrategia=None
         video_path = None
         youtube_id = None
         if pasta_estrategia:
-            arte_url = encontrar_arte(data, pasta_estrategia)
+            arte_url = encontrar_arte(data, pasta_estrategia, output_dir=output_dir)
             if arte_url:
                 print(f"    🖼️  Arte encontrada para {data.strftime('%d/%m')}")
             # Busca YouTube ID pelo nome do reel (campo **Vídeo:** no .md)
@@ -935,42 +958,15 @@ def escape_html(texto):
 
 def gerar_pagina_aprovacao(cliente, posts, periodo_label, semana_inicio, form_id, whatsapp_numero='', estado_filename=''):
     """Gera o HTML completo de uma página de aprovação."""
-    template_path = Path(__file__).parent.parent / 'aprovacao' / 'template.html'
+    template_path = Path(__file__).parent.parent / 'template.html'
     with open(template_path, 'r', encoding='utf-8') as f:
         template = f.read()
 
-    # Organizar posts por semana
-    semanas = {}
-    for post in posts:
-        # Semana = segunda-feira da semana do post
-        segunda = post['data'] - timedelta(days=post['data'].weekday())
-        semanas.setdefault(segunda, []).append(post)
-
-    semanas_ordenadas = sorted(semanas.keys())
-
-    # Gerar HTML dos posts e navegação de semanas
+    # Renderiza todos os posts em ordem cronológica (sem tabs de semana)
     posts_html = ''
     semanas_nav_html = ''
-
-    if len(semanas_ordenadas) > 1:
-        # Navegação de semanas
-        semanas_nav_html = '<div class="semanas-nav">'
-        for i, seg in enumerate(semanas_ordenadas):
-            fim_sem = seg + timedelta(days=6)
-            label = f"{seg.day}/{seg.month:02d} – {fim_sem.day}/{fim_sem.month:02d}"
-            ativa = ' ativa' if i == 0 else ''
-            semanas_nav_html += f'<button class="tab-semana{ativa}" id="tab-{seg}" onclick="mudarSemana(\'{seg}\')">{label}</button>'
-        semanas_nav_html += '</div>'
-
-        for i, seg in enumerate(semanas_ordenadas):
-            ativa = ' ativa' if i == 0 else ''
-            posts_html += f'<div class="semana-bloco{ativa}" id="semana-{seg}">'
-            for post in semanas[seg]:
-                posts_html += gerar_html_post(post)
-            posts_html += '</div>'
-    else:
-        for post in posts:
-            posts_html += gerar_html_post(post)
+    for post in sorted(posts, key=lambda p: p['data']):
+        posts_html += gerar_html_post(post)
 
     # Metadados dos posts para o JS (geração da mensagem WhatsApp)
     # meta_label permite substituir a data por outro texto (ex: "REEL 01" em entregas pontuais)
@@ -1150,6 +1146,9 @@ def gerar_para_cliente(cliente, datas_semana, agencia_path, base_url, output_dir
     for d in datas_semana:
         meses_necessarios.add(d.strftime('%Y-%m'))
 
+    slug_c = slug_cliente(cliente)
+    pasta_saida_cliente = output_dir / slug_c
+
     todos_posts = []
     for ano_mes in sorted(meses_necessarios):
         arquivo = encontrar_arquivo_mensal(cliente, ano_mes, agencia_path)
@@ -1160,9 +1159,9 @@ def gerar_para_cliente(cliente, datas_semana, agencia_path, base_url, output_dir
         pasta_estrategia = arquivo.parent
 
         if modo_mes:
-            posts = parse_conteudo_mensal(arquivo, pasta_estrategia=pasta_estrategia)
+            posts = parse_conteudo_mensal(arquivo, pasta_estrategia=pasta_estrategia, output_dir=pasta_saida_cliente)
         else:
-            posts = parse_conteudo_mensal(arquivo, set(datas_semana), pasta_estrategia=pasta_estrategia)
+            posts = parse_conteudo_mensal(arquivo, set(datas_semana), pasta_estrategia=pasta_estrategia, output_dir=pasta_saida_cliente)
 
         todos_posts.extend(posts)
 
@@ -1173,7 +1172,6 @@ def gerar_para_cliente(cliente, datas_semana, agencia_path, base_url, output_dir
     print(f"  ✅ {len(todos_posts)} post(s) encontrado(s)")
 
     # Gerar identificadores
-    slug_c = slug_cliente(cliente)
     semana_str = datas_semana[0].strftime('%Y-%m-%d')
     form_id = f"{slug_c}-{semana_str}"
 
@@ -1192,7 +1190,7 @@ def gerar_para_cliente(cliente, datas_semana, agencia_path, base_url, output_dir
     ano_mes_posts = min(todos_posts, key=lambda p: p['data'])['data'].strftime('%Y-%m')
 
     # Inicializar / atualizar estado-YYYY-MM.json (só adiciona novas entradas, não reseta existentes)
-    pasta_cliente = output_dir / slug_c
+    pasta_cliente = pasta_saida_cliente
     pasta_cliente.mkdir(parents=True, exist_ok=True)
     estado_filename = f'estado-{ano_mes_posts}.json'
     estado_path     = pasta_cliente / estado_filename
