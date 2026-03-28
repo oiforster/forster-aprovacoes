@@ -285,32 +285,35 @@ def ler_youtube_id(pasta_videos, reel_nome):
 
 def encontrar_pasta_entrega(data, pasta_cliente):
     """
-    Encontra a pasta 06_Entregas/YYYY-MM* do mês correspondente.
+    Encontra a pasta 06_Entregas/ que contém a arte do post.
     Retorna (pasta_posts_fixos, pasta_videos) ou (None, None).
 
-    Fallback: se não encontrar a pasta do mês, tenta o mês anterior
-    (cobre caso de artes de dois meses na mesma pasta de entrega).
+    Prioriza a pasta do mês do post, mas se a arte não estiver lá,
+    varre todas as pastas de entrega. Cobre períodos que cruzam meses
+    com artes em qualquer pasta.
     """
     pasta_entregas = pasta_cliente / '06_Entregas'
     if not pasta_entregas.exists():
         return None, None
 
+    dia_mes = data.strftime('%d-%m')
     prefixo_mes = data.strftime('%Y-%m')
+
+    # Coleta todas as pastas de entrega, priorizando a do mês do post
+    pastas = sorted(pasta_entregas.iterdir(), key=lambda e: (not e.name.startswith(prefixo_mes), e.name), reverse=False)
+
+    # Busca a arte em qualquer pasta de entrega
+    for entry in pastas:
+        if not entry.is_dir() or entry.name.startswith('.'):
+            continue
+        pasta_pf = entry / 'Posts_Fixos'
+        if pasta_pf.exists() and any(a.name.startswith(dia_mes) for a in pasta_pf.iterdir()):
+            return pasta_pf, entry / 'Videos'
+
+    # Se não achou arte, retorna a pasta do mês mesmo assim (para Videos/)
     for entry in pasta_entregas.iterdir():
         if entry.is_dir() and entry.name.startswith(prefixo_mes):
             return entry / 'Posts_Fixos', entry / 'Videos'
-
-    # Fallback: mês anterior (artes de abril podem estar na pasta de março)
-    mes_anterior = (data.replace(day=1) - timedelta(days=1)).strftime('%Y-%m')
-    for entry in pasta_entregas.iterdir():
-        if entry.is_dir() and entry.name.startswith(mes_anterior):
-            # Só usa se a arte realmente existir nessa pasta
-            pasta_pf = entry / 'Posts_Fixos'
-            if pasta_pf.exists():
-                dia_mes = data.strftime('%d-%m')
-                for arq in pasta_pf.iterdir():
-                    if arq.name.startswith(dia_mes):
-                        return pasta_pf, entry / 'Videos'
 
     return None, None
 
