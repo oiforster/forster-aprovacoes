@@ -80,6 +80,26 @@ def encontrar_pasta_entrega(ano_mes, pasta_cliente):
             return entry / 'Posts_Fixos', entry / 'Videos'
     return None, None
 
+def encontrar_arte_em_qualquer_entrega(data, pasta_cliente):
+    """Procura arte (DD-MM*.jpg) em todas as pastas de 06_Entregas/."""
+    pasta_entregas = pasta_cliente / '06_Entregas'
+    if not pasta_entregas.exists():
+        return None
+    prefixo = data.strftime('%d-%m')
+    prefixo_mes = data.strftime('%Y-%m')
+    # Prioriza pasta do mês do post
+    for entry in sorted(pasta_entregas.iterdir(), key=lambda e: (not e.name.startswith(prefixo_mes), e.name)):
+        if not entry.is_dir() or entry.name.startswith('.'):
+            continue
+        pf = entry / 'Posts_Fixos'
+        if pf.exists():
+            encontrados = [f.name.lower() for f in pf.iterdir()
+                          if f.suffix.lower() in EXT_IMAGEM and f.name.lower().startswith(prefixo)
+                          and '(capa)' not in f.name.lower()]
+            if encontrados:
+                return pf, encontrados
+    return None
+
 def detectar_formato(texto):
     t = texto.lower()
     if 'carrossel' in t or 'carousel' in t: return 'Carrossel'
@@ -173,11 +193,16 @@ def parse_planejamento(md_path):
 
 # ─── VALIDAÇÃO ───────────────────────────────────────────────────────────────
 
-def validar_cliente(cliente, ano_mes, agencia_path):
+def validar_cliente(cliente, ano_mes, agencia_path, data_inicio=None, data_fim=None):
     print(f"\n🔷 {cliente}")
 
-    # Encontrar arquivo mensal
+    # Encontrar arquivo mensal (com fallback para mês anterior)
     md = encontrar_arquivo_mensal(cliente, ano_mes, agencia_path)
+    if not md and data_inicio:
+        mes_anterior = (data_inicio.replace(day=1) - timedelta(days=1)).strftime('%Y-%m')
+        md = encontrar_arquivo_mensal(cliente, mes_anterior, agencia_path)
+        if md:
+            print(f"  ℹ️  Sem .md de {ano_mes} — usando {md.name}")
     if not md:
         print(f"  ⚠️  Arquivo de Conteúdo Mensal {ano_mes} não encontrado — pulando")
         return True  # não é erro crítico, cliente pode não ter conteúdo nesse mês
@@ -188,9 +213,15 @@ def validar_cliente(cliente, ano_mes, agencia_path):
         print(f"  ⚠️  Nenhum post encontrado no arquivo")
         return True
 
+    # Filtrar posts pelo período se definido
+    if data_inicio and data_fim:
+        posts = [p for p in posts if data_inicio <= p['data'] <= data_fim]
+        if not posts:
+            print(f"  ⚠️  Nenhum post no período {data_inicio} a {data_fim}")
+            return True
+
     # Encontrar pasta de entrega
     pasta_cliente = md.parent.parent  # sobe de 04_Estratégia para o cliente
-    pasta_fixos, pasta_videos = encontrar_pasta_entrega(ano_mes, pasta_cliente)
 
     erros  = []
     avisos = []
@@ -200,80 +231,63 @@ def validar_cliente(cliente, ano_mes, agencia_path):
     posts_com_arte = [p for p in posts if p['formato'] in ('Card', 'Carrossel')]
 
     if posts_com_arte:
-        if not pasta_fixos or not pasta_fixos.exists():
-            erros.append("Pasta Posts_Fixos/ não encontrada em 06_Entregas/")
-        else:
-            # Arquivos de imagem presentes
-            arquivos_presentes = {
-                f.name.lower(): f
-                for f in pasta_fixos.iterdir()
-                if f.suffix.lower() in EXT_IMAGEM and '(capa)' not in f.name.lower()
-            }
-
-            for post in posts_com_arte:
-                prefixo = post['data'].strftime('%d-%m')
-
-                # Procura imagem única ou slides
-                encontrados = [n for n in arquivos_presentes if n.startswith(prefixo)]
-
-                if not encontrados:
-                    erros.append(
-                        f"Arte não encontrada para {post['data'].strftime('%d/%m')} "
-                        f"({post['formato']}: {post['titulo'][:50]})\n"
-                        f"          → esperado: {prefixo}.jpg ou {prefixo}_1.jpg, {prefixo}_2.jpg..."
-                    )
-                else:
-                    ok.append(f"Arte {post['data'].strftime('%d/%m')}: {', '.join(sorted(encontrados))}")
-
-            # Arquivos sem post correspondente
-            datas_esperadas = {p['data'].strftime('%d-%m') for p in posts_com_arte}
-            for nome in arquivos_presentes:
-                prefixo_arquivo = re.match(r'(\d{2}-\d{2})', nome)
-                if prefixo_arquivo and prefixo_arquivo.group(1) not in datas_esperadas:
-                    avisos.append(
-                        f"Arquivo sem post no planejamento: {nome}\n"
-                        f"          → data {prefixo_arquivo.group(1)} não existe no .md deste mês"
-                    )
+        for post in posts_com_arte:
+            prefixo = post['data'].strftime('%d-%m')
+            resultado = encontrar_arte_em_qualquer_entrega(post['data'], pasta_cliente)
+            if resultado:
+                _, encontrados = resultado
+                ok.append(f"Arte {post['data'].strftime('%d/%m')}: {', '.join(sorted(encontrados))}")
+            else:
+                erros.append(
+                    f"Arte não encontrada para {post['data'].strftime('%d/%m')} "
+                    f"({post['formato']}: {post['titulo'][:50]})\n"
+                    f"          → esperado: {prefixo}.jpg ou {prefixo}_1.jpg, {prefixo}_2.jpg..."
+                )
 
     # ── Verificar Reels (Videos/) ─────────────────────────────────────────────
     posts_reel = [p for p in posts if p['formato'] in ('Reels', 'Video')]
 
+    # Coleta vídeos de todas as pastas de entrega relevantes
+    all_videos = {}
+    pasta_entregas = pasta_cliente / '06_Entregas'
+    if pasta_entregas.exists():
+        for entry in pasta_entregas.iterdir():
+            if entry.is_dir() and not entry.name.startswith('.'):
+                pv = entry / 'Videos'
+                if pv.exists():
+                    for f in pv.iterdir():
+                        if f.suffix.lower() in EXT_VIDEO and '(capa)' not in f.name.lower():
+                            all_videos[f.stem.lower()] = f
+
     if posts_reel:
-        if not pasta_videos or not pasta_videos.exists():
+        if not all_videos:
             if any(p['reel_nome'] for p in posts_reel):
                 erros.append("Pasta Videos/ não encontrada em 06_Entregas/")
         else:
-            arquivos_video = {
-                f.stem.lower(): f
-                for f in pasta_videos.iterdir()
-                if f.suffix.lower() in EXT_VIDEO and '(capa)' not in f.name.lower()
-            }
-            nomes_video_lower = {k: v for k, v in arquivos_video.items()}
-
             for post in posts_reel:
                 if not post['reel_nome']:
                     erros.append(
                         f"Campo **Vídeo:** ausente para {post['data'].strftime('%d/%m')} "
                         f"({post['titulo'][:50]})\n"
-                        f"          → adicionar no .md: **Vídeo:** REEL NN – Nome"
+                        f"          → adicionar no .md: **Vídeo:** REEL NN - Nome"
                     )
                     continue
 
                 reel_lower = post['reel_nome'].lower()
-                if reel_lower in nomes_video_lower:
+                if reel_lower in all_videos:
                     ok.append(f"Reel {post['data'].strftime('%d/%m')}: {post['reel_nome']}")
                 else:
                     # Tentar match parcial (ignora traço vs hífen)
                     reel_norm = reel_lower.replace('–', '-').replace('—', '-')
                     match = next(
-                        (k for k in nomes_video_lower if k.replace('–', '-').replace('—', '-') == reel_norm),
+                        (k for k in all_videos if k.replace('–', '-').replace('—', '-') == reel_norm),
                         None
                     )
                     if match:
                         avisos.append(
                             f"Reel {post['data'].strftime('%d/%m')}: nome ligeiramente diferente\n"
                             f"          → .md diz:    {post['reel_nome']}\n"
-                            f"          → arquivo é:  {nomes_video_lower[match].name}"
+                            f"          → arquivo é:  {all_videos[match].name}"
                         )
                     else:
                         erros.append(
@@ -289,7 +303,7 @@ def validar_cliente(cliente, ano_mes, agencia_path):
                 for p in posts_reel
                 if p['reel_nome']
             }
-            for nome_stem, f in arquivos_video.items():
+            for nome_stem, f in all_videos.items():
                 if nome_stem not in nomes_referenciados:
                     avisos.append(
                         f"Vídeo sem referência no planejamento: {f.name}\n"
@@ -323,6 +337,15 @@ def main():
 
     ano_mes = args.mes or date.today().strftime('%Y-%m')
 
+    # Período personalizado
+    data_inicio = None
+    data_fim = None
+    if args.inicio and args.fim:
+        from datetime import datetime
+        data_inicio = datetime.strptime(args.inicio, '%Y-%m-%d').date()
+        data_fim = datetime.strptime(args.fim, '%Y-%m-%d').date()
+        ano_mes = data_inicio.strftime('%Y-%m')
+
     print(f"\n📋 VALIDAÇÃO DE ARQUIVOS — {ano_mes}")
     print("=" * 54)
 
@@ -341,7 +364,7 @@ def main():
 
     todos_ok = True
     for cliente in clientes:
-        ok = validar_cliente(cliente, ano_mes, agencia)
+        ok = validar_cliente(cliente, ano_mes, agencia, data_inicio, data_fim)
         if not ok:
             todos_ok = False
 
