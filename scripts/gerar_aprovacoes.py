@@ -398,26 +398,27 @@ def encontrar_arte(data, pasta_estrategia, output_dir=None):
         if prefixo in links:
             return links[prefixo]
 
-    # Fallback final: copia o arquivo para o repo e serve diretamente
+    # Fallback final: copia o arquivo para o repo com nome limpo
     if output_dir:
         import shutil
-        from urllib.parse import quote
         pasta_artes_local = Path(output_dir) / 'artes'
         pasta_artes_local.mkdir(parents=True, exist_ok=True)
         if slides:
             urls = []
-            for slide in slides:
-                dest = pasta_artes_local / slide.name
+            for i, slide in enumerate(slides, 1):
+                nome_limpo = f'{prefixo}_{i}{slide.suffix.lower()}'
+                dest = pasta_artes_local / nome_limpo
                 shutil.copy2(slide, dest)
-                urls.append(f'artes/{quote(slide.name)}')
+                urls.append(f'artes/{nome_limpo}')
             print(f"    📁  Copiado {len(urls)} slide(s) para o repo")
             return urls
         else:
             arquivo = candidatos[0]
-            dest = pasta_artes_local / arquivo.name
+            nome_limpo = f'{prefixo}{arquivo.suffix.lower()}'
+            dest = pasta_artes_local / nome_limpo
             shutil.copy2(arquivo, dest)
-            print(f"    📁  Copiado {arquivo.name} para o repo")
-            return f'artes/{quote(arquivo.name)}'
+            print(f"    📁  Copiado {arquivo.name} → {nome_limpo}")
+            return f'artes/{nome_limpo}'
 
     return None
 
