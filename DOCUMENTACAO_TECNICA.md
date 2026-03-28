@@ -4,7 +4,7 @@
 **Criado em:** março de 2026
 **Repositório:** https://github.com/oiforster/forster-aprovacoes
 **Site:** https://aprovar.forsterfilmes.com
-**Última atualização:** 2026-03-28 — Domínio próprio `aprovar.forsterfilmes.com`; URLs limpas por cliente e mês; slugs personalizados; scripts funcionam em qualquer Mac (Path.home())
+**Última atualização:** 2026-03-28 — Domínio próprio; URLs limpas; slugs personalizados; imagens copiadas pro repo; layout cronológico sem tabs de semana; biblioteca separada em `/entregas/`
 
 ---
 
@@ -92,11 +92,27 @@ forster-aprovacoes/
 
 **Estrutura de URLs:**
 ```
-aprovar.forsterfilmes.com/                          ← índice geral
-aprovar.forsterfilmes.com/catarata/                 ← aprovação mais recente do cliente
-aprovar.forsterfilmes.com/catarata/2026-04-01       ← aprovação da semana de 1/04
-aprovar.forsterfilmes.com/catarata/abril-2026       ← biblioteca de entregas de abril
-aprovar.forsterfilmes.com/fyber-show-piscinas/      ← outro cliente (slug automático)
+aprovar.forsterfilmes.com/                               ← índice geral
+aprovar.forsterfilmes.com/catarata/                      ← aprovação mais recente (index.html)
+aprovar.forsterfilmes.com/catarata/2026-04-01            ← aprovação de abril (por período)
+aprovar.forsterfilmes.com/catarata/entregas/             ← biblioteca de entregas (índice)
+aprovar.forsterfilmes.com/catarata/entregas/abril-2026   ← biblioteca de abril
+aprovar.forsterfilmes.com/fyber-show-piscinas/           ← outro cliente (slug automático)
+```
+
+**Estrutura de arquivos no repo por cliente:**
+```
+{slug}/
+├── index.html          ← aprovação mais recente (atualizado a cada geração)
+├── YYYY-MM-DD.html     ← aprovação por período (permanente)
+├── estado-YYYY-MM.json ← estado de aprovação (lido pelo JS via GitHub raw)
+├── artes/              ← imagens copiadas do Synology (quando xattr não disponível)
+│   ├── DD-MM.jpg
+│   └── DD-MM_N.jpg
+└── entregas/           ← biblioteca de entregas (gerada por gerar_biblioteca.py)
+    ├── index.html      ← índice de meses
+    └── abril-2026/
+        └── index.html  ← página de download do mês
 ```
 
 ---
@@ -233,15 +249,19 @@ Script principal. Lê os arquivos `.md` de Conteúdo Mensal e gera as páginas H
 
 | Função | O que faz |
 |--------|-----------|
-| `encontrar_pasta_agencia()` | Prioriza Synology Drive; fallback para Google Drive (legado) |
+| `encontrar_pasta_agencia()` | Prioriza Synology Drive; fallback para Google Drive (legado); usa `Path.home()` — funciona em qualquer Mac |
 | `encontrar_arquivo_mensal(cliente, ano_mes, agencia_path)` | Busca o `.md` de Conteúdo Mensal em Recorrentes e Pontuais |
 | `gdrive_id_para_url(path)` | Lê o xattr `com.google.drivefs.item-id#S` e retorna URL `lh3.googleusercontent.com/d/ID` |
-| `encontrar_arte(data, pasta_cliente)` | Busca arte em `Posts_Fixos/`; detecta card (`DD-MM.jpg`) ou carrossel (`DD-MM_N.jpg`) |
+| `encontrar_arte(data, pasta_cliente, output_dir=None)` | Busca arte em `Posts_Fixos/`. Tenta: (1) xattr/Drive URL, (2) `_links.md`, (3) copia o arquivo para `{slug}/artes/` no repo e retorna URL relativa |
 | `ler_youtube_id(pasta_videos, reel_nome)` | Lê `Videos/_youtube.md` e retorna YouTube ID pelo nome do Reel |
-| `parse_conteudo_mensal(arquivo, datas)` | Parse do `.md`: extrai posts do período solicitado |
-| `gerar_pagina_aprovacao(...)` | Monta a página HTML completa a partir do template; popula OG tags |
-| `encontrar_youtube_md_pontual(cliente, ano_mes, agencia_path)` | Busca `_youtube.md` recursivamente nas pastas de entrega do cliente (estruturas não-padrão) |
-| `gerar_para_cliente_reels(cliente, ano_mes, ...)` | Fallback para pontuais: gera página direto do `_youtube.md`, sem precisar de calendário |
+| `parse_conteudo_mensal(arquivo, datas, pasta_estrategia, output_dir)` | Parse do `.md`: extrai posts do período; passa `output_dir` para `encontrar_arte()` |
+| `gerar_pagina_aprovacao(...)` | Monta a página HTML; todos os posts em ordem cronológica (sem tabs de semana) |
+| `gerar_para_cliente_reels(cliente, ano_mes, ...)` | Fallback para pontuais: gera página direto do `_youtube.md`, sem calendário |
+
+**Estratégia de imagens (ordem de prioridade):**
+1. xattr `com.google.drivefs.item-id#S` → URL `lh3.googleusercontent.com` (Mac do Samuel com Google Drive)
+2. `_links.md` na pasta `Posts_Fixos/` → URL manual (qualquer Mac)
+3. Cópia local para `{slug}/artes/` no repo → URL relativa (funciona em qualquer Mac, inclusive o da Silvana)
 
 **Argumentos CLI:**
 ```bash
@@ -252,20 +272,9 @@ Script principal. Lê os arquivos `.md` de Conteúdo Mensal e gera as páginas H
 --fim YYYY-MM-DD     # fim do período personalizado
 ```
 
-**Lógica de fallback para clientes pontuais:**
+**Layout:** uma página por período (mês ou semana personalizada), posts em ordem cronológica, sem navegação por semanas.
 
-Quando `--cliente` é passado e o cliente não está em `CLIENTES_RECORRENTES`, o script busca dinamicamente em `Clientes Pontuais/`. Se o cliente for encontrado mas não tiver arquivo de Conteúdo Mensal (sem calendário editorial), o script chama `gerar_para_cliente_reels()`, que lê o `_youtube.md` da pasta de entrega e gera a página com os vídeos disponíveis.
-
-Nas páginas geradas via `_youtube.md`:
-- `data_display` de cada card exibe `REEL 01`, `REEL 02` etc. (não uma data)
-- `meta_label` no JS faz a mensagem WhatsApp sair como "REEL 01 — Título — Aprovado"
-- Textos do template são adaptados: "Aprovação de vídeos", "Aprovar todos os vídeos"
-
-**Detalhes técnicos:**
-- Encoding: Synology Drive preserva NFD no macOS. `encontrar_pasta_agencia()` detecta o path real via verificação de existência direta
-- xattr: `com.google.drivefs.item-id#S` contém o Drive File ID (ainda usado para imagens de clientes recorrentes cujas artes estão no Google Drive)
-- URL de imagem: `https://lh3.googleusercontent.com/d/FILE_ID` (requer pasta `Posts_Fixos/` compartilhada publicamente no Drive)
-- Campo `**Vídeo:**`: suporta valor na mesma linha ou na linha seguinte
+**Fallback para clientes pontuais:** quando o cliente não está em `CLIENTES_RECORRENTES` e não tem `.md` de Conteúdo Mensal, usa `gerar_para_cliente_reels()` que lê `_youtube.md` diretamente.
 
 ---
 
