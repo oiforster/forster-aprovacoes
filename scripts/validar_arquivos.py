@@ -93,8 +93,9 @@ def encontrar_arte_em_qualquer_entrega(data, pasta_cliente):
             continue
         pf = entry / 'Posts_Fixos'
         if pf.exists():
-            encontrados = [f.name.lower() for f in pf.iterdir()
-                          if f.suffix.lower() in EXT_IMAGEM and f.name.lower().startswith(prefixo)
+            encontrados = [f.name.lower() for f in pf.rglob('*')
+                          if f.is_file() and f.suffix.lower() in EXT_IMAGEM
+                          and f.name.lower().startswith(prefixo)
                           and '(capa)' not in f.name.lower()]
             if encontrados:
                 return pf, encontrados

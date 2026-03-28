@@ -307,7 +307,7 @@ def encontrar_pasta_entrega(data, pasta_cliente):
         if not entry.is_dir() or entry.name.startswith('.'):
             continue
         pasta_pf = entry / 'Posts_Fixos'
-        if pasta_pf.exists() and any(a.name.startswith(dia_mes) for a in pasta_pf.iterdir()):
+        if pasta_pf.exists() and any(a.name.startswith(dia_mes) for a in pasta_pf.rglob('*') if a.is_file()):
             return pasta_pf, entry / 'Videos'
 
     # Se não achou arte, retorna a pasta do mês mesmo assim (para Videos/)
@@ -352,20 +352,26 @@ def encontrar_arte(data, pasta_estrategia, output_dir=None):
     if not pasta_artes.exists():
         return None
 
+    # Busca arquivos na pasta e em subpastas que começam com o prefixo (carrosseis)
     candidatos = sorted(
-        [f for f in pasta_artes.iterdir()
-         if f.suffix.lower() in extensoes
+        [f for f in pasta_artes.rglob('*')
+         if f.is_file()
+         and f.suffix.lower() in extensoes
          and f.name.lower().startswith(prefixo)
-         and '(capa)' not in f.name.lower()],   # ignora capas de reel
+         and '(capa)' not in f.name.lower()],
         key=lambda x: x.name
     )
 
     if not candidatos:
         return None
 
-    # Distingue imagem única (DD-MM.jpg) de carrossel (DD-MM_1.jpg, DD-MM_2.jpg...)
+    # Distingue imagem única (DD-MM.jpg) de carrossel (DD-MM_1.jpg, DD-MM 1.jpg, etc.)
+    # Aceita underscore, espaço(s) ou qualquer separador antes do número do slide
     slides = [f for f in candidatos
-              if re.match(rf'^{re.escape(prefixo)}_\d+\.', f.name.lower())]
+              if re.match(rf'^{re.escape(prefixo)}[\s_()a-z]*\d+\.', f.name.lower())]
+    # Se tem mais de 1 candidato, trata como carrossel mesmo sem separador explícito
+    if not slides and len(candidatos) > 1:
+        slides = candidatos
 
     if slides:
         urls = []
