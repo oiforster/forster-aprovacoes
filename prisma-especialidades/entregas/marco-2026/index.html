@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Biblioteca — Prisma Especialidades — Março de 2026</title>
+  <meta property="og:title" content="Biblioteca — Prisma Especialidades — Março de 2026"/>
+  <meta property="og:description" content="Acesse e baixe os conteúdos aprovados de Março de 2026."/>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #F5F5F0; color: #1A1A1A; min-height: 100vh;
+    }
+    .header {
+      background: #1A1A1A; color: #fff;
+      padding: 20px 20px 16px; position: sticky; top: 0; z-index: 100;
+    }
+    .header-label { font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: #999; margin-bottom: 4px; }
+    .header-cliente { font-size: 20px; font-weight: 700; letter-spacing: -0.02em; }
+    .header-periodo { font-size: 13px; color: #aaa; margin-top: 3px; }
+
+    .content { padding: 16px 16px 48px; display: flex; flex-direction: column; gap: 16px; }
+    @media (min-width: 480px) { .content { max-width: 480px; margin: 0 auto; } }
+
+    /* CARD DE VÍDEO */
+    .post-card {
+      background: #fff; border-radius: 14px;
+      overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.07);
+    }
+    .post-header { padding: 14px 14px 10px; display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
+    .post-meta { display: flex; flex-direction: column; gap: 4px; }
+    .post-data { font-size: 12px; font-weight: 600; color: #888; text-transform: uppercase; letter-spacing: 0.08em; }
+    .post-titulo { font-size: 15px; font-weight: 700; color: #1A1A1A; line-height: 1.3; }
+    .post-formato {
+      display: inline-block; font-size: 11px; font-weight: 600;
+      padding: 3px 8px; border-radius: 4px; letter-spacing: 0.06em;
+      text-transform: uppercase; flex-shrink: 0; margin-top: 2px;
+    }
+    .formato-reels   { background: #FCE4EC; color: #AD1457; }
+    .formato-video   { background: #E8F5E9; color: #2E7D32; }
+    .formato-card    { background: #E3F2FD; color: #1565C0; }
+    .formato-carrossel { background: #F3E5F5; color: #6A1B9A; }
+    .post-divider { height: 1px; background: #F0F0EC; margin: 0 14px; }
+
+    /* YOUTUBE FACADE */
+    .post-arte { width: 100%; background: #000; overflow: hidden; }
+    .youtube-facade {
+      position: relative; width: 100%; aspect-ratio: 9/16;
+      background: #000; cursor: pointer; overflow: hidden;
+    }
+    .youtube-facade img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .yt-play-btn {
+      position: absolute; top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+      filter: drop-shadow(0 2px 8px rgba(0,0,0,0.4));
+    }
+    .youtube-facade:active .yt-play-btn { transform: translate(-50%, -50%) scale(0.92); }
+    /* Sem vídeo — capa estática */
+    .capa-estatica { width: 100%; aspect-ratio: 9/16; object-fit: cover; display: block; background: #111; }
+
+    /* BOTÕES DE DOWNLOAD */
+    .post-acoes { padding: 10px 14px 14px; display: flex; flex-direction: column; gap: 8px; }
+    .btn-download {
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      padding: 11px 14px; background: #1A1A1A; color: #fff;
+      border-radius: 10px; font-size: 14px; font-weight: 600;
+      text-decoration: none; cursor: pointer; transition: background 0.15s;
+      border: none; width: 100%;
+    }
+    .btn-download:hover { background: #333; }
+    .btn-download svg { flex-shrink: 0; }
+    .badge-pendente {
+      display: flex; align-items: center; justify-content: center;
+      padding: 10px 14px; background: #F5F5F0; border-radius: 10px;
+      font-size: 13px; color: #aaa; font-weight: 500; gap: 6px;
+    }
+
+    /* FRAMES */
+    .frames-section { display: flex; flex-direction: column; gap: 16px; }
+    .frames-header { padding: 6px 2px 2px; display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+    .frames-titulo-texto { font-size: 13px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: #888; }
+    .btn-baixar-todos {
+      display: inline-flex; align-items: center; gap: 5px;
+      padding: 8px 14px; background: #1A1A1A; color: #fff;
+      border-radius: 8px; font-size: 12px; font-weight: 700;
+      letter-spacing: 0.04em; text-decoration: none; white-space: nowrap; transition: background 0.15s;
+    }
+    .btn-baixar-todos:hover { background: #333; }
+    .frames-grupo { background: #fff; border-radius: 14px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.07); }
+    .frames-grupo-titulo { font-size: 11px; font-weight: 700; letter-spacing: 0.10em; text-transform: uppercase; color: #999; padding: 12px 14px 6px; }
+    .frames-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; }
+    .frame-cell { aspect-ratio: 1; overflow: hidden; cursor: pointer; background: #eee; }
+    .frame-cell img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .frame-sem-preview { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: #F0F0EC; font-size: 24px; }
+
+    /* LIGHTBOX */
+    .lb-overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,0.92); z-index: 500;
+      flex-direction: column; align-items: center; justify-content: center;
+    }
+    .lb-overlay.ativo { display: flex; }
+    .lb-img { max-width: 100vw; max-height: 80vh; object-fit: contain; }
+    .lb-controls { display: flex; align-items: center; gap: 16px; margin-top: 16px; }
+    .lb-btn {
+      background: rgba(255,255,255,0.12); color: #fff; border: none;
+      border-radius: 50%; width: 44px; height: 44px; font-size: 20px;
+      display: flex; align-items: center; justify-content: center; cursor: pointer;
+    }
+    .lb-nome { color: #aaa; font-size: 13px; }
+    .lb-download {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 10px 18px; background: #fff; color: #1A1A1A;
+      border-radius: 8px; font-size: 13px; font-weight: 700; text-decoration: none;
+      margin-top: 12px;
+    }
+    .lb-fechar {
+      position: absolute; top: 16px; right: 16px;
+      background: rgba(255,255,255,0.15); color: #fff; border: none;
+      border-radius: 50%; width: 44px; height: 44px; font-size: 20px; cursor: pointer;
+    }
+    </style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-label">Biblioteca de conteúdo</div>
+  <div class="header-cliente">Prisma Especialidades</div>
+  <div class="header-periodo">Março de 2026</div>
+</div>
+
+<div class="content">
+  
+<div class="post-card" data-post-id="202603-reel-12-dia-da-mulher">
+  
+  <div class="post-header">
+    <div class="post-meta">
+      <div class="post-data"></div>
+      <div class="post-titulo">REEL 12 - Dia da Mulher</div>
+    </div>
+    <span class="post-formato formato-reels">VÍDEO</span>
+  </div>
+  <div class="post-divider"></div>
+  
+  <div class="post-acoes">
+    <div class="badge-pendente">Vídeo não disponível para download</div>
+  </div>
+</div>
+  
+</div>
+
+<!-- LIGHTBOX -->
+<div class="lb-overlay" id="lbOverlay" onclick="if(event.target===this)fecharLightbox()">
+  <button class="lb-fechar" onclick="fecharLightbox()">&#10005;</button>
+  <img class="lb-img" id="lbImg" src="" alt=""/>
+  <a class="lb-download" id="lbDownload" href="#" target="_blank" download>
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+    Baixar frame
+  </a>
+  <div class="lb-controls">
+    <button class="lb-btn" onclick="lbAnterior()">&#8592;</button>
+    <span class="lb-nome" id="lbNome"></span>
+    <button class="lb-btn" onclick="lbProximo()">&#8594;</button>
+  </div>
+</div>
+
+<script>
+  
+  var lbTotal = 0, lbIdx = 0;
+  var lbDriveUrls = {}, lbNomes = {};
+
+  function abrirLightbox(idx) {
+    lbIdx = idx;
+    _atualizarLightbox();
+    document.getElementById('lbOverlay').classList.add('ativo');
+  }
+  function fecharLightbox() {
+    document.getElementById('lbOverlay').classList.remove('ativo');
+  }
+  function lbAnterior() { lbIdx = (lbIdx - 1 + lbTotal) % lbTotal; _atualizarLightbox(); }
+  function lbProximo()  { lbIdx = (lbIdx + 1) % lbTotal; _atualizarLightbox(); }
+
+  function _atualizarLightbox() {
+    var src = document.getElementById('lb-src-' + lbIdx);
+    var img = document.getElementById('lbImg');
+    if (src && src.tagName === 'IMG') {
+      img.src = src.src;
+      img.style.display = '';
+    } else {
+      img.src = '';
+      img.style.display = 'none';
+    }
+    var driveUrl = lbDriveUrls[lbIdx] || '';
+    var btn = document.getElementById('lbDownload');
+    if (driveUrl) {
+      btn.href = driveUrl;
+      btn.style.display = '';
+    } else {
+      btn.style.display = 'none';
+    }
+    document.getElementById('lbNome').textContent = lbNomes[lbIdx] || '';
+  }
+
+  document.addEventListener('keydown', function(e) {
+    var ol = document.getElementById('lbOverlay');
+    if (!ol || !ol.classList.contains('ativo')) return;
+    if (e.key === 'ArrowLeft')  lbAnterior();
+    if (e.key === 'ArrowRight') lbProximo();
+    if (e.key === 'Escape')     fecharLightbox();
+  });
+    
+  
+  window.abrirReel = function(ytId, facadeId) {
+    var overlay = document.getElementById('yt-overlay');
+    if (!overlay) {
+      overlay = document.createElement('div');
+      overlay.id = 'yt-overlay';
+      overlay.style.cssText = 'position:fixed;inset:0;background:#000;z-index:600;display:none;flex-direction:column;align-items:center;justify-content:center;';
+      var closeBtn = document.createElement('button');
+      closeBtn.innerHTML = '&#10005;';
+      closeBtn.style.cssText = 'position:absolute;top:16px;right:16px;z-index:10;background:rgba(255,255,255,0.15);color:#fff;border:none;border-radius:50%;width:44px;height:44px;font-size:20px;cursor:pointer;';
+      closeBtn.onclick = function() { overlay.style.display = 'none'; overlay.innerHTML = ''; overlay.appendChild(closeBtn); };
+      overlay.appendChild(closeBtn);
+      document.body.appendChild(overlay);
+    }
+    var w = Math.min(window.innerWidth, 400);
+    var h = Math.round(w * 16 / 9);
+    var iframe = document.createElement('iframe');
+    iframe.src = 'https://www.youtube.com/embed/' + ytId + '?autoplay=1&rel=0';
+    iframe.style.cssText = 'width:' + w + 'px;height:' + h + 'px;border:none;';
+    iframe.allow = 'autoplay; fullscreen';
+    overlay.appendChild(iframe);
+    overlay.style.display = 'flex';
+  };
+    
+  
+  // Carrega estado de aprovação do GitHub e libera downloads dos itens aprovados
+  (function() {
+    var estadoUrl = 'https://raw.githubusercontent.com/oiforster/forster-aprovacoes/main/prisma-especialidades/estado-2026-03.json';
+    fetch(estadoUrl + '?_=' + Date.now())
+      .then(function(r) { return r.ok ? r.json() : {}; })
+      .catch(function() { return {}; })
+      .then(function(estado) {
+        document.querySelectorAll('[data-post-id]').forEach(function(card) {
+          var id     = card.dataset.postId;
+          var status = estado[id] || 'pendente';
+          var btnDl  = card.querySelector('.btn-download');
+          var badge  = card.querySelector('.badge-pendente');
+          if (status === 'aprovado') {
+            if (btnDl)  btnDl.style.display  = '';
+            if (badge)  badge.style.display  = 'none';
+          } else {
+            if (btnDl)  btnDl.style.display  = 'none';
+            if (badge)  badge.style.display  = '';
+          }
+        });
+      });
+  })();
+    
+</script>
+</body>
+</html>
