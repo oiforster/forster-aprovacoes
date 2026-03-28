@@ -1156,10 +1156,24 @@ def gerar_para_cliente(cliente, datas_semana, agencia_path, base_url, output_dir
     pasta_saida_cliente = output_dir / slug_c
 
     todos_posts = []
+    arquivos_lidos = set()  # evita ler o mesmo .md duas vezes
+
     for ano_mes in sorted(meses_necessarios):
         arquivo = encontrar_arquivo_mensal(cliente, ano_mes, agencia_path)
+
+        # Fallback: se não encontrou .md do mês, tenta o mês anterior
+        # (cobre caso de .md que mistura posts de dois meses)
         if not arquivo:
+            dt = datetime.strptime(ano_mes, '%Y-%m')
+            mes_anterior = (dt.replace(day=1) - timedelta(days=1)).strftime('%Y-%m')
+            arquivo = encontrar_arquivo_mensal(cliente, mes_anterior, agencia_path)
+            if arquivo:
+                print(f"  ℹ️  Sem .md de {ano_mes} — usando {arquivo.name} (contém posts do período)")
+
+        if not arquivo or str(arquivo) in arquivos_lidos:
             continue
+
+        arquivos_lidos.add(str(arquivo))
         print(f"  📄 Lendo: {arquivo.name}")
 
         pasta_estrategia = arquivo.parent

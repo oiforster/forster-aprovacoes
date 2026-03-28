@@ -120,8 +120,10 @@ PERIODO_FIM=""
 normalizar_data() {
   local d="$1"
   if [[ "$d" == *"/"* ]]; then
-    local dia="${d%%/*}"; local resto="${d#*/}"; local mes="${resto%%/*}"; local ano="${resto#*/}"
-    printf '%s-%02d-%02d' "$ano" "$mes" "$dia"
+    python3 -c "
+p = '$d'.split('/')
+print(f'{p[2]}-{int(p[1]):02d}-{int(p[0]):02d}')
+"
   else
     echo "$d"
   fi
