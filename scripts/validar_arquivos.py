@@ -36,12 +36,91 @@ CLIENTES_RECORRENTES = [
 EXT_IMAGEM = {'.jpg', '.jpeg', '.png', '.webp'}
 EXT_VIDEO  = {'.mov', '.mp4', '.m4v'}
 
+# Padrão de nomes em Posts_Fixos/:
+#   Imagem única:  DD-MM.jpg
+#   Carrossel:     DD-MM_1.jpg, DD-MM_2.jpg, ...
+#   Sem espaços, acentos, parênteses ou dia da semana.
+#   Slides em subpastas são movidos para Posts_Fixos/ raiz.
+
 # ─── UTILITÁRIOS ─────────────────────────────────────────────────────────────
 
 def slugify(texto):
     texto = unicodedata.normalize('NFD', texto)
     texto = ''.join(c for c in texto if unicodedata.category(c) != 'Mn')
     return texto.lower().replace(' ', '-')
+
+def normalizar_nome_arte(nome):
+    """
+    Converte nome de arte para o padrão limpo.
+    '04-04 (Sáb).jpg'       → '04-04.jpg'
+    '30-03 (Seg)  1.jpg'    → '30-03_1.jpg'
+    '01-04 (Qua) .jpg'      → '01-04.jpg'
+    '09-04 (qui)_2.png'     → '09-04_2.png'
+    Retorna None se não for um arquivo de arte válido.
+    """
+    # Normaliza NFD → NFC
+    nome = unicodedata.normalize('NFC', nome)
+    # Extrai prefixo DD-MM e extensão
+    m = re.match(r'^(\d{2}-\d{2})\s*(?:\([^)]*\))?\s*[_\s]*(\d+)?\s*(\.\w+)$', nome)
+    if not m:
+        return None
+    prefixo = m.group(1)
+    numero = m.group(2)
+    ext = m.group(3).lower()
+    if numero:
+        return f'{prefixo}_{numero}{ext}'
+    return f'{prefixo}{ext}'
+
+
+def normalizar_posts_fixos(pasta_pf):
+    """
+    Renomeia arquivos em Posts_Fixos/ para o padrão limpo.
+    Move slides de subpastas para a raiz. Remove subpastas vazias.
+    Retorna lista de renomeações feitas.
+    """
+    if not pasta_pf or not pasta_pf.exists():
+        return []
+
+    renomeacoes = []
+
+    # 1. Mover arquivos de subpastas para a raiz
+    for subdir in list(pasta_pf.iterdir()):
+        if not subdir.is_dir() or subdir.name.startswith('.'):
+            continue
+        for arquivo in list(subdir.iterdir()):
+            if arquivo.is_file() and arquivo.suffix.lower() in EXT_IMAGEM:
+                destino = pasta_pf / arquivo.name
+                if not destino.exists():
+                    arquivo.rename(destino)
+                    renomeacoes.append((f'{subdir.name}/{arquivo.name}', arquivo.name))
+        # Remove subpasta se ficou vazia
+        remaining = [f for f in subdir.iterdir() if not f.name.startswith('.')]
+        if not remaining:
+            try:
+                # Remove .DS_Store se existir
+                ds = subdir / '.DS_Store'
+                if ds.exists():
+                    ds.unlink()
+                subdir.rmdir()
+            except OSError:
+                pass
+
+    # 2. Renomear arquivos na raiz para o padrão limpo
+    for arquivo in list(pasta_pf.iterdir()):
+        if not arquivo.is_file() or arquivo.suffix.lower() not in EXT_IMAGEM:
+            continue
+        if '(capa)' in arquivo.name.lower():
+            continue
+
+        nome_limpo = normalizar_nome_arte(arquivo.name)
+        if nome_limpo and nome_limpo != arquivo.name:
+            destino = pasta_pf / nome_limpo
+            if not destino.exists():
+                arquivo.rename(destino)
+                renomeacoes.append((arquivo.name, nome_limpo))
+
+    return renomeacoes
+
 
 def encontrar_pasta_agencia():
     home = Path.home()
@@ -223,6 +302,16 @@ def validar_cliente(cliente, ano_mes, agencia_path, data_inicio=None, data_fim=N
 
     # Encontrar pasta de entrega
     pasta_cliente = md.parent.parent  # sobe de 04_Estratégia para o cliente
+
+    # Normalizar nomes em Posts_Fixos/ (todas as pastas de entrega)
+    pasta_entregas = pasta_cliente / '06_Entregas'
+    if pasta_entregas.exists():
+        for entry in pasta_entregas.iterdir():
+            if entry.is_dir() and not entry.name.startswith('.'):
+                pf = entry / 'Posts_Fixos'
+                renomeacoes = normalizar_posts_fixos(pf)
+                for antigo, novo in renomeacoes:
+                    print(f"  🔄 Renomeado: {antigo} → {novo}")
 
     erros  = []
     avisos = []
