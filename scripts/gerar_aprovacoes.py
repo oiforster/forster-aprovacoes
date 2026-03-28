@@ -24,13 +24,14 @@ from pathlib import Path
 
 # Caminho base (detecta NFD automaticamente)
 def encontrar_pasta_agencia():
+    home = Path.home()
     # Synology Drive — fonte de verdade ativa
-    synology = Path('/Users/samuelforster/Library/CloudStorage/SynologyDrive-Agencia')
+    synology = home / 'Library/CloudStorage/SynologyDrive-Agencia'
     if synology.exists():
         return synology
     # Fallback: Google Drive (legado) ou ambiente de desenvolvimento
     for base in [
-        Path('/Users/samuelforster/Library/CloudStorage/GoogleDrive-oiforster@gmail.com/Meu Drive/Forster Filmes/CLAUDE_COWORK'),
+        home / 'Library/CloudStorage/GoogleDrive-oiforster@gmail.com/Meu Drive/Forster Filmes/CLAUDE_COWORK',
         Path('/sessions/laughing-nifty-franklin/mnt/SynologyDrive-Agencia'),
     ]:
         if base.exists():

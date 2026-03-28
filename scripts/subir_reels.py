@@ -68,12 +68,13 @@ def slugify(texto):
     return texto.lower().replace(' ', '-')
 
 def encontrar_pasta_agencia():
+    home = Path.home()
     # Synology Drive — fonte de verdade ativa
-    synology = Path('/Users/samuelforster/Library/CloudStorage/SynologyDrive-Agencia')
+    synology = home / 'Library/CloudStorage/SynologyDrive-Agencia'
     if synology.exists():
         return synology
     # Fallback: Google Drive (legado)
-    gdrive = Path('/Users/samuelforster/Library/CloudStorage/GoogleDrive-oiforster@gmail.com/Meu Drive/Forster Filmes/CLAUDE_COWORK')
+    gdrive = home / 'Library/CloudStorage/GoogleDrive-oiforster@gmail.com/Meu Drive/Forster Filmes/CLAUDE_COWORK'
     if gdrive.exists():
         for entry in gdrive.iterdir():
             if 'Ag' in entry.name:
