@@ -26,6 +26,44 @@ else
 fi
 echo ""
 
+# ── DEPENDÊNCIAS ─────────────────────────────────────
+python3 - <<'DEPEOF'
+import importlib, importlib.util, subprocess, sys
+
+PACOTES =[
+    ("googleapiclient", "google-api-python-client"),
+    ("google_auth_oauthlib", "google-auth-oauthlib"),
+    ("google.auth.transport.requests", "google-auth-httplib2"),
+]
+
+def modulo_instalado(mod):
+    try:
+        return importlib.util.find_spec(mod) is not None
+    except (ModuleNotFoundError, ValueError):
+        return False
+
+faltando =[(mod, pkg) for mod, pkg in PACOTES if not modulo_instalado(mod)]
+
+if faltando:
+    print("  Instalando dependências...")
+    for mod, pkg in faltando:
+        print(f"    → {pkg}")
+        resultado = subprocess.run([sys.executable, "-m", "pip", "install", "--user", "--quiet", pkg],
+            capture_output=True, text=True
+        )
+        if resultado.returncode != 0:
+            print(f"  ❌ Erro ao instalar {pkg}:")
+            print(resultado.stderr.strip())
+            sys.exit(1)
+    print("  ✅ Dependências instaladas.\n")
+DEPEOF
+
+DEP_STATUS=$?
+if [ $DEP_STATUS -ne 0 ]; then
+  read -p "Pressione Enter para fechar..."
+  exit 1
+fi
+
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo "   FORSTER FILMES — Fluxo Completo de Aprovações"
 echo "   Validar → YouTube → Gerar páginas → Publicar"
