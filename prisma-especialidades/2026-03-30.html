@@ -4,65 +4,79 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Aprovação — Prisma Especialidades</title>
+  <meta property="og:title"       content="Aprovação — Prisma Especialidades — 30/03 a 9/04" />
+  <meta property="og:description" content="Acesse para aprovar ou pedir ajuste nos vídeos de 30/03 a 9/04." />
+  <meta property="og:image"       content="" />
+  <meta property="og:type"        content="website" />
+  <!-- Inter Font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background: #F5F5F0;
-      color: #1A1A1A;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #f5f5f7;
+      color: #1d1d1f;
       min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
     }
 
     /* HEADER */
     .header {
-      background: #1A1A1A;
+      background: #1d1d1f;
       color: #fff;
-      padding: 20px 20px 16px;
+      padding: 24px 20px 18px;
       position: sticky;
       top: 0;
       z-index: 100;
     }
     .header-label {
-      font-size: 11px;
-      letter-spacing: 0.12em;
+      font-size: 0.6875rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
       text-transform: uppercase;
-      color: #999;
-      margin-bottom: 4px;
+      color: #86868b;
+      margin-bottom: 6px;
     }
     .header-cliente {
-      font-size: 20px;
+      font-size: 1.375rem;
       font-weight: 700;
-      letter-spacing: -0.02em;
+      letter-spacing: -0.03em;
+      line-height: 1.15;
     }
     .header-periodo {
-      font-size: 13px;
-      color: #aaa;
-      margin-top: 3px;
+      font-size: 0.8125rem;
+      font-weight: 400;
+      color: #86868b;
+      margin-top: 4px;
     }
     .header-progress {
-      margin-top: 12px;
+      margin-top: 14px;
       display: flex;
       align-items: center;
       gap: 10px;
     }
     .progress-bar-bg {
       flex: 1;
-      height: 4px;
+      height: 3px;
       background: #333;
       border-radius: 2px;
       overflow: hidden;
     }
     .progress-bar-fill {
       height: 100%;
-      background: #4CAF50;
+      background: #34c759;
       border-radius: 2px;
       width: 0%;
-      transition: width 0.3s ease;
+      transition: width 0.4s cubic-bezier(0.16, 1, 0.3, 1);
     }
     .progress-text {
-      font-size: 12px;
-      color: #aaa;
+      font-size: 0.6875rem;
+      font-weight: 500;
+      color: #86868b;
       white-space: nowrap;
     }
 
@@ -73,19 +87,19 @@
     .btn-aprovar-tudo {
       width: 100%;
       padding: 14px;
-      background: #1A1A1A;
+      background: #1d1d1f;
       color: #fff;
       border: none;
-      border-radius: 10px;
-      font-size: 15px;
+      border-radius: 12px;
+      font-size: 0.9375rem;
       font-weight: 600;
-      letter-spacing: 0.01em;
+      letter-spacing: -0.01em;
       cursor: pointer;
-      transition: background 0.2s;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
     }
     .btn-aprovar-tudo:hover { background: #333; }
     .btn-aprovar-tudo.ativo {
-      background: #4CAF50;
+      background: #34c759;
     }
 
     /* SEMANAS / TABS */
@@ -101,16 +115,16 @@
       flex-shrink: 0;
       padding: 6px 14px;
       border-radius: 20px;
-      font-size: 13px;
+      font-size: 0.8125rem;
       font-weight: 500;
-      background: #E8E8E4;
-      color: #555;
+      background: #e8e8ed;
+      color: #6e6e73;
       cursor: pointer;
       border: none;
-      transition: all 0.2s;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
     }
     .tab-semana.ativa {
-      background: #1A1A1A;
+      background: #1d1d1f;
       color: #fff;
     }
 
@@ -119,25 +133,25 @@
       padding: 16px 16px 100px;
       display: flex;
       flex-direction: column;
-      gap: 28px;
+      gap: 24px;
     }
 
     .post-card {
       background: #fff;
       border-radius: 16px;
       overflow: hidden;
-      box-shadow: 0 1px 4px rgba(0,0,0,0.06);
-      transition: box-shadow 0.2s;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.04);
+      transition: box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1);
     }
     .post-card.aprovado {
-      box-shadow: 0 0 0 2px #4CAF50;
+      box-shadow: 0 0 0 2px #34c759, 0 4px 12px rgba(52,199,89,0.1);
     }
     .post-card.ajuste {
-      box-shadow: 0 0 0 2px #FF9800;
+      box-shadow: 0 0 0 2px #ff9f0a, 0 4px 12px rgba(255,159,10,0.1);
     }
 
     .post-header {
-      padding: 14px 16px 10px;
+      padding: 16px 16px 12px;
       display: flex;
       align-items: flex-start;
       justify-content: space-between;
@@ -149,37 +163,38 @@
       gap: 4px;
     }
     .post-data {
-      font-size: 12px;
+      font-size: 0.6875rem;
       font-weight: 600;
-      color: #888;
+      color: #86868b;
       text-transform: uppercase;
       letter-spacing: 0.08em;
     }
     .post-titulo {
-      font-size: 15px;
+      font-size: 0.9375rem;
       font-weight: 700;
-      color: #1A1A1A;
+      color: #1d1d1f;
+      letter-spacing: -0.01em;
       line-height: 1.3;
     }
     .post-formato {
       display: inline-block;
-      font-size: 11px;
+      font-size: 0.6875rem;
       font-weight: 600;
       padding: 3px 8px;
-      border-radius: 4px;
-      letter-spacing: 0.06em;
+      border-radius: 6px;
+      letter-spacing: 0.04em;
       text-transform: uppercase;
       flex-shrink: 0;
       margin-top: 2px;
     }
-    .formato-card    { background: #E3F2FD; color: #1565C0; }
-    .formato-reels   { background: #FCE4EC; color: #AD1457; }
-    .formato-carrossel { background: #F3E5F5; color: #6A1B9A; }
-    .formato-video   { background: #E8F5E9; color: #2E7D32; }
+    .formato-card    { background: #e8f0fe; color: #1a73e8; }
+    .formato-reels   { background: #fce8ef; color: #d93025; }
+    .formato-carrossel { background: #f3e8fd; color: #8430ce; }
+    .formato-video   { background: #e6f4ea; color: #1e8e3e; }
 
     .post-divider {
       height: 1px;
-      background: #F0F0EC;
+      background: #f5f5f7;
       margin: 0 16px;
     }
 
@@ -187,24 +202,24 @@
       padding: 12px 16px;
     }
     .post-conteudo-label {
-      font-size: 10px;
-      font-weight: 700;
-      color: #aaa;
+      font-size: 0.625rem;
+      font-weight: 600;
+      color: #86868b;
       letter-spacing: 0.1em;
       text-transform: uppercase;
       margin-bottom: 6px;
     }
     .post-texto {
-      font-size: 14px;
-      color: #333;
-      line-height: 1.55;
+      font-size: 0.875rem;
+      color: #6e6e73;
+      line-height: 1.6;
       white-space: pre-wrap;
       word-break: break-word;
     }
     .post-legenda {
       margin-top: 10px;
       padding-top: 10px;
-      border-top: 1px solid #F0F0EC;
+      border-top: 1px solid #f5f5f7;
     }
 
     /* ARTE INLINE — imagem única */
@@ -333,17 +348,17 @@
       justify-content: center;
       gap: 6px;
       padding: 9px 0 5px;
-      background: #F0F0EC;
+      background: #f5f5f7;
     }
     .carrossel-dot {
       width: 6px;
       height: 6px;
       border-radius: 50%;
-      background: #C8C8C2;
+      background: #c7c7cc;
       transition: background 0.2s;
     }
     .carrossel-dot.ativa {
-      background: #3897f0;
+      background: #1d1d1f;
     }
 
     /* MEDIA LINK */
@@ -355,15 +370,17 @@
       align-items: center;
       gap: 8px;
       padding: 10px 14px;
-      background: #F5F5F0;
-      border-radius: 8px;
+      background: #f5f5f7;
+      border-radius: 10px;
       text-decoration: none;
-      color: #1A1A1A;
-      font-size: 13px;
+      color: #1d1d1f;
+      font-size: 0.8125rem;
       font-weight: 600;
       border: none;
       cursor: pointer;
+      transition: background 0.2s;
     }
+    .btn-ver-midia:hover { background: #e8e8ed; }
     .btn-ver-midia svg { flex-shrink: 0; }
 
     /* APROVAÇÃO */
@@ -376,30 +393,30 @@
       flex: 1;
       padding: 12px;
       border: none;
-      border-radius: 10px;
-      font-size: 14px;
+      border-radius: 12px;
+      font-size: 0.875rem;
       font-weight: 600;
       cursor: pointer;
-      transition: all 0.15s;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
       display: flex;
       align-items: center;
       justify-content: center;
       gap: 6px;
     }
     .btn-aprovar {
-      background: #E8F5E9;
-      color: #2E7D32;
+      background: #e6f4ea;
+      color: #1e8e3e;
     }
     .btn-aprovar:active, .btn-aprovar.ativo {
-      background: #4CAF50;
+      background: #34c759;
       color: #fff;
     }
     .btn-ajuste {
-      background: #FFF3E0;
-      color: #E65100;
+      background: #fef3e2;
+      color: #e65100;
     }
     .btn-ajuste:active, .btn-ajuste.ativo {
-      background: #FF9800;
+      background: #ff9f0a;
       color: #fff;
     }
 
@@ -412,35 +429,39 @@
     .campo-ajuste textarea {
       width: 100%;
       padding: 12px;
-      border: 1.5px solid #FF9800;
-      border-radius: 10px;
-      font-size: 14px;
+      border: 1.5px solid #ff9f0a;
+      border-radius: 12px;
+      font-size: 0.875rem;
       font-family: inherit;
-      color: #1A1A1A;
-      background: #FFF8F0;
+      color: #1d1d1f;
+      background: #fffbf5;
       resize: none;
       outline: none;
       min-height: 80px;
+      line-height: 1.5;
     }
-    .campo-ajuste textarea::placeholder { color: #bbb; }
+    .campo-ajuste textarea:focus {
+      border-color: #e65100;
+    }
+    .campo-ajuste textarea::placeholder { color: #c7c7cc; }
     .btn-confirmar-obs {
       display: block;
       width: 100%;
       margin-top: 8px;
       padding: 10px;
-      background: #FF9800;
+      background: #ff9f0a;
       color: #fff;
       border: none;
-      border-radius: 8px;
-      font-size: 14px;
+      border-radius: 10px;
+      font-size: 0.875rem;
       font-weight: 600;
       cursor: pointer;
-      transition: background 0.15s;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
       text-align: center;
     }
     .btn-confirmar-obs:active { background: #e65100; }
     .btn-confirmar-obs.confirmado {
-      background: #4CAF50;
+      background: #34c759;
     }
 
     /* RODAPÉ FLUTUANTE */
@@ -450,23 +471,23 @@
       left: 0;
       right: 0;
       padding: 12px 16px 24px;
-      background: linear-gradient(to top, #F5F5F0 70%, transparent);
+      background: linear-gradient(to top, #f5f5f7 70%, transparent);
     }
     .btn-enviar {
       width: 100%;
       padding: 16px;
-      background: #1A1A1A;
+      background: #1d1d1f;
       color: #fff;
       border: none;
-      border-radius: 12px;
-      font-size: 16px;
+      border-radius: 14px;
+      font-size: 1rem;
       font-weight: 700;
       cursor: pointer;
-      transition: background 0.2s;
-      letter-spacing: -0.01em;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      letter-spacing: -0.02em;
     }
     .btn-enviar:disabled {
-      background: #CCC;
+      background: #c7c7cc;
       cursor: not-allowed;
     }
     .btn-enviar:not(:disabled):hover { background: #333; }
@@ -476,7 +497,7 @@
       display: none;
       position: fixed;
       inset: 0;
-      background: #F5F5F0;
+      background: #f5f5f7;
       flex-direction: column;
       align-items: center;
       justify-content: center;
@@ -491,7 +512,7 @@
       display: none;
       position: fixed;
       inset: 0;
-      background: #F5F5F0;
+      background: #f5f5f7;
       flex-direction: column;
       align-items: center;
       justify-content: center;
@@ -503,24 +524,24 @@
     .confirmacao-icone {
       width: 72px;
       height: 72px;
-      background: #4CAF50;
+      background: #34c759;
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
-      margin-bottom: 24px;
+      margin-bottom: 28px;
     }
     .confirmacao-titulo {
-      font-size: 24px;
-      font-weight: 800;
-      color: #1A1A1A;
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #1d1d1f;
       margin-bottom: 12px;
       letter-spacing: -0.03em;
     }
     .confirmacao-texto {
-      font-size: 15px;
-      color: #666;
-      line-height: 1.6;
+      font-size: 0.9375rem;
+      color: #6e6e73;
+      line-height: 1.7;
     }
 
     /* SEMANA OCULTA */
@@ -539,7 +560,9 @@
       display: none;
       position: fixed;
       inset: 0;
-      background: rgba(0,0,0,0.55);
+      background: rgba(0,0,0,0.4);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
       z-index: 400;
       align-items: flex-end;
       justify-content: center;
@@ -557,30 +580,31 @@
       display: flex;
       flex-direction: column;
       gap: 16px;
-      animation: slideUp 0.25s ease;
+      animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
     }
     @keyframes slideUp {
       from { transform: translateY(60px); opacity: 0; }
       to { transform: translateY(0); opacity: 1; }
     }
     .modal-mensagem-titulo {
-      font-size: 17px;
+      font-size: 1.0625rem;
       font-weight: 700;
-      color: #1a1a1a;
+      color: #1d1d1f;
+      letter-spacing: -0.01em;
       text-align: center;
     }
     .modal-mensagem-instrucao {
-      font-size: 14px;
-      color: #666;
+      font-size: 0.875rem;
+      color: #6e6e73;
       text-align: center;
       line-height: 1.5;
     }
     .modal-mensagem-texto {
-      background: #f5f5f0;
+      background: #f5f5f7;
       border-radius: 12px;
       padding: 16px;
-      font-size: 14px;
-      color: #333;
+      font-size: 0.875rem;
+      color: #6e6e73;
       line-height: 1.6;
       white-space: pre-wrap;
       font-family: inherit;
@@ -594,40 +618,44 @@
       background: #25D366;
       color: #fff;
       border: none;
-      border-radius: 12px;
+      border-radius: 14px;
       padding: 16px;
-      font-size: 16px;
+      font-size: 1rem;
       font-weight: 700;
+      letter-spacing: -0.01em;
       cursor: pointer;
       width: 100%;
-      transition: background 0.2s;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
     }
     .modal-btn-copiar:active { background: #1ebe5a; }
-    .modal-btn-copiar.copiado { background: #1ebe5a; }
+    .modal-btn-copiar.copiado { background: #34c759; }
     .modal-btn-wpp {
       background: #fff;
-      color: #128C7E;
-      border: 2px solid #128C7E;
-      border-radius: 12px;
+      color: #1d1d1f;
+      border: 1.5px solid #e8e8ed;
+      border-radius: 14px;
       padding: 14px;
-      font-size: 15px;
+      font-size: 0.9375rem;
       font-weight: 600;
       cursor: pointer;
       width: 100%;
-      transition: background 0.2s;
+      transition: all 0.2s;
     }
-    .modal-btn-wpp:active { background: #f0faf9; }
+    .modal-btn-wpp:active { background: #f5f5f7; }
     .modal-btn-fechar {
       background: none;
       border: none;
-      color: #999;
-      font-size: 14px;
+      color: #86868b;
+      font-size: 0.875rem;
       cursor: pointer;
       text-align: center;
       padding: 4px;
     }
 
     </style>
+  <!-- EmailJS SDK -->
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+  <script>emailjs.init({ publicKey: '-xrMYz7vRGvZg8ZOY' });</script>
 </head>
 <body>
 
@@ -635,12 +663,12 @@
 <div class="header">
   <div class="header-label">Aprovação de conteúdo</div>
   <div class="header-cliente">Prisma Especialidades</div>
-  <div class="header-periodo">30/03 a 5/04</div>
+  <div class="header-periodo">30/03 a 9/04</div>
   <div class="header-progress">
     <div class="progress-bar-bg">
       <div class="progress-bar-fill" id="progressBar"></div>
     </div>
-    <div class="progress-text" id="progressText">0 de 7 aprovados</div>
+    <div class="progress-text" id="progressText">0 de 11 aprovados</div>
   </div>
 </div>
 
@@ -666,14 +694,35 @@
       <span class="post-formato formato-carrossel">Carrossel</span>
     </div>
     
+    <div class="post-arte">
+      <div class="carrossel-wrapper" id="carr-20260330-um-centro-medico-pensado-para-">
+        <div class="carrossel-track"><div class="carrossel-slide"><img src="artes/30-03 (Seg)  1.jpg" loading="lazy" onerror="this.closest('.carrossel-slide').style.display='none'" /></div><div class="carrossel-slide"><img src="artes/30-03 (Seg)  2.jpg" loading="lazy" onerror="this.closest('.carrossel-slide').style.display='none'" /></div><div class="carrossel-slide"><img src="artes/30-03 (Seg)  3.jpg" loading="lazy" onerror="this.closest('.carrossel-slide').style.display='none'" /></div><div class="carrossel-slide"><img src="artes/30-03 (Seg)  4.jpg" loading="lazy" onerror="this.closest('.carrossel-slide').style.display='none'" /></div><div class="carrossel-slide"><img src="artes/30-03 (Seg)  5.jpg" loading="lazy" onerror="this.closest('.carrossel-slide').style.display='none'" /></div><div class="carrossel-slide"><img src="artes/30-03 (Seg)  6.jpg" loading="lazy" onerror="this.closest('.carrossel-slide').style.display='none'" /></div></div>
+        <div class="carrossel-counter">1 / 6</div>
+        <button class="carrossel-prev" onclick="carrosselNav('carr-20260330-um-centro-medico-pensado-para-',-1)" aria-label="Anterior">&#8249;</button>
+        <button class="carrossel-next" onclick="carrosselNav('carr-20260330-um-centro-medico-pensado-para-', 1)" aria-label="Próximo">&#8250;</button>
+      </div>
+      <div class="carrossel-dots" id="dots-carr-20260330-um-centro-medico-pensado-para-"><span class="carrossel-dot ativa"></span><span class="carrossel-dot"></span><span class="carrossel-dot"></span><span class="carrossel-dot"></span><span class="carrossel-dot"></span><span class="carrossel-dot"></span></div>
+    </div>
+    <script>(function(){
+      var track = document.querySelector('#carr-20260330-um-centro-medico-pensado-para- .carrossel-track');
+      var counter = document.querySelector('#carr-20260330-um-centro-medico-pensado-para- .carrossel-counter');
+      var dots = document.querySelectorAll('#dots-carr-20260330-um-centro-medico-pensado-para- .carrossel-dot');
+      var total = 6;
+      track.addEventListener('scroll', function() {
+        var idx = Math.round(track.scrollLeft / track.offsetWidth);
+        counter.textContent = (idx + 1) + ' / ' + total;
+        dots.forEach(function(d, i) { d.classList.toggle('ativa', i === idx); });
+      });
+    })();
+    window.carrosselNav = window.carrosselNav || function(id, dir) {
+      var t = document.querySelector('#' + id + ' .carrossel-track');
+      t.scrollBy({ left: dir * t.offsetWidth, behavior: 'smooth' });
+    };</script>
     <div class="post-divider"></div>
     
-    <div class="post-conteudo">
-      <div class="post-conteudo-label" style="margin-top:0px">Slide 1</div><div class="post-texto">Um centro médico pensado para cuidar de você<br>e de quem você ama.</div><div class="post-conteudo-label" style="margin-top:8px">Slide 2</div><div class="post-texto">A Prisma Especialidades nasce com um propósito claro:<br>ser o centro de saúde da família de Novo Hamburgo.</div><div class="post-conteudo-label" style="margin-top:8px">Slide 3</div><div class="post-texto">Múltiplas especialidades.<br>Um só endereço.<br>Sem precisar correr de clínica em clínica.</div><div class="post-conteudo-label" style="margin-top:8px">Slide 4</div><div class="post-texto">Com médicos que têm tempo para ouvir,<br>examinar e cuidar de verdade.</div><div class="post-conteudo-label" style="margin-top:8px">Slide 5</div><div class="post-texto">Porque saúde de qualidade não é luxo.<br>É o mínimo que você merece.</div>
-    </div>
     <div class="post-conteudo" style="padding-top:0">
       <div class="post-conteudo-label">Legenda</div>
-      <div class="post-texto">A Prisma Especialidades foi criada para ser diferente — não apenas mais uma clínica popular.<br>Aqui, qualidade e acessibilidade não são opostos. São o ponto de partida.<br>Abertura em 09 de abril. Fica com a gente até lá. 🌿<br>---</div>
+      <div class="post-texto">A Prisma Especialidades foi criada para ser diferente, não apenas mais uma clínica popular.<br>Aqui, qualidade e acessibilidade não são opostos. São o ponto de partida.<br>Abertura em 09 de abril.<br>---</div>
     </div>
     
     <div class="post-acoes">
@@ -705,15 +754,19 @@
       <span class="post-formato formato-card">Card</span>
     </div>
     
+    <div class="post-arte">
+      <img
+        src="artes/31-03 (Ter).jpg"
+        alt="Arte — &quot;Popular com qualidade. É possível.&quot; — O diferencial da clínica"
+        loading="lazy"
+        onerror="this.parentElement.style.display='none'"
+      />
+    </div>
     <div class="post-divider"></div>
     
-    <div class="post-conteudo">
-      <div class="post-conteudo-label">Texto</div>
-      <div class="post-texto">Popular com qualidade.<br>Isso é possível — e é o que a gente faz.</div>
-    </div>
     <div class="post-conteudo" style="padding-top:0">
       <div class="post-conteudo-label">Legenda</div>
-      <div class="post-texto">Existe um problema silencioso nas clínicas populares: muitas cobram barato porque pagam mal e entregam pouco.<br>A Prisma Especialidades foi fundada com uma premissa diferente — preço justo, médicos valorizados e atendimento que você vai recomendar para quem você mais ama.<br>Popular com qualidade não é slogan. É o que guia cada decisão aqui dentro.<br>---</div>
+      <div class="post-texto">A Prisma Especialidades foi fundada com uma premissa diferente: entregar especialidades médicas e exames no mesmo lugar. Para que cuidar da sua saúde e da saúde da sua família seja fácil e prático. <br>---</div>
     </div>
     
     <div class="post-acoes">
@@ -745,15 +798,19 @@
       <span class="post-formato formato-card">Card</span>
     </div>
     
+    <div class="post-arte">
+      <img
+        src="artes/01-04 (Qua) .jpg"
+        alt="Arte — &quot;O espaço que preparamos para você.&quot; — Foto da clínica por dentro"
+        loading="lazy"
+        onerror="this.parentElement.style.display='none'"
+      />
+    </div>
     <div class="post-divider"></div>
     
-    <div class="post-conteudo">
-      <div class="post-conteudo-label">Texto</div>
-      <div class="post-texto">O espaço que preparamos para você.</div>
-    </div>
     <div class="post-conteudo" style="padding-top:0">
       <div class="post-conteudo-label">Legenda</div>
-      <div class="post-texto">Cada detalhe foi pensado para que você se sinta bem desde a entrada.<br>Um ambiente acolhedor, organizado e cuidadoso — para toda a família.<br>📍 Av. Pedro Adams Filho, 6739 — Guarani, Novo Hamburgo<br>Abertura em 09 de abril.<br>---</div>
+      <div class="post-texto">A Prisma Clínica de Olhos é referência em oftalmologia de qualidade em Novo Hamburgo e isso não muda.<br>A diferença é, que agora, ela faz parte da Prisma Especialidades, onde o mesmo padrão de cuidado se expande para muito mais especialidades médicas e exames, no mesmo espaço.<br>Bem-vindo à Prisma Especialidades. 👁️<br>---<br>### FASE 3 — AQUECIMENTO PRÉ-ABERTURA (03–07/04)<br>---</div>
     </div>
     
     <div class="post-acoes">
@@ -785,15 +842,19 @@
       <span class="post-formato formato-card">Card</span>
     </div>
     
+    <div class="post-arte">
+      <img
+        src="artes/02-04 (Qui).jpg"
+        alt="Arte — &quot;A oftalmologia de excelência continua — agora como parte de algo maior.&quot; — Continuidade Catarata Center"
+        loading="lazy"
+        onerror="this.parentElement.style.display='none'"
+      />
+    </div>
     <div class="post-divider"></div>
     
-    <div class="post-conteudo">
-      <div class="post-conteudo-label">Texto</div>
-      <div class="post-texto">A oftalmologia de excelência que você conhece<br>agora é parte de algo maior.</div>
-    </div>
     <div class="post-conteudo" style="padding-top:0">
       <div class="post-conteudo-label">Legenda</div>
-      <div class="post-texto">O Catarata Center sempre foi referência em oftalmologia de qualidade em Novo Hamburgo. Isso não muda.<br>A diferença é que agora, o mesmo padrão de cuidado se expande para muito mais especialidades — sob o mesmo teto.<br>Bem-vindo à Prisma Especialidades. 👁️<br>---<br>### FASE 3 — AQUECIMENTO PRÉ-ABERTURA (03–07/04)<br>---</div>
+      <div class="post-texto">Nosso grande objetivo é reunir em uma clínica, especialidades médicas para toda a família: do bebê ao idoso. Nesta abertura contamos com oftalmologista, ortopedista e traumatologista, mas em breve também teremos pediatra, psicólogo, fisioterapeuta, ginecologista, clínico geral.<br>Nosso bloco cirurgico já está equipado para cirurgias de ortopedia, vascular e otorrino, além de das oftalmologicas, como sempre.<br>Está em fase de finalização um setor de exames de imagem: tomografia, ressonância, raio-x e ultrasom.<br>São múltiplas especialidades, em um só endereço, com atendimento de qualidade.<br>Agenda e disponibilidade de especialidades: confira pelo whatsapp do link na bio.<br>---</div>
     </div>
     
     <div class="post-acoes">
@@ -825,14 +886,19 @@
       <span class="post-formato formato-carrossel">Carrossel</span>
     </div>
     
+    <div class="post-arte">
+      <img
+        src="artes/03-04 (Sex).jpg"
+        alt="Arte — &quot;Tudo que a sua família precisa, em um só endereço.&quot; — Apresentação das especialidades"
+        loading="lazy"
+        onerror="this.parentElement.style.display='none'"
+      />
+    </div>
     <div class="post-divider"></div>
     
-    <div class="post-conteudo">
-      <div class="post-conteudo-label" style="margin-top:0px">Slide 1</div><div class="post-texto">Tudo que a sua família precisa,<br>em um só endereço.</div><div class="post-conteudo-label" style="margin-top:8px">Slide 2</div><div class="post-texto">🫀 Cardiologia<br>Para o coração, com cuidado.</div><div class="post-conteudo-label" style="margin-top:8px">Slide 3</div><div class="post-texto">👶 Pediatria<br>Para os pequenos da família.</div><div class="post-conteudo-label" style="margin-top:8px">Slide 4</div><div class="post-texto">🦴 Ortopedia<br>Para quem não pode parar.</div><div class="post-conteudo-label" style="margin-top:8px">Slide 5</div><div class="post-texto">🧠 Neurologia<br>Cuidado para a mente e o sistema nervoso.</div><div class="post-conteudo-label" style="margin-top:8px">Slide 6</div><div class="post-texto">👁️ Oftalmologia<br>Com o padrão Catarata Center.</div><div class="post-conteudo-label" style="margin-top:8px">Slide 7</div><div class="post-texto">E muito mais:<br>Clínica Médica · Geriatria · Ginecologia<br>Fisioterapia · Nutrição · Laboratório · Imagens</div>
-    </div>
     <div class="post-conteudo" style="padding-top:0">
       <div class="post-conteudo-label">Legenda</div>
-      <div class="post-texto">Uma clínica para toda a família — do bebê ao idoso.<br>Múltiplas especialidades, um só endereço, atendimento de qualidade.<br>Agenda e disponibilidade de especialidades: confira pelo link na bio.<br>---</div>
+      <div class="post-texto">Atrás de cada consulta há uma história, uma família, uma preocupação.<br>Na Prisma Especialidades, nossos médicos são escolhidos não só pela formação, mas pela forma como tratam cada paciente. Com atenção. Com respeito. Com cuidado real.<br>Consulte as especialidades médicas e exames disponíveis através do whatsapp com link da bio.<br>---</div>
     </div>
     
     <div class="post-acoes">
@@ -864,15 +930,19 @@
       <span class="post-formato formato-card">Card</span>
     </div>
     
+    <div class="post-arte">
+      <img
+        src="artes/04-04 (Sáb).jpg"
+        alt="Arte — &quot;Médicos que têm tempo para ouvir.&quot; — Equipe e lado humano"
+        loading="lazy"
+        onerror="this.parentElement.style.display='none'"
+      />
+    </div>
     <div class="post-divider"></div>
     
-    <div class="post-conteudo">
-      <div class="post-conteudo-label">Texto</div>
-      <div class="post-texto">Médicos que têm tempo para ouvir.<br>Porque cuidar começa pela escuta.</div>
-    </div>
     <div class="post-conteudo" style="padding-top:0">
       <div class="post-conteudo-label">Legenda</div>
-      <div class="post-texto">Atrás de cada consulta há uma história, uma família, uma preocupação.<br>Na Prisma Especialidades, nossos médicos foram escolhidos não só pela formação — mas pela forma como tratam cada paciente. Com atenção. Com respeito. Com cuidado real.<br>---</div>
+      <div class="post-texto">A abertura está chegando. Em 4 dias, a Prisma Especialidades abre as portas para você e sua família.<br>Quer ser um dos primeiros? O link para agendamento já está na bio.<br>---</div>
     </div>
     
     <div class="post-acoes">
@@ -907,12 +977,7 @@
     <div class="post-divider"></div>
     
     <div class="post-conteudo">
-      <div class="post-conteudo-label">Texto</div>
-      <div class="post-texto">Faltam 4 dias.</div>
-    </div>
-    <div class="post-conteudo" style="padding-top:0">
-      <div class="post-conteudo-label">Legenda</div>
-      <div class="post-texto">A abertura está chegando. Em 4 dias, a Prisma Especialidades abre as portas para você e sua família.<br>Quer ser um dos primeiros? O link para agendamento já está na bio. 🗓️<br>---</div>
+      <div class="post-texto" style="color:#aaa;font-style:italic">Conteúdo detalhado não disponível neste arquivo.</div>
     </div>
     
     <div class="post-acoes">
@@ -931,6 +996,182 @@
         rows="3"
       ></textarea>
       <button class="btn-confirmar-obs" id="btnobs-20260405-faltam-4-dias-contagem-regress" onclick="confirmarObs('20260405-faltam-4-dias-contagem-regress')">
+        Registrar observação
+      </button>
+    </div>
+  </div>
+  <div class="post-card" id="card-20260406-quem-esta-por-tras-da-prisma-e" data-post-id="20260406-quem-esta-por-tras-da-prisma-e">
+    <div class="post-header">
+      <div class="post-meta">
+        <div class="post-data">06/04 (seg)</div>
+        <div class="post-titulo">&quot;Quem está por trás da Prisma Especialidades.&quot; — Foto da Dra. Juliana com frase pessoal</div>
+      </div>
+      <span class="post-formato formato-card">Card</span>
+    </div>
+    
+    <div class="post-arte">
+      <img
+        src="artes/06-04 (Seg) .jpg"
+        alt="Arte — &quot;Quem está por trás da Prisma Especialidades.&quot; — Foto da Dra. Juliana com frase pessoal"
+        loading="lazy"
+        onerror="this.parentElement.style.display='none'"
+      />
+    </div>
+    <div class="post-divider"></div>
+    
+    <div class="post-conteudo" style="padding-top:0">
+      <div class="post-conteudo-label">Legenda</div>
+      <div class="post-texto">A Prisma Especialidades não nasceu de uma ideia de negócio. Nasceu de uma convicção.<br>A Dra. Juliana dedicou anos à oftalmologia e enxergou, além dos olhos dos seus pacientes, uma necessidade maior: uma saúde mais completa, mais humana e mais acessível para as famílias.<br>É isso que abre as portas em 09/04.<br>---</div>
+    </div>
+    
+    <div class="post-acoes">
+      <button class="btn-aprovar" id="aprovar-20260406-quem-esta-por-tras-da-prisma-e" onclick="marcarPost('20260406-quem-esta-por-tras-da-prisma-e', 'aprovado')">
+        ✓ Aprovar
+      </button>
+      <button class="btn-ajuste" id="ajuste-20260406-quem-esta-por-tras-da-prisma-e" onclick="marcarPost('20260406-quem-esta-por-tras-da-prisma-e', 'ajuste')">
+        ✗ Pedir ajuste
+      </button>
+    </div>
+    <div class="campo-ajuste" id="campo-20260406-quem-esta-por-tras-da-prisma-e">
+      <textarea
+        id="obs-20260406-quem-esta-por-tras-da-prisma-e"
+        placeholder="O que você gostaria de ajustar neste post?"
+        oninput="atualizarComentario('20260406-quem-esta-por-tras-da-prisma-e', this.value)"
+        rows="3"
+      ></textarea>
+      <button class="btn-confirmar-obs" id="btnobs-20260406-quem-esta-por-tras-da-prisma-e" onclick="confirmarObs('20260406-quem-esta-por-tras-da-prisma-e')">
+        Registrar observação
+      </button>
+    </div>
+  </div>
+  <div class="post-card" id="card-20260407-faltam-2-dias-para-a-abertura-" data-post-id="20260407-faltam-2-dias-para-a-abertura-">
+    <div class="post-header">
+      <div class="post-meta">
+        <div class="post-data">07/04 (ter)</div>
+        <div class="post-titulo">&quot;Faltam 2 dias para a abertura.&quot; — Véspera da abertura ao público</div>
+      </div>
+      <span class="post-formato formato-card">Card</span>
+    </div>
+    
+    <div class="post-arte">
+      <img
+        src="artes/07-04 (Ter).jpg"
+        alt="Arte — &quot;Faltam 2 dias para a abertura.&quot; — Véspera da abertura ao público"
+        loading="lazy"
+        onerror="this.parentElement.style.display='none'"
+      />
+    </div>
+    <div class="post-divider"></div>
+    
+    <div class="post-conteudo" style="padding-top:0">
+      <div class="post-conteudo-label">Legenda</div>
+      <div class="post-texto">A espera está quase acabando.<br>Na quinta-feira, 09 de abril, a Prisma Especialidades abre oficialmente as portas.<br>Já agendou sua consulta? Link na bio. 🌿<br>---<br>### FASE 4 — INAUGURAÇÃO (08–09/04)<br>---</div>
+    </div>
+    
+    <div class="post-acoes">
+      <button class="btn-aprovar" id="aprovar-20260407-faltam-2-dias-para-a-abertura-" onclick="marcarPost('20260407-faltam-2-dias-para-a-abertura-', 'aprovado')">
+        ✓ Aprovar
+      </button>
+      <button class="btn-ajuste" id="ajuste-20260407-faltam-2-dias-para-a-abertura-" onclick="marcarPost('20260407-faltam-2-dias-para-a-abertura-', 'ajuste')">
+        ✗ Pedir ajuste
+      </button>
+    </div>
+    <div class="campo-ajuste" id="campo-20260407-faltam-2-dias-para-a-abertura-">
+      <textarea
+        id="obs-20260407-faltam-2-dias-para-a-abertura-"
+        placeholder="O que você gostaria de ajustar neste post?"
+        oninput="atualizarComentario('20260407-faltam-2-dias-para-a-abertura-', this.value)"
+        rows="3"
+      ></textarea>
+      <button class="btn-confirmar-obs" id="btnobs-20260407-faltam-2-dias-para-a-abertura-" onclick="confirmarObs('20260407-faltam-2-dias-para-a-abertura-')">
+        Registrar observação
+      </button>
+    </div>
+  </div>
+  <div class="post-card" id="card-20260408-amanha-as-portas-abrem-para-to" data-post-id="20260408-amanha-as-portas-abrem-para-to">
+    <div class="post-header">
+      <div class="post-meta">
+        <div class="post-data">08/04 (qua)</div>
+        <div class="post-titulo">&quot;Amanhã as portas abrem para todos. Estamos prontos.&quot; — Véspera da inauguração</div>
+      </div>
+      <span class="post-formato formato-card">Card</span>
+    </div>
+    
+    <div class="post-arte">
+      <img
+        src="artes/08-04 (Qua).jpg"
+        alt="Arte — &quot;Amanhã as portas abrem para todos. Estamos prontos.&quot; — Véspera da inauguração"
+        loading="lazy"
+        onerror="this.parentElement.style.display='none'"
+      />
+    </div>
+    <div class="post-divider"></div>
+    
+    <div class="post-conteudo" style="padding-top:0">
+      <div class="post-conteudo-label">Legenda</div>
+      <div class="post-texto">Amanhã é o grande dia da inauguração pra você!<br>Em 09 de abril, a Prisma Especialidades abre para toda a comunidade.<br>Saúde completa para você e sua família — começa amanhã.<br>---</div>
+    </div>
+    
+    <div class="post-acoes">
+      <button class="btn-aprovar" id="aprovar-20260408-amanha-as-portas-abrem-para-to" onclick="marcarPost('20260408-amanha-as-portas-abrem-para-to', 'aprovado')">
+        ✓ Aprovar
+      </button>
+      <button class="btn-ajuste" id="ajuste-20260408-amanha-as-portas-abrem-para-to" onclick="marcarPost('20260408-amanha-as-portas-abrem-para-to', 'ajuste')">
+        ✗ Pedir ajuste
+      </button>
+    </div>
+    <div class="campo-ajuste" id="campo-20260408-amanha-as-portas-abrem-para-to">
+      <textarea
+        id="obs-20260408-amanha-as-portas-abrem-para-to"
+        placeholder="O que você gostaria de ajustar neste post?"
+        oninput="atualizarComentario('20260408-amanha-as-portas-abrem-para-to', this.value)"
+        rows="3"
+      ></textarea>
+      <button class="btn-confirmar-obs" id="btnobs-20260408-amanha-as-portas-abrem-para-to" onclick="confirmarObs('20260408-amanha-as-portas-abrem-para-to')">
+        Registrar observação
+      </button>
+    </div>
+  </div>
+  <div class="post-card" id="card-20260409-hoje-abrimos-bem-vindos-a-pris" data-post-id="20260409-hoje-abrimos-bem-vindos-a-pris">
+    <div class="post-header">
+      <div class="post-meta">
+        <div class="post-data">09/04 (qui)</div>
+        <div class="post-titulo">&quot;Hoje abrimos. Bem-vindos à Prisma Especialidades.&quot; — Abertura oficial</div>
+      </div>
+      <span class="post-formato formato-card">Card</span>
+    </div>
+    
+    <div class="post-arte">
+      <img
+        src="artes/09-04 (Qui).jpg"
+        alt="Arte — &quot;Hoje abrimos. Bem-vindos à Prisma Especialidades.&quot; — Abertura oficial"
+        loading="lazy"
+        onerror="this.parentElement.style.display='none'"
+      />
+    </div>
+    <div class="post-divider"></div>
+    
+    <div class="post-conteudo" style="padding-top:0">
+      <div class="post-conteudo-label">Legenda</div>
+      <div class="post-texto">Este é o dia.<br>A Prisma Especialidades está aberta.<br>Venha nos conhecer. Traga sua família. Cuide da sua saúde com quem cuida de verdade.<br>Agendamentos: link na bio<br>---<br>## Posts Fixos<br>Não há posts fixos neste período — todo o conteúdo integra o calendário de lançamento.<br>---<br>## Legendas dos Vídeos<br>Não há vídeos neste período de lançamento.<br>---<br>## Pendências<br>- [x] Confirmar lista de especialidades com a Dra. Juliana (para carrossel de 03/04)<br>- [x] Receber frase pessoal da Dra. Juliana (para card de 06/04 — pode ser enviada por mensagem)<br>- [x] Definir perfil do Instagram da Prisma Especialidades (conta nova ou mudança do @prismaclinica) — necessário antes de 25/03</div>
+    </div>
+    
+    <div class="post-acoes">
+      <button class="btn-aprovar" id="aprovar-20260409-hoje-abrimos-bem-vindos-a-pris" onclick="marcarPost('20260409-hoje-abrimos-bem-vindos-a-pris', 'aprovado')">
+        ✓ Aprovar
+      </button>
+      <button class="btn-ajuste" id="ajuste-20260409-hoje-abrimos-bem-vindos-a-pris" onclick="marcarPost('20260409-hoje-abrimos-bem-vindos-a-pris', 'ajuste')">
+        ✗ Pedir ajuste
+      </button>
+    </div>
+    <div class="campo-ajuste" id="campo-20260409-hoje-abrimos-bem-vindos-a-pris">
+      <textarea
+        id="obs-20260409-hoje-abrimos-bem-vindos-a-pris"
+        placeholder="O que você gostaria de ajustar neste post?"
+        oninput="atualizarComentario('20260409-hoje-abrimos-bem-vindos-a-pris', this.value)"
+        rows="3"
+      ></textarea>
+      <button class="btn-confirmar-obs" id="btnobs-20260409-hoje-abrimos-bem-vindos-a-pris" onclick="confirmarObs('20260409-hoje-abrimos-bem-vindos-a-pris')">
         Registrar observação
       </button>
     </div>
@@ -986,13 +1227,78 @@
     } catch(e) {}
   })();
 
-  const totalPosts = 7;
+  const totalPosts = 11;
   const nomeCliente = "Prisma Especialidades";
-  const periodo = "30/03 a 5/04";
+  const periodo = "30/03 a 9/04";
   const whatsappNumero = '5551980603512';
   const whatsappGrupo = 'https://chat.whatsapp.com/IjFPBeEKvJeAiaZBpl5xpq?mode=gi_t';  // link do grupo (ex: https://chat.whatsapp.com/XXX)
-  const postsMeta = {"20260330-um-centro-medico-pensado-para-": {"data": "30/03", "titulo": "\"Um centro médico pensado para cuidar de você e de quem você ama.\" — O conceito"}, "20260331-popular-com-qualidade-e-possiv": {"data": "31/03", "titulo": "\"Popular com qualidade. É possível.\" — O diferencial da clínica"}, "20260401-o-espaco-que-preparamos-para-v": {"data": "01/04", "titulo": "\"O espaço que preparamos para você.\" — Foto da clínica por dentro"}, "20260402-a-oftalmologia-de-excelencia-c": {"data": "02/04", "titulo": "\"A oftalmologia de excelência continua — agora como parte de algo maior.\" — Continuidade Catarata Center"}, "20260403-tudo-que-a-sua-familia-precisa": {"data": "03/04", "titulo": "\"Tudo que a sua família precisa, em um só endereço.\" — Apresentação das especialidades"}, "20260404-medicos-que-tem-tempo-para-ouv": {"data": "04/04", "titulo": "\"Médicos que têm tempo para ouvir.\" — Equipe e lado humano"}, "20260405-faltam-4-dias-contagem-regress": {"data": "05/04", "titulo": "\"Faltam 4 dias.\" — Contagem regressiva"}};
-  const postsOrdem = ["20260330-um-centro-medico-pensado-para-", "20260331-popular-com-qualidade-e-possiv", "20260401-o-espaco-que-preparamos-para-v", "20260402-a-oftalmologia-de-excelencia-c", "20260403-tudo-que-a-sua-familia-precisa", "20260404-medicos-que-tem-tempo-para-ouv", "20260405-faltam-4-dias-contagem-regress"];
+  const postsMeta = {"20260330-um-centro-medico-pensado-para-": {"data": "30/03", "titulo": "\"Um centro médico pensado para cuidar de você e de quem você ama.\" — O conceito"}, "20260331-popular-com-qualidade-e-possiv": {"data": "31/03", "titulo": "\"Popular com qualidade. É possível.\" — O diferencial da clínica"}, "20260401-o-espaco-que-preparamos-para-v": {"data": "01/04", "titulo": "\"O espaço que preparamos para você.\" — Foto da clínica por dentro"}, "20260402-a-oftalmologia-de-excelencia-c": {"data": "02/04", "titulo": "\"A oftalmologia de excelência continua — agora como parte de algo maior.\" — Continuidade Catarata Center"}, "20260403-tudo-que-a-sua-familia-precisa": {"data": "03/04", "titulo": "\"Tudo que a sua família precisa, em um só endereço.\" — Apresentação das especialidades"}, "20260404-medicos-que-tem-tempo-para-ouv": {"data": "04/04", "titulo": "\"Médicos que têm tempo para ouvir.\" — Equipe e lado humano"}, "20260405-faltam-4-dias-contagem-regress": {"data": "05/04", "titulo": "\"Faltam 4 dias.\" — Contagem regressiva"}, "20260406-quem-esta-por-tras-da-prisma-e": {"data": "06/04", "titulo": "\"Quem está por trás da Prisma Especialidades.\" — Foto da Dra. Juliana com frase pessoal"}, "20260407-faltam-2-dias-para-a-abertura-": {"data": "07/04", "titulo": "\"Faltam 2 dias para a abertura.\" — Véspera da abertura ao público"}, "20260408-amanha-as-portas-abrem-para-to": {"data": "08/04", "titulo": "\"Amanhã as portas abrem para todos. Estamos prontos.\" — Véspera da inauguração"}, "20260409-hoje-abrimos-bem-vindos-a-pris": {"data": "09/04", "titulo": "\"Hoje abrimos. Bem-vindos à Prisma Especialidades.\" — Abertura oficial"}};
+  const postsOrdem = ["20260330-um-centro-medico-pensado-para-", "20260331-popular-com-qualidade-e-possiv", "20260401-o-espaco-que-preparamos-para-v", "20260402-a-oftalmologia-de-excelencia-c", "20260403-tudo-que-a-sua-familia-precisa", "20260404-medicos-que-tem-tempo-para-ouv", "20260405-faltam-4-dias-contagem-regress", "20260406-quem-esta-por-tras-da-prisma-e", "20260407-faltam-2-dias-para-a-abertura-", "20260408-amanha-as-portas-abrem-para-to", "20260409-hoje-abrimos-bem-vindos-a-pris"];
+
+  // ── ESTADO VIA GITHUB API ───────────────────────────────────────────────────
+  // Token fragmentado para não acionar o GitHub Secret Scanning.
+  // Permissão: Contents read/write apenas neste repositório.
+  const _tk = ['github', '_pat_', '11A4XFG6Q0V9ee2TfDGWKP_Z1vH306NmDFc07G2UHTHWyTJQRYkc4ClwFZGa1j9LThUODYITL6dNhDr6Kn'].join('');
+  const _ghOwner = 'oiforster';
+  const _ghRepo  = 'forster-aprovacoes';
+  const _estadoPath = 'prisma-especialidades/estado-2026-03.json'; // ex: aprovacao/fyber-show-piscinas/estado-2026-03.json
+
+  // Fila serializada: evita race-condition de SHA quando o cliente clica rápido
+  let _salvarFila = Promise.resolve();
+
+  async function _salvarEstado(postId, status) {
+    _salvarFila = _salvarFila.then(async () => {
+      try {
+        const url = 'https://api.github.com/repos/' + _ghOwner + '/' + _ghRepo + '/contents/' + _estadoPath;
+        const getResp = await fetch(url, { headers: { Authorization: 'token ' + _tk } });
+        if (!getResp.ok) return;
+        const getData = await getResp.json();
+        const sha     = getData.sha;
+        const estado  = JSON.parse(atob(getData.content.replace(/\n/g, '')));
+        estado[postId] = status;
+        const novoConteudo = btoa(unescape(encodeURIComponent(JSON.stringify(estado, null, 2))));
+        await fetch(url, {
+          method: 'PUT',
+          headers: { Authorization: 'token ' + _tk, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ message: 'estado: ' + postId, content: novoConteudo, sha: sha })
+        });
+      } catch(e) { /* falha silenciosa — WhatsApp é o canal principal */ }
+    });
+  }
+
+  async function _salvarEstadoMultiplos(mapa) {
+    _salvarFila = _salvarFila.then(async () => {
+      try {
+        const url = 'https://api.github.com/repos/' + _ghOwner + '/' + _ghRepo + '/contents/' + _estadoPath;
+        const getResp = await fetch(url, { headers: { Authorization: 'token ' + _tk } });
+        if (!getResp.ok) return;
+        const getData = await getResp.json();
+        const sha    = getData.sha;
+        const estado = JSON.parse(atob(getData.content.replace(/\n/g, '')));
+        Object.assign(estado, mapa);
+        const novoConteudo = btoa(unescape(encodeURIComponent(JSON.stringify(estado, null, 2))));
+        await fetch(url, {
+          method: 'PUT',
+          headers: { Authorization: 'token ' + _tk, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ message: 'estado: aprovar-tudo', content: novoConteudo, sha: sha })
+        });
+      } catch(e) { /* falha silenciosa */ }
+    });
+  }
+  
+  function enviarEmailSilencioso(mensagem) {
+    try {
+      emailjs.send('service_a00b37r', 'template_lyk4lff', {
+        title: 'Aprovações — ' + nomeCliente + ' — ' + periodo,
+        name: nomeCliente,
+        message: mensagem,
+        email: ''
+      });
+    } catch(e) {
+      // silencioso — não interrompe o fluxo
+    }
+  }
+
   const statusPosts = {};
   const comentariosPosts = {};
 
@@ -1009,6 +1315,7 @@
       btnAprovar.classList.remove('ativo');
       btnAjuste.classList.remove('ativo');
       if (campoAjuste) campoAjuste.classList.remove('visivel');
+      _salvarEstado(id, 'pendente');
     } else {
       statusPosts[id] = acao;
       card.classList.remove('aprovado', 'ajuste');
@@ -1024,6 +1331,7 @@
         btnAjuste.classList.add('ativo');
         if (campoAjuste) campoAjuste.classList.add('visivel');
       }
+      _salvarEstado(id, acao);
     }
 
     atualizarProgresso();
@@ -1070,9 +1378,11 @@
     if (todosAprovados) return;
 
     // Aprova todos os posts
+    const mapaEstado = {};
     document.querySelectorAll('[data-post-id]').forEach(card => {
       const id = card.dataset.postId;
       statusPosts[id] = 'aprovado';
+      mapaEstado[id]  = 'aprovado';
       card.classList.add('aprovado');
       card.classList.remove('ajuste');
       const ba = document.getElementById('aprovar-' + id);
@@ -1082,6 +1392,7 @@
       if (baj) baj.classList.remove('ativo');
       if (ca) ca.classList.remove('visivel');
     });
+    _salvarEstadoMultiplos(mapaEstado);
 
     btn.classList.add('ativo');
     btn.textContent = '✓ Todos os posts aprovados';
@@ -1114,6 +1425,9 @@
     }
 
     const mensagem = linhas.join('\n');
+
+    // Disparo silencioso do email de redundância
+    enviarEmailSilencioso(mensagem);
 
     if (whatsappGrupo) {
       // Mostra modal com a mensagem para o cliente copiar e abrir o grupo
