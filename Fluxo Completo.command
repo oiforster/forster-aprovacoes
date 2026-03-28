@@ -102,23 +102,30 @@ case "$CLIENTE_INPUT" in
   *) CLIENTE="$CLIENTE_INPUT" ;;
 esac
 
-# ── QUAL MÊS? ─────────────────────────────────────────
-echo "Qual mês? (deixe em branco para o mês atual)"
-read -p "  YYYY-MM (ex: 2026-04) ou Enter: " MES_INPUT
-echo ""
-
 # ── QUAL PERÍODO? ────────────────────────────────────
 echo "Qual período para aprovação?"
 echo ""
 echo "   1. Próxima semana (padrão)"
 echo "   2. Semana atual"
 echo "   3. Período personalizado"
+echo "   4. Mês completo"
 echo ""
-read -p "  Escolha (1/2/3) ou Enter para padrão: " PERIODO_OPCAO
+read -p "  Escolha (1/2/3/4) ou Enter para padrão: " PERIODO_OPCAO
 echo ""
 
 PERIODO_INICIO=""
 PERIODO_FIM=""
+
+# Função auxiliar para normalizar DD/MM/AAAA → YYYY-MM-DD
+normalizar_data() {
+  local d="$1"
+  if [[ "$d" == *"/"* ]]; then
+    local dia="${d%%/*}"; local resto="${d#*/}"; local mes="${resto%%/*}"; local ano="${resto#*/}"
+    printf '%s-%02d-%02d' "$ano" "$mes" "$dia"
+  else
+    echo "$d"
+  fi
+}
 
 case "$PERIODO_OPCAO" in
   2)
@@ -138,19 +145,27 @@ print(segunda.strftime('%Y-%m-%d'), domingo.strftime('%Y-%m-%d'))
   3)
     read -p "  Data de início (DD/MM/AAAA ou AAAA-MM-DD): " INI_INPUT
     read -p "  Data de fim    (DD/MM/AAAA ou AAAA-MM-DD): " FIM_INPUT
-    # Normaliza DD/MM/AAAA para YYYY-MM-DD
-    normalizar_data() {
-      local d="$1"
-      if [[ "$d" == *"/"* ]]; then
-        local dia="${d%%/*}"; local resto="${d#*/}"; local mes="${resto%%/*}"; local ano="${resto#*/}"
-        printf '%s-%02d-%02d' "$ano" "$mes" "$dia"
-      else
-        echo "$d"
-      fi
-    }
     PERIODO_INICIO=$(normalizar_data "$INI_INPUT")
     PERIODO_FIM=$(normalizar_data "$FIM_INPUT")
     echo "  📅 Período: $PERIODO_INICIO a $PERIODO_FIM"
+    echo ""
+    ;;
+  4)
+    # Mês completo
+    read -p "  Qual mês? (YYYY-MM, ex: 2026-04) ou Enter para o atual: " MES_COMPLETO_INPUT
+    if [ -z "$MES_COMPLETO_INPUT" ]; then
+      MES_COMPLETO_INPUT=$(date '+%Y-%m')
+    fi
+    ANO_MES="$MES_COMPLETO_INPUT"
+    PERIODO_INICIO="${ANO_MES}-01"
+    # Último dia do mês
+    PERIODO_FIM=$(python3 -c "
+import calendar
+ano, mes = '${ANO_MES}'.split('-')
+ultimo = calendar.monthrange(int(ano), int(mes))[1]
+print(f'{ano}-{mes}-{ultimo:02d}')
+")
+    echo "  📅 Mês completo: $PERIODO_INICIO a $PERIODO_FIM"
     echo ""
     ;;
   *)
@@ -158,6 +173,20 @@ print(segunda.strftime('%Y-%m-%d'), domingo.strftime('%Y-%m-%d'))
     echo ""
     ;;
 esac
+
+# ── QUAL MÊS? (inferido automaticamente se não informado) ──
+# Se o período define datas explícitas, infere o mês da data de início
+MES_INPUT=""
+if [ -n "$PERIODO_INICIO" ]; then
+  MES_INPUT=$(echo "$PERIODO_INICIO" | cut -d'-' -f1-2)
+fi
+
+# Se não tem período definido (opção 1 — próxima semana), pergunta o mês
+if [ -z "$MES_INPUT" ]; then
+  echo "Qual mês? (deixe em branco para o mês atual)"
+  read -p "  YYYY-MM (ex: 2026-04) ou Enter: " MES_INPUT
+  echo ""
+fi
 
 # Monta array de argumentos (trata espaços corretamente)
 ARGS=()
