@@ -6,7 +6,7 @@
   <title>Aprovação — Catarata Center</title>
   <meta property="og:title"       content="Aprovação — Catarata Center — 1 a 30 de abril" />
   <meta property="og:description" content="Acesse para aprovar ou pedir ajuste nos vídeos de 1 a 30 de abril." />
-  <meta property="og:image"       content="" />
+  <meta property="og:image"       content="https://img.youtube.com/vi/tsb7chgGsog/maxresdefault.jpg" />
   <meta property="og:type"        content="website" />
   <!-- Inter Font -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -738,6 +738,56 @@
       <span class="post-formato formato-reels">Reels</span>
     </div>
     
+    <div class="post-arte">
+      <div class="youtube-facade" id="ytf-20260403-paquimetria" onclick="abrirReel('tsb7chgGsog','ytf-20260403-paquimetria')">
+        <img
+          src="https://img.youtube.com/vi/tsb7chgGsog/maxresdefault.jpg"
+          onerror="this.src='https://img.youtube.com/vi/tsb7chgGsog/hqdefault.jpg'"
+          alt="Reel — Paquimetria"
+        />
+        <div class="yt-play-btn">
+          <svg viewBox="0 0 68 48" width="68" height="48">
+            <path d="M66.5 7.7a8.5 8.5 0 0 0-6-6C56 0 34 0 34 0S12 0 7.5 1.7a8.5 8.5 0 0 0-6 6C0 14.3 0 24 0 24s0 9.7 1.5 16.3a8.5 8.5 0 0 0 6 6C12 48 34 48 34 48s22 0 26.5-1.7a8.5 8.5 0 0 0 6-6C68 33.7 68 24 68 24s0-9.7-1.5-16.3z" fill="rgba(0,0,0,0.7)"/>
+            <path d="M45 24 27 14v20z" fill="white"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+    <script>(function(){
+      window.abrirReel = window.abrirReel || function(ytId, facadeId) {
+        // Overlay fullscreen dentro do site (mobile e desktop)
+        var overlay = document.getElementById('yt-overlay');
+        if (!overlay) {
+          overlay = document.createElement('div');
+          overlay.id = 'yt-overlay';
+          overlay.style.cssText = 'position:fixed;inset:0;background:#000;z-index:500;display:none;flex-direction:column;align-items:center;justify-content:center;';
+
+          var closeBtn = document.createElement('button');
+          closeBtn.innerHTML = '&#10005;';
+          closeBtn.style.cssText = 'position:absolute;top:16px;right:16px;z-index:10;background:rgba(255,255,255,0.15);color:#fff;border:none;border-radius:50%;width:44px;height:44px;font-size:20px;cursor:pointer;line-height:1;';
+          closeBtn.setAttribute('aria-label', 'Fechar vídeo');
+          closeBtn.onclick = function() {
+            overlay.style.display = 'none';
+            var ifr = document.getElementById('yt-iframe');
+            if (ifr) ifr.src = '';
+          };
+
+          var ifr = document.createElement('iframe');
+          ifr.id = 'yt-iframe';
+          ifr.style.cssText = 'width:100%;height:100%;border:none;';
+          ifr.setAttribute('allow','accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen');
+          ifr.setAttribute('allowfullscreen','');
+
+          overlay.appendChild(closeBtn);
+          overlay.appendChild(ifr);
+          document.body.appendChild(overlay);
+        }
+
+        var ifr = document.getElementById('yt-iframe');
+        ifr.src = 'https://www.youtube.com/embed/' + ytId + '?autoplay=1&rel=0&modestbranding=1&playsinline=1';
+        overlay.style.display = 'flex';
+      };
+    })();</script>
     <div class="post-divider"></div>
     
     <div class="post-conteudo" style="padding-top:0">
@@ -1186,7 +1236,7 @@
     
     <div class="post-conteudo" style="padding-top:0">
       <div class="post-conteudo-label">Legenda</div>
-      <div class="post-texto">Na cirurgia de catarata, a lente natural do olho é substituída por uma lente intraocular. E não existe só um tipo, existem várias, com características diferentes para necessidades diferentes.<br>Lente monofocal: corrige visão para longe ou para perto. Lente multifocal: permite enxergar bem em múltiplas distâncias. Lente tórica: indicada para quem tem astigmatismo.<br>A escolha depende do seu estilo de vida, da sua profissão, dos seus hábitos. E dos dados que os exames revelam sobre o seu olho.<br>Não é uma decisão que o médico toma sozinho. É uma conversa!<br>👁 Ver bem é importante. Se sentir seguro também.<br>#lenteintraocular #cirurgiadecatarata #cataratacenter #oftalmologia #novohamburgors<br>---<br>&lt;!-- ═══════════════════════════════════════════════════════════<br>     NOTAS PARA O SCRIPT DE APROVAÇÃO<br>     ════════════════════════════════════════════════════════════<br>  REGRAS CRÍTICAS para o script funcionar corretamente:<br>  1. TABELA DO CALENDÁRIO<br>     - Obrigatória. O script usa ela para saber quais posts existem.<br>     - Data na primeira coluna: &quot;DD/MM Dia&quot; — ex: &quot;07/04 Ter&quot;<br>     - Formato na segunda coluna: Card, Carrossel, Reels ou Vídeo<br>     - Pode ter múltiplas tabelas (uma por fase)<br>  2. CABEÇALHO DE SEÇÃO<br>     - Padrão: #### DD/MM (Dia) — Formato — Título<br>     - O script usa só a data (DD/MM) para linkar à tabela<br>     - O restante do cabeçalho é livre<br>     - Aceita ## ### ou ####<br>  3. CAMPOS DE CONTEÚDO (nomes exatos, com os asteriscos)<br>     - Texto do card: → texto da arte<br>     - Legenda:       → legenda do Instagram<br>     - Slide N (...): → slides do carrossel (N = número)<br>     - Vídeo:         → nome do Reel (sem extensão)<br>  4. NOME DO REEL (campo Vídeo:)<br>     - Deve bater exatamente com o nome do arquivo .mov<br>     - Padrão: REEL NN – Nome do Vídeo<br>     - O Samuel usa esse mesmo nome ao nomear o arquivo no Final Cut<br>     - Exemplo: REEL 01 – Abertura Clínica<br>  5. ARTES (Posts_Fixos/)<br>     - Card:      DD-MM.jpg  →  07-04.jpg<br>     - Carrossel: DD-MM_1.jpg, DD-MM_2.jpg, ...  →  09-04_1.jpg<br>     - Os arquivos precisam estar na pasta Posts_Fixos/ da Entrega<br>     - A pasta Posts_Fixos/ precisa estar compartilhada no Drive<br>  6. SEPARADOR ENTRE POSTS<br>     - Usar --- (três traços) entre cada seção de post<br>═══════════════════════════════════════════════════════════ --&gt;</div>
+      <div class="post-texto">Na cirurgia de catarata, a lente natural do olho é substituída por uma lente intraocular. E não existe só um tipo, existem várias, com características diferentes para necessidades diferentes.<br>Lente monofocal: corrige visão para longe ou para perto. Lente multifocal: permite enxergar bem em múltiplas distâncias. Lente tórica: indicada para quem tem astigmatismo.<br>A escolha depende do seu estilo de vida, da sua profissão, dos seus hábitos. E dos dados que os exames revelam sobre o seu olho.<br>Não é uma decisão que o médico toma sozinho. É uma conversa!<br>👁 Ver bem é importante. Se sentir seguro também.<br>#lenteintraocular #cirurgiadecatarata #cataratacenter #oftalmologia #novohamburgors<br>---</div>
     </div>
     
     <div class="post-acoes">

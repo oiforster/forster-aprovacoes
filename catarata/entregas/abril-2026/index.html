@@ -133,6 +133,29 @@
 
 <div class="content">
   
+<div class="post-card" data-post-id="202604-reel-04-paquimetria">
+  
+  <div class="post-header">
+    <div class="post-meta">
+      <div class="post-data"></div>
+      <div class="post-titulo">REEL 04 - Paquimetria</div>
+    </div>
+    <span class="post-formato formato-reels">VÍDEO</span>
+  </div>
+  <div class="post-divider"></div>
+  <div class="post-arte"><img class="capa-estatica" src="https://lh3.googleusercontent.com/d/1tsqGyiUiiusUba6VgmLX3jX8QunaKF-W" alt="REEL 04 - Paquimetria"/></div>
+  <div class="post-acoes">
+    
+  <a class="btn-download" href="https://drive.google.com/uc?export=download&id=1aCCHpTb-M69jmNxEHrluu1iiqOafB2hw" style="display:none">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+    Salvar vídeo original
+  </a>
+  <div class="badge-pendente">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+    Aguardando aprovação
+  </div>
+  </div>
+</div>
   
 </div>
 
@@ -223,7 +246,7 @@
   
   // Carrega estado de aprovação do GitHub e libera downloads dos itens aprovados
   (function() {
-    var estadoUrl = 'https://raw.githubusercontent.com/oiforster/forster-aprovacoes/main/aprovacao/catarata-center/estado-2026-04.json';
+    var estadoUrl = 'https://raw.githubusercontent.com/oiforster/forster-aprovacoes/main/catarata/estado-2026-04.json';
     fetch(estadoUrl + '?_=' + Date.now())
       .then(function(r) { return r.ok ? r.json() : {}; })
       .catch(function() { return {}; })
