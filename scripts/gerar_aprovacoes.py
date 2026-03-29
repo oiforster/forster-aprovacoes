@@ -954,18 +954,27 @@ def gerar_html_post(post):
         <div class="post-data">{post['data_display']}</div>
         <div class="post-titulo">{escape_html(post['titulo'])}</div>
       </div>
-      <span class="post-formato {fmt_class}">{post['formato']}</span>
+      <div class="post-header-right">
+        <span class="post-formato {fmt_class}">{post['formato']}</span>
+        <span class="post-status-badge"></span>
+      </div>
     </div>
     {html_arte}
     <div class="post-divider"></div>
     {html_conteudo}
     {html_media}
+    <div class="obs-salva" id="obs-salva-{post_id}">
+      <div class="obs-salva-inner">
+        <div class="obs-salva-label">Observação do cliente</div>
+        <div class="obs-salva-texto"></div>
+      </div>
+    </div>
     <div class="post-acoes">
       <button class="btn-aprovar" id="aprovar-{post_id}" onclick="marcarPost('{post_id}', 'aprovado')">
-        ✓ Aprovar
+        Aprovar
       </button>
       <button class="btn-ajuste" id="ajuste-{post_id}" onclick="marcarPost('{post_id}', 'ajuste')">
-        ✗ Pedir ajuste
+        Pedir ajuste
       </button>
     </div>
     <div class="campo-ajuste" id="campo-{post_id}">
@@ -1043,6 +1052,9 @@ def gerar_pagina_aprovacao(cliente, posts, periodo_label, semana_inicio, form_id
     html = html.replace('{{PERIODO_JSON}}', json.dumps(periodo_label, ensure_ascii=False))
     html = html.replace('{{POSTS_META_JSON}}', json.dumps(posts_meta_dict, ensure_ascii=False))
     html = html.replace('{{POSTS_ORDEM_JSON}}', json.dumps(posts_ordem_list, ensure_ascii=False))
+
+    # Frames placeholder (preenchido pelo gerador se houver frames)
+    html = html.replace('{{FRAMES_HTML}}', '')
 
     # GitHub API — estado de aprovação
     slug_c = slug_cliente(cliente)
@@ -1172,6 +1184,133 @@ def gerar_para_cliente_reels(cliente, ano_mes, agencia_path, base_url, output_di
     url = f"{base_url}/{slug_c}/{ano_mes}.html"
     return caminho_saida, url
 
+# ─── ÍNDICE DE MESES ────────────────────────────────────────────────────────
+
+def gerar_indice_meses(cliente, pasta_cliente, base_url):
+    """Gera index.html na raiz do cliente com listagem de todos os meses."""
+    slug_c = slug_cliente(cliente)
+
+    # Encontra todos os estado-YYYY-MM.json
+    meses_info = []
+    for f in sorted(pasta_cliente.iterdir()):
+        if f.name.startswith('estado-') and f.name.endswith('.json'):
+            ano_mes = f.name.replace('estado-', '').replace('.json', '')
+            try:
+                with open(f, 'r', encoding='utf-8') as fj:
+                    estado = json.load(fj)
+            except Exception:
+                continue
+
+            total = len(estado)
+            respondidos = 0
+            aprovados = 0
+            for val in estado.values():
+                if isinstance(val, str):
+                    s = val
+                elif isinstance(val, dict):
+                    s = val.get('status', 'pendente')
+                else:
+                    s = 'pendente'
+                if s != 'pendente':
+                    respondidos += 1
+                if s == 'aprovado':
+                    aprovados += 1
+
+            try:
+                ano, mes = map(int, ano_mes.split('-'))
+                label = f"{MESES_PT[mes].capitalize()} de {ano}"
+            except Exception:
+                label = ano_mes
+
+            completo = respondidos == total and total > 0
+            meses_info.append({
+                'ano_mes': ano_mes,
+                'label': label,
+                'total': total,
+                'respondidos': respondidos,
+                'aprovados': aprovados,
+                'completo': completo,
+            })
+
+    # Ordena do mais recente para o mais antigo
+    meses_info.sort(key=lambda m: m['ano_mes'], reverse=True)
+
+    # Gera HTML do índice
+    template_index = Path(__file__).parent.parent / 'template_index.html'
+    if template_index.exists():
+        with open(template_index, 'r', encoding='utf-8') as f:
+            html = f.read()
+    else:
+        html = _gerar_indice_html_inline(cliente, meses_info, slug_c)
+
+    if template_index.exists():
+        cards_html = ''
+        for m in meses_info:
+            pct = int(m['respondidos'] / m['total'] * 100) if m['total'] > 0 else 0
+            check = ' ✓' if m['completo'] else ''
+            status_text = f"{m['respondidos']}/{m['total']}{check}"
+            cards_html += f'''
+    <a class="mes-card" href="{m['ano_mes']}/">
+      <div class="mes-card-header">
+        <div class="mes-card-titulo">{m['label']}</div>
+        <div class="mes-card-status{' completo' if m['completo'] else ''}">{status_text}</div>
+      </div>
+      <div class="mes-card-progress-bg">
+        <div class="mes-card-progress-fill" style="width:{pct}%"></div>
+      </div>
+    </a>'''
+
+        html = html.replace('{{NOME_CLIENTE}}', cliente)
+        html = html.replace('{{MESES_HTML}}', cards_html)
+
+    index_path = pasta_cliente / 'index.html'
+    with open(index_path, 'w', encoding='utf-8') as f:
+        f.write(html)
+    print(f"  📋 Índice de meses atualizado: {index_path}")
+
+
+def _gerar_indice_html_inline(cliente, meses_info, slug_c):
+    """Fallback: gera HTML do índice sem template externo."""
+    cards = ''
+    for m in meses_info:
+        pct = int(m['respondidos'] / m['total'] * 100) if m['total'] > 0 else 0
+        check = ' ✓' if m['completo'] else ''
+        status_text = f"{m['respondidos']}/{m['total']}{check}"
+        cards += f'''
+    <a class="mes-card" href="{m['ano_mes']}/" style="display:block;text-decoration:none;background:#fff;border-radius:16px;padding:20px;margin-bottom:12px;box-shadow:0 1px 3px rgba(0,0,0,0.03),0 4px 16px rgba(0,0,0,0.04);">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+        <div style="font-size:1.0625rem;font-weight:600;color:#1d1d1f;">{m['label']}</div>
+        <div style="font-size:0.8125rem;font-weight:600;color:{'#34c759' if m['completo'] else '#86868b'};">{status_text}</div>
+      </div>
+      <div style="height:3px;background:#e8e8ed;border-radius:2px;overflow:hidden;">
+        <div style="height:100%;background:#34c759;width:{pct}%;border-radius:2px;"></div>
+      </div>
+    </a>'''
+
+    return f'''<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Aprovações — {cliente}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * {{ box-sizing: border-box; margin: 0; padding: 0; }}
+    body {{ font-family: 'Inter', sans-serif; background: #FAFAF8; color: #1d1d1f; min-height: 100vh; -webkit-font-smoothing: antialiased; }}
+  </style>
+</head>
+<body>
+  <div style="max-width:440px;margin:0 auto;padding:40px 16px;">
+    <div style="font-size:0.6875rem;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:#86868b;margin-bottom:8px;">Aprovação de conteúdo</div>
+    <div style="font-family:'Playfair Display',Georgia,serif;font-size:1.625rem;font-weight:600;color:#1d1d1f;margin-bottom:32px;">{cliente}</div>
+    {cards}
+  </div>
+</body>
+</html>'''
+
+
 # ─── FUNÇÃO PRINCIPAL ────────────────────────────────────────────────────────
 
 def gerar_para_cliente(cliente, datas_semana, agencia_path, base_url, output_dir, modo_mes=False):
@@ -1239,7 +1378,7 @@ def gerar_para_cliente(cliente, datas_semana, agencia_path, base_url, output_dir
     # Determinar ano-mês predominante dos posts
     ano_mes_posts = min(todos_posts, key=lambda p: p['data'])['data'].strftime('%Y-%m')
 
-    # Inicializar / atualizar estado-YYYY-MM.json (só adiciona novas entradas, não reseta existentes)
+    # Inicializar / atualizar estado-YYYY-MM.json (novo formato: objeto com status + obs)
     pasta_cliente = pasta_saida_cliente
     pasta_cliente.mkdir(parents=True, exist_ok=True)
     estado_filename = f'estado-{ano_mes_posts}.json'
@@ -1253,7 +1392,10 @@ def gerar_para_cliente(cliente, datas_semana, agencia_path, base_url, output_dir
             pass
     for p in todos_posts:
         if p['id'] not in estado_existente:
-            estado_existente[p['id']] = 'pendente'
+            estado_existente[p['id']] = {'status': 'pendente'}
+        elif isinstance(estado_existente[p['id']], str):
+            # Migra formato antigo (string) para novo (objeto)
+            estado_existente[p['id']] = {'status': estado_existente[p['id']]}
     with open(estado_path, 'w', encoding='utf-8') as _f:
         json.dump(estado_existente, _f, ensure_ascii=False, indent=2)
 
@@ -1263,18 +1405,18 @@ def gerar_para_cliente(cliente, datas_semana, agencia_path, base_url, output_dir
         estado_filename=estado_filename,
     )
 
-    nome_arquivo = f"{semana_str}.html"
-    caminho_saida = pasta_cliente / nome_arquivo
+    # Nova estrutura: YYYY-MM/index.html (URL limpa)
+    pasta_mes = pasta_cliente / ano_mes_posts
+    pasta_mes.mkdir(parents=True, exist_ok=True)
+    caminho_saida = pasta_mes / 'index.html'
 
     with open(caminho_saida, 'w', encoding='utf-8') as f:
         f.write(html)
 
-    # Gerar também index.html na pasta do cliente (sempre a última semana)
-    index_path = pasta_cliente / 'index.html'
-    with open(index_path, 'w', encoding='utf-8') as f:
-        f.write(html)
+    # Gerar índice de meses na raiz do cliente
+    gerar_indice_meses(cliente, pasta_cliente, base_url)
 
-    url = f"{base_url}/{slug_c}/{nome_arquivo}"
+    url = f"{base_url}/{slug_c}/{ano_mes_posts}"
     url_index = f"{base_url}/{slug_c}/"
 
     mensagem = gerar_mensagem_whatsapp(cliente, periodo_label, url_index)

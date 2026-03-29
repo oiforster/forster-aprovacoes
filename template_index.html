@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Aprovações — Óticas Casa Marco</title>
+  <title>Aprovações — {{NOME_CLIENTE}}</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -92,17 +92,8 @@
 <body>
   <div class="container">
     <div class="page-label">Aprovação de conteúdo</div>
-    <div class="page-title">Óticas Casa Marco</div>
-    
-    <a class="mes-card" href="2026-04/">
-      <div class="mes-card-header">
-        <div class="mes-card-titulo">Abril de 2026</div>
-        <div class="mes-card-status completo">15/15 ✓</div>
-      </div>
-      <div class="mes-card-progress-bg">
-        <div class="mes-card-progress-fill" style="width:100%"></div>
-      </div>
-    </a>
+    <div class="page-title">{{NOME_CLIENTE}}</div>
+    {{MESES_HTML}}
     <div class="footer-text">Forster Filmes</div>
   </div>
 </body>

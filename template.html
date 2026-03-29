@@ -8,16 +8,16 @@
   <meta property="og:description" content="{{OG_DESCRIPTION}}" />
   <meta property="og:image"       content="{{OG_IMAGE}}" />
   <meta property="og:type"        content="website" />
-  <!-- Inter Font -->
+  <!-- Inter + Playfair Display -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background: #f5f5f7;
+      background: #FAFAF8;
       color: #1d1d1f;
       min-height: 100vh;
       -webkit-font-smoothing: antialiased;
@@ -26,26 +26,28 @@
 
     /* HEADER */
     .header {
-      background: #1d1d1f;
-      color: #fff;
-      padding: 24px 20px 18px;
+      background: #fff;
+      padding: 32px 20px 24px;
       position: sticky;
       top: 0;
       z-index: 100;
+      border-bottom: 1px solid rgba(0,0,0,0.06);
     }
     .header-label {
       font-size: 0.6875rem;
       font-weight: 600;
-      letter-spacing: 0.1em;
+      letter-spacing: 0.12em;
       text-transform: uppercase;
       color: #86868b;
-      margin-bottom: 6px;
+      margin-bottom: 8px;
     }
     .header-cliente {
-      font-size: 1.375rem;
-      font-weight: 700;
-      letter-spacing: -0.03em;
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 1.625rem;
+      font-weight: 600;
+      letter-spacing: -0.02em;
       line-height: 1.15;
+      color: #1d1d1f;
     }
     .header-periodo {
       font-size: 0.8125rem;
@@ -54,7 +56,7 @@
       margin-top: 4px;
     }
     .header-progress {
-      margin-top: 14px;
+      margin-top: 16px;
       display: flex;
       align-items: center;
       gap: 10px;
@@ -62,7 +64,7 @@
     .progress-bar-bg {
       flex: 1;
       height: 3px;
-      background: #333;
+      background: #e8e8ed;
       border-radius: 2px;
       overflow: hidden;
     }
@@ -71,7 +73,7 @@
       background: #34c759;
       border-radius: 2px;
       width: 0%;
-      transition: width 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      transition: width 0.6s cubic-bezier(0.16, 1, 0.3, 1);
     }
     .progress-text {
       font-size: 0.6875rem;
@@ -102,52 +104,73 @@
       background: #34c759;
     }
 
-    /* SEMANAS / TABS */
-    .semanas-nav {
-      padding: 8px 16px;
+    /* SEPARADORES DE SEÇÃO */
+    .secao-separador {
+      padding: 20px 16px 8px;
       display: flex;
-      gap: 8px;
-      overflow-x: auto;
-      scrollbar-width: none;
+      align-items: center;
+      gap: 12px;
     }
-    .semanas-nav::-webkit-scrollbar { display: none; }
-    .tab-semana {
-      flex-shrink: 0;
-      padding: 6px 14px;
-      border-radius: 20px;
-      font-size: 0.8125rem;
+    .secao-separador h2 {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 1.0625rem;
       font-weight: 500;
-      background: #e8e8ed;
-      color: #6e6e73;
-      cursor: pointer;
-      border: none;
-      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      color: #1d1d1f;
+      white-space: nowrap;
     }
-    .tab-semana.ativa {
-      background: #1d1d1f;
-      color: #fff;
+    .secao-separador.respondidos h2 {
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: #86868b;
+    }
+    .secao-linha {
+      flex: 1;
+      height: 1px;
+      background: #e8e8ed;
     }
 
     /* POSTS */
     .posts-container {
-      padding: 16px 16px 100px;
+      padding: 8px 16px 120px;
       display: flex;
       flex-direction: column;
-      gap: 24px;
+      gap: 20px;
     }
 
     .post-card {
       background: #fff;
       border-radius: 16px;
       overflow: hidden;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.04);
-      transition: box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.03), 0 4px 16px rgba(0,0,0,0.04);
+      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      border-left: 4px solid transparent;
     }
     .post-card.aprovado {
-      box-shadow: 0 0 0 2px #34c759, 0 4px 12px rgba(52,199,89,0.1);
+      border-left-color: #34c759;
+      opacity: 0.8;
     }
     .post-card.ajuste {
-      box-shadow: 0 0 0 2px #ff9f0a, 0 4px 12px rgba(255,159,10,0.1);
+      border-left-color: #ff9f0a;
+    }
+
+    /* Badge de status */
+    .post-status-badge {
+      display: none;
+      font-size: 0.6875rem;
+      font-weight: 600;
+      padding: 3px 10px;
+      border-radius: 20px;
+      letter-spacing: 0.02em;
+    }
+    .post-card.aprovado .post-status-badge {
+      display: inline-block;
+      background: #e6f4ea;
+      color: #1e8e3e;
+    }
+    .post-card.ajuste .post-status-badge {
+      display: inline-block;
+      background: #fef3e2;
+      color: #e65100;
     }
 
     .post-header {
@@ -161,6 +184,7 @@
       display: flex;
       flex-direction: column;
       gap: 4px;
+      flex: 1;
     }
     .post-data {
       font-size: 0.6875rem;
@@ -176,6 +200,13 @@
       letter-spacing: -0.01em;
       line-height: 1.3;
     }
+    .post-header-right {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 6px;
+      flex-shrink: 0;
+    }
     .post-formato {
       display: inline-block;
       font-size: 0.6875rem;
@@ -184,8 +215,6 @@
       border-radius: 6px;
       letter-spacing: 0.04em;
       text-transform: uppercase;
-      flex-shrink: 0;
-      margin-top: 2px;
     }
     .formato-card    { background: #e8f0fe; color: #1a73e8; }
     .formato-reels   { background: #fce8ef; color: #d93025; }
@@ -222,18 +251,18 @@
       border-top: 1px solid #f5f5f7;
     }
 
-    /* ARTE INLINE — imagem única */
+    /* ARTE INLINE */
     .post-arte {
       width: 100%;
       background: #000;
       overflow: hidden;
     }
 
-    /* PLAYER YOUTUBE — proporção 9:16 (Reel vertical) */
+    /* PLAYER YOUTUBE */
     .youtube-wrapper {
       position: relative;
       width: 100%;
-      padding-bottom: 177.78%; /* 16/9 invertido */
+      padding-bottom: 177.78%;
       height: 0;
       background: #000;
     }
@@ -250,7 +279,7 @@
       display: block;
     }
 
-    /* YOUTUBE FACADE — thumbnail + botão play */
+    /* YOUTUBE FACADE */
     .youtube-facade {
       position: relative;
       width: 100%;
@@ -278,7 +307,7 @@
       transform: translate(-50%, -50%) scale(0.92);
     }
 
-    /* CARROSSEL — estilo Instagram */
+    /* CARROSSEL */
     .carrossel-wrapper {
       position: relative;
       width: 100%;
@@ -317,7 +346,6 @@
       border-radius: 20px;
       letter-spacing: 0.03em;
     }
-    /* Setas de navegação — visíveis só em desktop (hover: hover) */
     .carrossel-prev, .carrossel-next {
       display: none;
       position: absolute;
@@ -348,7 +376,7 @@
       justify-content: center;
       gap: 6px;
       padding: 9px 0 5px;
-      background: #f5f5f7;
+      background: #FAFAF8;
     }
     .carrossel-dot {
       width: 6px;
@@ -383,7 +411,7 @@
     .btn-ver-midia:hover { background: #e8e8ed; }
     .btn-ver-midia svg { flex-shrink: 0; }
 
-    /* APROVAÇÃO */
+    /* APROVACAO */
     .post-acoes {
       display: flex;
       gap: 8px;
@@ -444,6 +472,34 @@
       border-color: #e65100;
     }
     .campo-ajuste textarea::placeholder { color: #c7c7cc; }
+
+    /* Observação salva (exibida ao restaurar estado) */
+    .obs-salva {
+      display: none;
+      padding: 0 16px 14px;
+    }
+    .obs-salva.visivel { display: block; }
+    .obs-salva-inner {
+      background: #FFF8E1;
+      border: 1px solid #FFE082;
+      border-radius: 12px;
+      padding: 12px 14px;
+    }
+    .obs-salva-label {
+      font-size: 0.625rem;
+      font-weight: 600;
+      color: #e65100;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+    .obs-salva-texto {
+      font-size: 0.875rem;
+      color: #5D4037;
+      font-style: italic;
+      line-height: 1.5;
+    }
+
     .btn-confirmar-obs {
       display: block;
       width: 100%;
@@ -464,14 +520,14 @@
       background: #34c759;
     }
 
-    /* RODAPÉ FLUTUANTE */
+    /* RODAPE FLUTUANTE */
     .rodape {
       position: fixed;
       bottom: 0;
       left: 0;
       right: 0;
       padding: 12px 16px 24px;
-      background: linear-gradient(to top, #f5f5f7 70%, transparent);
+      background: linear-gradient(to top, #FAFAF8 70%, transparent);
     }
     .btn-enviar {
       width: 100%;
@@ -492,12 +548,12 @@
     }
     .btn-enviar:not(:disabled):hover { background: #333; }
 
-    /* JÁ APROVADA (persiste via localStorage) */
+    /* JA APROVADA */
     .tela-ja-aprovada {
       display: none;
       position: fixed;
       inset: 0;
-      background: #f5f5f7;
+      background: #FAFAF8;
       flex-direction: column;
       align-items: center;
       justify-content: center;
@@ -507,12 +563,12 @@
     }
     .tela-ja-aprovada.visivel { display: flex; }
 
-    /* CONFIRMAÇÃO */
+    /* CONFIRMACAO */
     .tela-confirmacao {
       display: none;
       position: fixed;
       inset: 0;
-      background: #f5f5f7;
+      background: #FAFAF8;
       flex-direction: column;
       align-items: center;
       justify-content: center;
@@ -532,11 +588,12 @@
       margin-bottom: 28px;
     }
     .confirmacao-titulo {
+      font-family: 'Playfair Display', Georgia, serif;
       font-size: 1.5rem;
-      font-weight: 700;
+      font-weight: 600;
       color: #1d1d1f;
       margin-bottom: 12px;
-      letter-spacing: -0.03em;
+      letter-spacing: -0.02em;
     }
     .confirmacao-texto {
       font-size: 0.9375rem;
@@ -548,13 +605,44 @@
     .semana-bloco { display: none; flex-direction: column; gap: 28px; }
     .semana-bloco.ativa { display: flex; }
 
+    /* LOADING OVERLAY */
+    .loading-overlay {
+      position: fixed;
+      inset: 0;
+      background: #FAFAF8;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 250;
+      transition: opacity 0.4s ease;
+    }
+    .loading-overlay.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+    .loading-spinner {
+      width: 32px;
+      height: 32px;
+      border: 3px solid #e8e8ed;
+      border-top-color: #1d1d1f;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .loading-text {
+      margin-top: 16px;
+      font-size: 0.8125rem;
+      color: #86868b;
+    }
+
     @media (min-width: 480px) {
       .posts-container { max-width: 440px; margin: 0 auto; }
       .aprovar-tudo-container { max-width: 440px; margin: 0 auto; }
-      .semanas-nav { max-width: 440px; margin: 0 auto; }
+      .secao-separador { max-width: 440px; margin-left: auto; margin-right: auto; }
       .rodape { max-width: 440px; left: 50%; transform: translateX(-50%); }
     }
-  
+
     /* MODAL MENSAGEM WHATSAPP */
     .modal-mensagem {
       display: none;
@@ -587,10 +675,10 @@
       to { transform: translateY(0); opacity: 1; }
     }
     .modal-mensagem-titulo {
+      font-family: 'Playfair Display', Georgia, serif;
       font-size: 1.0625rem;
-      font-weight: 700;
+      font-weight: 600;
       color: #1d1d1f;
-      letter-spacing: -0.01em;
       text-align: center;
     }
     .modal-mensagem-instrucao {
@@ -652,14 +740,109 @@
       padding: 4px;
     }
 
-    </style>
+    /* FRAMES */
+    .frames-section {
+      padding: 0 16px 40px;
+    }
+    .frames-section h2 {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: #1d1d1f;
+      margin-bottom: 16px;
+    }
+    .frames-grupo-titulo {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: #86868b;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin: 16px 0 8px;
+    }
+    .frames-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+    .frames-grid img {
+      width: 100%;
+      aspect-ratio: 9 / 16;
+      object-fit: cover;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+    .frames-grid img:active { opacity: 0.8; }
+
+    /* LIGHTBOX */
+    .lightbox {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.95);
+      z-index: 500;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    .lightbox.visivel { display: flex; }
+    .lightbox-close {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      background: rgba(255,255,255,0.15);
+      color: #fff;
+      border: none;
+      border-radius: 50%;
+      width: 44px;
+      height: 44px;
+      font-size: 20px;
+      cursor: pointer;
+    }
+    .lightbox img {
+      max-width: 95vw;
+      max-height: 85vh;
+      object-fit: contain;
+    }
+    .lightbox-hint {
+      position: absolute;
+      bottom: 24px;
+      color: rgba(255,255,255,0.5);
+      font-size: 0.75rem;
+    }
+    .lightbox-nav {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      background: rgba(255,255,255,0.15);
+      color: #fff;
+      border: none;
+      border-radius: 50%;
+      width: 44px;
+      height: 44px;
+      font-size: 22px;
+      cursor: pointer;
+    }
+    .lightbox-nav.prev { left: 12px; }
+    .lightbox-nav.next { right: 12px; }
+
+    @media (min-width: 480px) {
+      .frames-section { max-width: 440px; margin: 0 auto; }
+    }
+  </style>
   <!-- EmailJS SDK -->
   <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
   <script>emailjs.init({ publicKey: '-xrMYz7vRGvZg8ZOY' });</script>
 </head>
 <body>
 
-<!-- CABEÇALHO -->
+<!-- LOADING OVERLAY -->
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="loading-spinner"></div>
+  <div class="loading-text">Carregando aprovações...</div>
+</div>
+
+<!-- CABECALHO -->
 <div class="header">
   <div class="header-label">Aprovação de conteúdo</div>
   <div class="header-cliente">{{NOME_CLIENTE}}</div>
@@ -675,26 +858,33 @@
 <!-- APROVAR TUDO -->
 <div class="aprovar-tudo-container">
   <button class="btn-aprovar-tudo" id="btnAprovarTudo" onclick="aprovarTudo()">
-    ✓ Aprovar todos os posts
+    Aprovar todos os posts
   </button>
 </div>
 
-<!-- NAVEGAÇÃO DE SEMANAS (só aparece se houver mais de uma semana) -->
-{{SEMANAS_NAV}}
+<!-- SEPARADOR PENDENTES -->
+<div class="secao-separador" id="secaoPendentes" style="display:none">
+  <h2>Aguardando sua aprovação</h2>
+  <div class="secao-linha"></div>
+</div>
 
 <!-- POSTS -->
 <div class="posts-container" id="postsContainer">
   {{POSTS_HTML}}
 </div>
 
-<!-- RODAPÉ FIXO -->
+<!-- SEPARADOR RESPONDIDOS (inserido por JS) -->
+
+{{FRAMES_HTML}}
+
+<!-- RODAPE FIXO -->
 <div class="rodape">
   <button class="btn-enviar" id="btnEnviar" onclick="enviarAprovacao()" disabled>
     Enviar aprovações
   </button>
 </div>
 
-<!-- TELA JÁ APROVADA -->
+<!-- TELA JA APROVADA -->
 <div class="tela-ja-aprovada" id="telaJaAprovada">
   <div class="confirmacao-icone" style="background:#1A1A1A">
     <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
@@ -703,13 +893,13 @@
   </div>
   <div class="confirmacao-titulo">Tudo certo por aqui!</div>
   <div class="confirmacao-texto">
-    Você já enviou suas aprovações desta semana.<br>
+    Você já enviou suas aprovações.<br>
     Quando houver novos conteúdos para revisar,<br>
-    a Silvana vai te enviar um novo link. 🙌
+    a Silvana vai te enviar um novo link.
   </div>
 </div>
 
-<!-- TELA DE CONFIRMAÇÃO -->
+<!-- TELA DE CONFIRMACAO -->
 <div class="tela-confirmacao" id="telaConfirmacao">
   <div class="confirmacao-icone">
     <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
@@ -719,7 +909,7 @@
   <div class="confirmacao-titulo">Aprovações enviadas!</div>
   <div class="confirmacao-texto">
     A Silvana já recebeu suas respostas.<br>
-    Qualquer dúvida, é só chamar no WhatsApp. 😊
+    Qualquer dúvida, é só chamar no WhatsApp.
   </div>
 </div>
 
@@ -740,22 +930,27 @@
   const nomeCliente = {{NOME_CLIENTE_JSON}};
   const periodo = {{PERIODO_JSON}};
   const whatsappNumero = '{{WHATSAPP_SILVANA}}';
-  const whatsappGrupo = '{{WHATSAPP_GRUPO}}';  // link do grupo (ex: https://chat.whatsapp.com/XXX)
+  const whatsappGrupo = '{{WHATSAPP_GRUPO}}';
   const postsMeta = {{POSTS_META_JSON}};
   const postsOrdem = {{POSTS_ORDEM_JSON}};
 
-  // ── ESTADO VIA GITHUB API ───────────────────────────────────────────────────
-  // Token fragmentado para não acionar o GitHub Secret Scanning.
-  // Permissão: Contents read/write apenas neste repositório.
+  // ── ESTADO VIA GITHUB API ──────────────────────────────────────
   const _tk = ['github', '_pat_', '{{GH_TOKEN_BODY}}'].join('');
   const _ghOwner = 'oiforster';
   const _ghRepo  = 'forster-aprovacoes';
-  const _estadoPath = '{{ESTADO_PATH}}'; // ex: aprovacao/fyber-show-piscinas/estado-2026-03.json
+  const _estadoPath = '{{ESTADO_PATH}}';
 
-  // Fila serializada: evita race-condition de SHA quando o cliente clica rápido
   let _salvarFila = Promise.resolve();
 
-  async function _salvarEstado(postId, status) {
+  // Novo formato de estado: { "post-id": { "status": "aprovado", "obs": "..." } }
+  // Retrocompat: aceita string pura (formato antigo)
+  function _parseEstadoItem(val) {
+    if (typeof val === 'string') return { status: val, obs: '' };
+    if (val && typeof val === 'object') return { status: val.status || 'pendente', obs: val.obs || '' };
+    return { status: 'pendente', obs: '' };
+  }
+
+  async function _salvarEstado(postId, status, obs) {
     _salvarFila = _salvarFila.then(async () => {
       try {
         const url = 'https://api.github.com/repos/' + _ghOwner + '/' + _ghRepo + '/contents/' + _estadoPath;
@@ -764,14 +959,16 @@
         const getData = await getResp.json();
         const sha     = getData.sha;
         const estado  = JSON.parse(atob(getData.content.replace(/\n/g, '')));
-        estado[postId] = status;
+        const item = { status: status };
+        if (obs) item.obs = obs;
+        estado[postId] = item;
         const novoConteudo = btoa(unescape(encodeURIComponent(JSON.stringify(estado, null, 2))));
         await fetch(url, {
           method: 'PUT',
           headers: { Authorization: 'token ' + _tk, 'Content-Type': 'application/json' },
           body: JSON.stringify({ message: 'estado: ' + postId, content: novoConteudo, sha: sha })
         });
-      } catch(e) { /* falha silenciosa — WhatsApp é o canal principal */ }
+      } catch(e) {}
     });
   }
 
@@ -784,17 +981,138 @@
         const getData = await getResp.json();
         const sha    = getData.sha;
         const estado = JSON.parse(atob(getData.content.replace(/\n/g, '')));
-        Object.assign(estado, mapa);
+        for (const [k, v] of Object.entries(mapa)) {
+          estado[k] = v;
+        }
         const novoConteudo = btoa(unescape(encodeURIComponent(JSON.stringify(estado, null, 2))));
         await fetch(url, {
           method: 'PUT',
           headers: { Authorization: 'token ' + _tk, 'Content-Type': 'application/json' },
-          body: JSON.stringify({ message: 'estado: aprovar-tudo', content: novoConteudo, sha: sha })
+          body: JSON.stringify({ message: 'estado: lote', content: novoConteudo, sha: sha })
         });
-      } catch(e) { /* falha silenciosa */ }
+      } catch(e) {}
     });
   }
-  
+
+  // ── CARREGAR ESTADO DO GITHUB ──────────────────────────────────
+  async function _carregarEstado() {
+    try {
+      const url = 'https://api.github.com/repos/' + _ghOwner + '/' + _ghRepo + '/contents/' + _estadoPath;
+      const resp = await fetch(url, { headers: { Authorization: 'token ' + _tk } });
+      if (!resp.ok) return null;
+      const data = await resp.json();
+      const raw = atob(data.content.replace(/\n/g, ''));
+      // Decode UTF-8 corretamente (atob retorna Latin-1, precisamos de UTF-8)
+      const texto = decodeURIComponent(escape(raw));
+      return JSON.parse(texto);
+    } catch(e) {
+      return null;
+    }
+  }
+
+  function _aplicarEstado(estado) {
+    if (!estado) return;
+
+    for (const [postId, val] of Object.entries(estado)) {
+      const parsed = _parseEstadoItem(val);
+      if (parsed.status === 'pendente') continue;
+
+      const card = document.getElementById('card-' + postId);
+      if (!card) continue;
+
+      statusPosts[postId] = parsed.status;
+
+      if (parsed.status === 'aprovado') {
+        card.classList.add('aprovado');
+        const ba = document.getElementById('aprovar-' + postId);
+        if (ba) ba.classList.add('ativo');
+        // Mostra badge
+        const badge = card.querySelector('.post-status-badge');
+        if (badge) { badge.textContent = '\u2713 Aprovado'; }
+      } else if (parsed.status === 'ajuste') {
+        card.classList.add('ajuste');
+        const baj = document.getElementById('ajuste-' + postId);
+        if (baj) baj.classList.add('ativo');
+        const badge = card.querySelector('.post-status-badge');
+        if (badge) { badge.textContent = 'Ajuste solicitado'; }
+
+        // Mostrar observação salva
+        if (parsed.obs) {
+          comentariosPosts[postId] = parsed.obs;
+          const obsSalva = document.getElementById('obs-salva-' + postId);
+          if (obsSalva) {
+            obsSalva.querySelector('.obs-salva-texto').textContent = parsed.obs;
+            obsSalva.classList.add('visivel');
+          }
+          // Pre-fill textarea
+          const ta = document.getElementById('obs-' + postId);
+          if (ta) {
+            ta.value = parsed.obs;
+            ta.disabled = true;
+          }
+          const campoAjuste = document.getElementById('campo-' + postId);
+          if (campoAjuste) campoAjuste.classList.add('visivel');
+          const btnObs = document.getElementById('btnobs-' + postId);
+          if (btnObs) {
+            btnObs.textContent = '\u2713 Observação registrada';
+            btnObs.classList.add('confirmado');
+            btnObs.disabled = true;
+          }
+        }
+      }
+    }
+
+    atualizarProgresso();
+    _reordenarPosts();
+  }
+
+  function _reordenarPosts() {
+    const container = document.getElementById('postsContainer');
+    const cards = Array.from(container.querySelectorAll('.post-card'));
+
+    const pendentes = [];
+    const ajustes = [];
+    const aprovados = [];
+
+    cards.forEach(card => {
+      const id = card.dataset.postId;
+      const s = statusPosts[id];
+      if (s === 'aprovado') aprovados.push(card);
+      else if (s === 'ajuste') ajustes.push(card);
+      else pendentes.push(card);
+    });
+
+    // Limpar container
+    cards.forEach(c => c.remove());
+
+    // Remove separadores antigos
+    document.querySelectorAll('.secao-separador-dinamico').forEach(e => e.remove());
+
+    const secaoPendentes = document.getElementById('secaoPendentes');
+    const haRespondidos = aprovados.length > 0 || ajustes.length > 0;
+    const haPendentes = pendentes.length > 0;
+
+    // Mostra separador pendentes
+    if (haPendentes && haRespondidos) {
+      secaoPendentes.style.display = 'flex';
+    }
+
+    // Insere pendentes primeiro
+    pendentes.forEach(c => container.appendChild(c));
+
+    // Cria separador de respondidos se necessario
+    if (haRespondidos) {
+      const sep = document.createElement('div');
+      sep.className = 'secao-separador respondidos secao-separador-dinamico';
+      sep.innerHTML = '<h2>Já respondidos</h2><div class="secao-linha"></div>';
+      container.appendChild(sep);
+    }
+
+    // Insere ajustes depois aprovados
+    ajustes.forEach(c => container.appendChild(c));
+    aprovados.forEach(c => container.appendChild(c));
+  }
+
   function enviarEmailSilencioso(mensagem) {
     try {
       emailjs.send('service_a00b37r', 'template_lyk4lff', {
@@ -803,9 +1121,7 @@
         message: mensagem,
         email: ''
       });
-    } catch(e) {
-      // silencioso — não interrompe o fluxo
-    }
+    } catch(e) {}
   }
 
   const statusPosts = {};
@@ -816,6 +1132,7 @@
     const btnAprovar = document.getElementById('aprovar-' + id);
     const btnAjuste = document.getElementById('ajuste-' + id);
     const campoAjuste = document.getElementById('campo-' + id);
+    const obsSalva = document.getElementById('obs-salva-' + id);
 
     // Toggle: clicar novamente desmarca
     if (statusPosts[id] === acao) {
@@ -824,6 +1141,8 @@
       btnAprovar.classList.remove('ativo');
       btnAjuste.classList.remove('ativo');
       if (campoAjuste) campoAjuste.classList.remove('visivel');
+      if (obsSalva) obsSalva.classList.remove('visivel');
+      card.querySelector('.post-status-badge').style.display = 'none';
       _salvarEstado(id, 'pendente');
     } else {
       statusPosts[id] = acao;
@@ -835,12 +1154,14 @@
         card.classList.add('aprovado');
         btnAprovar.classList.add('ativo');
         if (campoAjuste) campoAjuste.classList.remove('visivel');
+        if (obsSalva) obsSalva.classList.remove('visivel');
+        _salvarEstado(id, 'aprovado');
       } else {
         card.classList.add('ajuste');
         btnAjuste.classList.add('ativo');
         if (campoAjuste) campoAjuste.classList.add('visivel');
+        // Obs sera salva ao confirmar
       }
-      _salvarEstado(id, acao);
     }
 
     atualizarProgresso();
@@ -858,11 +1179,22 @@
       ta.placeholder = 'Por favor escreva a observação antes de confirmar.';
       return;
     }
-    comentariosPosts[id] = ta.value.trim();
+    var obs = ta.value.trim();
+    comentariosPosts[id] = obs;
     ta.disabled = true;
-    btn.textContent = '✓ Observação registrada';
+    btn.textContent = '\u2713 Observação registrada';
     btn.classList.add('confirmado');
     btn.disabled = true;
+
+    // Salva estado com observação
+    _salvarEstado(id, 'ajuste', obs);
+
+    // Mostra caixa de obs salva
+    var obsSalva = document.getElementById('obs-salva-' + id);
+    if (obsSalva) {
+      obsSalva.querySelector('.obs-salva-texto').textContent = obs;
+      obsSalva.classList.add('visivel');
+    }
   }
 
   function atualizarProgresso() {
@@ -876,7 +1208,7 @@
     const btnEnviar = document.getElementById('btnEnviar');
     btnEnviar.disabled = respondidos < totalPosts;
     if (respondidos === totalPosts) {
-      btnEnviar.textContent = 'Enviar aprovações ✓';
+      btnEnviar.textContent = 'Enviar aprovações \u2713';
     }
   }
 
@@ -886,12 +1218,11 @@
 
     if (todosAprovados) return;
 
-    // Aprova todos os posts
     const mapaEstado = {};
     document.querySelectorAll('[data-post-id]').forEach(card => {
       const id = card.dataset.postId;
       statusPosts[id] = 'aprovado';
-      mapaEstado[id]  = 'aprovado';
+      mapaEstado[id]  = { status: 'aprovado' };
       card.classList.add('aprovado');
       card.classList.remove('ajuste');
       const ba = document.getElementById('aprovar-' + id);
@@ -904,7 +1235,7 @@
     _salvarEstadoMultiplos(mapaEstado);
 
     btn.classList.add('ativo');
-    btn.textContent = '✓ Todos os posts aprovados';
+    btn.textContent = '\u2713 Todos os posts aprovados';
     atualizarProgresso();
   }
 
@@ -918,7 +1249,6 @@
   }
 
   function enviarAprovacao() {
-    // Monta mensagem formatada para WhatsApp
     const linhas = ['*Aprovações — ' + nomeCliente + ' — ' + periodo + '*', ''];
 
     for (const id of postsOrdem) {
@@ -926,48 +1256,41 @@
       const meta = postsMeta[id];
       if (!meta || !status) continue;
       if (status === 'aprovado') {
-        linhas.push('✅ ' + meta.data + ' — ' + meta.titulo + ' — Aprovado');
+        linhas.push('\u2705 ' + meta.data + ' — ' + meta.titulo + ' — Aprovado');
       } else {
         const obs = (comentariosPosts[id] || '').trim();
-        linhas.push('⚠️ ' + meta.data + ' — ' + meta.titulo + ' — Ajuste' + (obs ? ': "' + obs + '"' : ''));
+        linhas.push('\u26A0\uFE0F ' + meta.data + ' — ' + meta.titulo + ' — Ajuste' + (obs ? ': "' + obs + '"' : ''));
       }
     }
 
     const mensagem = linhas.join('\n');
-
-    // Disparo silencioso do email de redundância
     enviarEmailSilencioso(mensagem);
 
     if (whatsappGrupo) {
-      // Mostra modal com a mensagem para o cliente copiar e abrir o grupo
       _mensagemParaEnviar = mensagem;
       document.getElementById('modalMensagemTexto').value = mensagem;
       document.getElementById('btnCopiarMensagem').textContent = 'Copiar mensagem';
       document.getElementById('btnCopiarMensagem').classList.remove('copiado');
       document.getElementById('modalMensagem').classList.add('visivel');
     } else {
-      // Fallback: abre conversa direta com a Silvana
       window.open('https://wa.me/' + whatsappNumero + '?text=' + encodeURIComponent(mensagem), '_blank');
-      // Grava aprovação no localStorage para travar a página
       try { localStorage.setItem('aprovacao:' + location.pathname, '1'); } catch(e) {}
       document.getElementById('telaConfirmacao').classList.add('visivel');
     }
   }
 
-  // Variável para guardar a mensagem do modal
   var _mensagemParaEnviar = '';
 
   function copiarMensagemModal() {
     var texto = document.getElementById('modalMensagemTexto').value;
     var btn = document.getElementById('btnCopiarMensagem');
     navigator.clipboard.writeText(texto).then(function() {
-      btn.textContent = 'Copiado! ✓';
+      btn.textContent = 'Copiado! \u2713';
       btn.classList.add('copiado');
     }).catch(function() {
-      // Fallback para browsers sem clipboard API
       document.getElementById('modalMensagemTexto').select();
       document.execCommand('copy');
-      btn.textContent = 'Copiado! ✓';
+      btn.textContent = 'Copiado! \u2713';
       btn.classList.add('copiado');
     });
   }
@@ -975,7 +1298,6 @@
   function abrirWhatsAppModal() {
     window.open(whatsappGrupo, '_blank');
     fecharModalMensagem();
-    // Grava aprovação no localStorage para travar a página
     try { localStorage.setItem('aprovacao:' + location.pathname, '1'); } catch(e) {}
     document.getElementById('telaConfirmacao').classList.add('visivel');
   }
@@ -984,13 +1306,50 @@
     document.getElementById('modalMensagem').classList.remove('visivel');
   }
 
-  // Fecha modal ao clicar no backdrop
-  document.getElementById('modalMensagem').addEventListener('click', function(e) {
-    if (e.target === this) fecharModalMensagem();
+  // ── LIGHTBOX PARA FRAMES ──────────────────────────────────────
+  var _lbFrames = [];
+  var _lbIdx = 0;
+
+  function abrirLightbox(grupo, idx) {
+    var imgs = document.querySelectorAll('.frames-grupo[data-grupo="' + grupo + '"] img');
+    _lbFrames = Array.from(imgs).map(function(img) { return img.dataset.full || img.src; });
+    _lbIdx = idx;
+    var lb = document.getElementById('lightbox');
+    lb.querySelector('img').src = _lbFrames[_lbIdx];
+    lb.classList.add('visivel');
+  }
+
+  function fecharLightbox() {
+    document.getElementById('lightbox').classList.remove('visivel');
+  }
+
+  function navLightbox(dir) {
+    _lbIdx = (_lbIdx + dir + _lbFrames.length) % _lbFrames.length;
+    document.getElementById('lightbox').querySelector('img').src = _lbFrames[_lbIdx];
+  }
+
+  // Swipe no lightbox
+  (function() {
+    var lb = document.getElementById('lightbox');
+    if (!lb) return;
+    var startX = 0;
+    lb.addEventListener('touchstart', function(e) { startX = e.touches[0].clientX; });
+    lb.addEventListener('touchend', function(e) {
+      var diff = e.changedTouches[0].clientX - startX;
+      if (Math.abs(diff) > 50) navLightbox(diff > 0 ? -1 : 1);
+    });
+  })();
+
+  // ── INIT: CARREGAR ESTADO ──────────────────────────────────────
+  document.addEventListener('DOMContentLoaded', async function() {
+    const estado = await _carregarEstado();
+    _aplicarEstado(estado);
+    // Remove loading overlay
+    var overlay = document.getElementById('loadingOverlay');
+    if (overlay) overlay.classList.add('hidden');
   });
 
 </script>
-
 
 <!-- Modal: mensagem WhatsApp -->
 <div class="modal-mensagem" id="modalMensagem">
@@ -1006,6 +1365,20 @@
     </button>
     <button class="modal-btn-fechar" onclick="fecharModalMensagem()">Fechar</button>
   </div>
+</div>
+<script>
+  document.getElementById('modalMensagem').addEventListener('click', function(e) {
+    if (e.target === this) fecharModalMensagem();
+  });
+</script>
+
+<!-- Lightbox -->
+<div class="lightbox" id="lightbox">
+  <button class="lightbox-close" onclick="fecharLightbox()">&times;</button>
+  <button class="lightbox-nav prev" onclick="navLightbox(-1)">&#8249;</button>
+  <img src="" alt="Frame" />
+  <button class="lightbox-nav next" onclick="navLightbox(1)">&#8250;</button>
+  <div class="lightbox-hint">Segure o dedo sobre a imagem para salvar na galeria</div>
 </div>
 
 </body>
