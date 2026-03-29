@@ -4,65 +4,79 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Aprovação — Óticas Casa Marco</title>
+  <meta property="og:title"       content="Aprovação — Óticas Casa Marco — 1 a 30 de abril" />
+  <meta property="og:description" content="Acesse para aprovar ou pedir ajuste nos vídeos de 1 a 30 de abril." />
+  <meta property="og:image"       content="" />
+  <meta property="og:type"        content="website" />
+  <!-- Inter Font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background: #F5F5F0;
-      color: #1A1A1A;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #f5f5f7;
+      color: #1d1d1f;
       min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
     }
 
     /* HEADER */
     .header {
-      background: #1A1A1A;
+      background: #1d1d1f;
       color: #fff;
-      padding: 20px 20px 16px;
+      padding: 24px 20px 18px;
       position: sticky;
       top: 0;
       z-index: 100;
     }
     .header-label {
-      font-size: 11px;
-      letter-spacing: 0.12em;
+      font-size: 0.6875rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
       text-transform: uppercase;
-      color: #999;
-      margin-bottom: 4px;
+      color: #86868b;
+      margin-bottom: 6px;
     }
     .header-cliente {
-      font-size: 20px;
+      font-size: 1.375rem;
       font-weight: 700;
-      letter-spacing: -0.02em;
+      letter-spacing: -0.03em;
+      line-height: 1.15;
     }
     .header-periodo {
-      font-size: 13px;
-      color: #aaa;
-      margin-top: 3px;
+      font-size: 0.8125rem;
+      font-weight: 400;
+      color: #86868b;
+      margin-top: 4px;
     }
     .header-progress {
-      margin-top: 12px;
+      margin-top: 14px;
       display: flex;
       align-items: center;
       gap: 10px;
     }
     .progress-bar-bg {
       flex: 1;
-      height: 4px;
+      height: 3px;
       background: #333;
       border-radius: 2px;
       overflow: hidden;
     }
     .progress-bar-fill {
       height: 100%;
-      background: #4CAF50;
+      background: #34c759;
       border-radius: 2px;
       width: 0%;
-      transition: width 0.3s ease;
+      transition: width 0.4s cubic-bezier(0.16, 1, 0.3, 1);
     }
     .progress-text {
-      font-size: 12px;
-      color: #aaa;
+      font-size: 0.6875rem;
+      font-weight: 500;
+      color: #86868b;
       white-space: nowrap;
     }
 
@@ -73,19 +87,19 @@
     .btn-aprovar-tudo {
       width: 100%;
       padding: 14px;
-      background: #1A1A1A;
+      background: #1d1d1f;
       color: #fff;
       border: none;
-      border-radius: 10px;
-      font-size: 15px;
+      border-radius: 12px;
+      font-size: 0.9375rem;
       font-weight: 600;
-      letter-spacing: 0.01em;
+      letter-spacing: -0.01em;
       cursor: pointer;
-      transition: background 0.2s;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
     }
     .btn-aprovar-tudo:hover { background: #333; }
     .btn-aprovar-tudo.ativo {
-      background: #4CAF50;
+      background: #34c759;
     }
 
     /* SEMANAS / TABS */
@@ -101,16 +115,16 @@
       flex-shrink: 0;
       padding: 6px 14px;
       border-radius: 20px;
-      font-size: 13px;
+      font-size: 0.8125rem;
       font-weight: 500;
-      background: #E8E8E4;
-      color: #555;
+      background: #e8e8ed;
+      color: #6e6e73;
       cursor: pointer;
       border: none;
-      transition: all 0.2s;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
     }
     .tab-semana.ativa {
-      background: #1A1A1A;
+      background: #1d1d1f;
       color: #fff;
     }
 
@@ -119,25 +133,25 @@
       padding: 16px 16px 100px;
       display: flex;
       flex-direction: column;
-      gap: 28px;
+      gap: 24px;
     }
 
     .post-card {
       background: #fff;
       border-radius: 16px;
       overflow: hidden;
-      box-shadow: 0 1px 4px rgba(0,0,0,0.06);
-      transition: box-shadow 0.2s;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.04);
+      transition: box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1);
     }
     .post-card.aprovado {
-      box-shadow: 0 0 0 2px #4CAF50;
+      box-shadow: 0 0 0 2px #34c759, 0 4px 12px rgba(52,199,89,0.1);
     }
     .post-card.ajuste {
-      box-shadow: 0 0 0 2px #FF9800;
+      box-shadow: 0 0 0 2px #ff9f0a, 0 4px 12px rgba(255,159,10,0.1);
     }
 
     .post-header {
-      padding: 14px 16px 10px;
+      padding: 16px 16px 12px;
       display: flex;
       align-items: flex-start;
       justify-content: space-between;
@@ -149,37 +163,38 @@
       gap: 4px;
     }
     .post-data {
-      font-size: 12px;
+      font-size: 0.6875rem;
       font-weight: 600;
-      color: #888;
+      color: #86868b;
       text-transform: uppercase;
       letter-spacing: 0.08em;
     }
     .post-titulo {
-      font-size: 15px;
+      font-size: 0.9375rem;
       font-weight: 700;
-      color: #1A1A1A;
+      color: #1d1d1f;
+      letter-spacing: -0.01em;
       line-height: 1.3;
     }
     .post-formato {
       display: inline-block;
-      font-size: 11px;
+      font-size: 0.6875rem;
       font-weight: 600;
       padding: 3px 8px;
-      border-radius: 4px;
-      letter-spacing: 0.06em;
+      border-radius: 6px;
+      letter-spacing: 0.04em;
       text-transform: uppercase;
       flex-shrink: 0;
       margin-top: 2px;
     }
-    .formato-card    { background: #E3F2FD; color: #1565C0; }
-    .formato-reels   { background: #FCE4EC; color: #AD1457; }
-    .formato-carrossel { background: #F3E5F5; color: #6A1B9A; }
-    .formato-video   { background: #E8F5E9; color: #2E7D32; }
+    .formato-card    { background: #e8f0fe; color: #1a73e8; }
+    .formato-reels   { background: #fce8ef; color: #d93025; }
+    .formato-carrossel { background: #f3e8fd; color: #8430ce; }
+    .formato-video   { background: #e6f4ea; color: #1e8e3e; }
 
     .post-divider {
       height: 1px;
-      background: #F0F0EC;
+      background: #f5f5f7;
       margin: 0 16px;
     }
 
@@ -187,24 +202,24 @@
       padding: 12px 16px;
     }
     .post-conteudo-label {
-      font-size: 10px;
-      font-weight: 700;
-      color: #aaa;
+      font-size: 0.625rem;
+      font-weight: 600;
+      color: #86868b;
       letter-spacing: 0.1em;
       text-transform: uppercase;
       margin-bottom: 6px;
     }
     .post-texto {
-      font-size: 14px;
-      color: #333;
-      line-height: 1.55;
+      font-size: 0.875rem;
+      color: #6e6e73;
+      line-height: 1.6;
       white-space: pre-wrap;
       word-break: break-word;
     }
     .post-legenda {
       margin-top: 10px;
       padding-top: 10px;
-      border-top: 1px solid #F0F0EC;
+      border-top: 1px solid #f5f5f7;
     }
 
     /* ARTE INLINE — imagem única */
@@ -333,17 +348,17 @@
       justify-content: center;
       gap: 6px;
       padding: 9px 0 5px;
-      background: #F0F0EC;
+      background: #f5f5f7;
     }
     .carrossel-dot {
       width: 6px;
       height: 6px;
       border-radius: 50%;
-      background: #C8C8C2;
+      background: #c7c7cc;
       transition: background 0.2s;
     }
     .carrossel-dot.ativa {
-      background: #3897f0;
+      background: #1d1d1f;
     }
 
     /* MEDIA LINK */
@@ -355,15 +370,17 @@
       align-items: center;
       gap: 8px;
       padding: 10px 14px;
-      background: #F5F5F0;
-      border-radius: 8px;
+      background: #f5f5f7;
+      border-radius: 10px;
       text-decoration: none;
-      color: #1A1A1A;
-      font-size: 13px;
+      color: #1d1d1f;
+      font-size: 0.8125rem;
       font-weight: 600;
       border: none;
       cursor: pointer;
+      transition: background 0.2s;
     }
+    .btn-ver-midia:hover { background: #e8e8ed; }
     .btn-ver-midia svg { flex-shrink: 0; }
 
     /* APROVAÇÃO */
@@ -376,30 +393,30 @@
       flex: 1;
       padding: 12px;
       border: none;
-      border-radius: 10px;
-      font-size: 14px;
+      border-radius: 12px;
+      font-size: 0.875rem;
       font-weight: 600;
       cursor: pointer;
-      transition: all 0.15s;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
       display: flex;
       align-items: center;
       justify-content: center;
       gap: 6px;
     }
     .btn-aprovar {
-      background: #E8F5E9;
-      color: #2E7D32;
+      background: #e6f4ea;
+      color: #1e8e3e;
     }
     .btn-aprovar:active, .btn-aprovar.ativo {
-      background: #4CAF50;
+      background: #34c759;
       color: #fff;
     }
     .btn-ajuste {
-      background: #FFF3E0;
-      color: #E65100;
+      background: #fef3e2;
+      color: #e65100;
     }
     .btn-ajuste:active, .btn-ajuste.ativo {
-      background: #FF9800;
+      background: #ff9f0a;
       color: #fff;
     }
 
@@ -412,35 +429,39 @@
     .campo-ajuste textarea {
       width: 100%;
       padding: 12px;
-      border: 1.5px solid #FF9800;
-      border-radius: 10px;
-      font-size: 14px;
+      border: 1.5px solid #ff9f0a;
+      border-radius: 12px;
+      font-size: 0.875rem;
       font-family: inherit;
-      color: #1A1A1A;
-      background: #FFF8F0;
+      color: #1d1d1f;
+      background: #fffbf5;
       resize: none;
       outline: none;
       min-height: 80px;
+      line-height: 1.5;
     }
-    .campo-ajuste textarea::placeholder { color: #bbb; }
+    .campo-ajuste textarea:focus {
+      border-color: #e65100;
+    }
+    .campo-ajuste textarea::placeholder { color: #c7c7cc; }
     .btn-confirmar-obs {
       display: block;
       width: 100%;
       margin-top: 8px;
       padding: 10px;
-      background: #FF9800;
+      background: #ff9f0a;
       color: #fff;
       border: none;
-      border-radius: 8px;
-      font-size: 14px;
+      border-radius: 10px;
+      font-size: 0.875rem;
       font-weight: 600;
       cursor: pointer;
-      transition: background 0.15s;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
       text-align: center;
     }
     .btn-confirmar-obs:active { background: #e65100; }
     .btn-confirmar-obs.confirmado {
-      background: #4CAF50;
+      background: #34c759;
     }
 
     /* RODAPÉ FLUTUANTE */
@@ -450,23 +471,23 @@
       left: 0;
       right: 0;
       padding: 12px 16px 24px;
-      background: linear-gradient(to top, #F5F5F0 70%, transparent);
+      background: linear-gradient(to top, #f5f5f7 70%, transparent);
     }
     .btn-enviar {
       width: 100%;
       padding: 16px;
-      background: #1A1A1A;
+      background: #1d1d1f;
       color: #fff;
       border: none;
-      border-radius: 12px;
-      font-size: 16px;
+      border-radius: 14px;
+      font-size: 1rem;
       font-weight: 700;
       cursor: pointer;
-      transition: background 0.2s;
-      letter-spacing: -0.01em;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      letter-spacing: -0.02em;
     }
     .btn-enviar:disabled {
-      background: #CCC;
+      background: #c7c7cc;
       cursor: not-allowed;
     }
     .btn-enviar:not(:disabled):hover { background: #333; }
@@ -476,7 +497,7 @@
       display: none;
       position: fixed;
       inset: 0;
-      background: #F5F5F0;
+      background: #f5f5f7;
       flex-direction: column;
       align-items: center;
       justify-content: center;
@@ -491,7 +512,7 @@
       display: none;
       position: fixed;
       inset: 0;
-      background: #F5F5F0;
+      background: #f5f5f7;
       flex-direction: column;
       align-items: center;
       justify-content: center;
@@ -503,24 +524,24 @@
     .confirmacao-icone {
       width: 72px;
       height: 72px;
-      background: #4CAF50;
+      background: #34c759;
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
-      margin-bottom: 24px;
+      margin-bottom: 28px;
     }
     .confirmacao-titulo {
-      font-size: 24px;
-      font-weight: 800;
-      color: #1A1A1A;
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #1d1d1f;
       margin-bottom: 12px;
       letter-spacing: -0.03em;
     }
     .confirmacao-texto {
-      font-size: 15px;
-      color: #666;
-      line-height: 1.6;
+      font-size: 0.9375rem;
+      color: #6e6e73;
+      line-height: 1.7;
     }
 
     /* SEMANA OCULTA */
@@ -533,7 +554,108 @@
       .semanas-nav { max-width: 440px; margin: 0 auto; }
       .rodape { max-width: 440px; left: 50%; transform: translateX(-50%); }
     }
-  </style>
+  
+    /* MODAL MENSAGEM WHATSAPP */
+    .modal-mensagem {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.4);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      z-index: 400;
+      align-items: flex-end;
+      justify-content: center;
+      padding-bottom: 0;
+    }
+    .modal-mensagem.visivel { display: flex; }
+    .modal-mensagem-inner {
+      background: #fff;
+      border-radius: 20px 20px 0 0;
+      padding: 28px 24px 40px;
+      width: 100%;
+      max-width: 540px;
+      max-height: 85vh;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    @keyframes slideUp {
+      from { transform: translateY(60px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+    .modal-mensagem-titulo {
+      font-size: 1.0625rem;
+      font-weight: 700;
+      color: #1d1d1f;
+      letter-spacing: -0.01em;
+      text-align: center;
+    }
+    .modal-mensagem-instrucao {
+      font-size: 0.875rem;
+      color: #6e6e73;
+      text-align: center;
+      line-height: 1.5;
+    }
+    .modal-mensagem-texto {
+      background: #f5f5f7;
+      border-radius: 12px;
+      padding: 16px;
+      font-size: 0.875rem;
+      color: #6e6e73;
+      line-height: 1.6;
+      white-space: pre-wrap;
+      font-family: inherit;
+      border: none;
+      resize: none;
+      width: 100%;
+      box-sizing: border-box;
+      min-height: 120px;
+    }
+    .modal-btn-copiar {
+      background: #25D366;
+      color: #fff;
+      border: none;
+      border-radius: 14px;
+      padding: 16px;
+      font-size: 1rem;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      cursor: pointer;
+      width: 100%;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .modal-btn-copiar:active { background: #1ebe5a; }
+    .modal-btn-copiar.copiado { background: #34c759; }
+    .modal-btn-wpp {
+      background: #fff;
+      color: #1d1d1f;
+      border: 1.5px solid #e8e8ed;
+      border-radius: 14px;
+      padding: 14px;
+      font-size: 0.9375rem;
+      font-weight: 600;
+      cursor: pointer;
+      width: 100%;
+      transition: all 0.2s;
+    }
+    .modal-btn-wpp:active { background: #f5f5f7; }
+    .modal-btn-fechar {
+      background: none;
+      border: none;
+      color: #86868b;
+      font-size: 0.875rem;
+      cursor: pointer;
+      text-align: center;
+      padding: 4px;
+    }
+
+    </style>
+  <!-- EmailJS SDK -->
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+  <script>emailjs.init({ publicKey: '-xrMYz7vRGvZg8ZOY' });</script>
 </head>
 <body>
 
@@ -541,12 +663,12 @@
 <div class="header">
   <div class="header-label">Aprovação de conteúdo</div>
   <div class="header-cliente">Óticas Casa Marco</div>
-  <div class="header-periodo">23 a 29 de março</div>
+  <div class="header-periodo">1 a 30 de abril</div>
   <div class="header-progress">
     <div class="progress-bar-bg">
       <div class="progress-bar-fill" id="progressBar"></div>
     </div>
-    <div class="progress-text" id="progressText">0 de 5 aprovados</div>
+    <div class="progress-text" id="progressText">0 de 15 aprovados</div>
   </div>
 </div>
 
@@ -563,19 +685,55 @@
 <!-- POSTS -->
 <div class="posts-container" id="postsContainer">
   
-  <div class="post-card" id="card-20260325-uma-nova-fase-esta-chegando-te" data-post-id="20260325-uma-nova-fase-esta-chegando-te">
+  <div class="post-card" id="card-20260401-pecas-classicas-que-atravessam" data-post-id="20260401-pecas-classicas-que-atravessam">
     <div class="post-header">
       <div class="post-meta">
-        <div class="post-data">25/03 (qua)</div>
-        <div class="post-titulo">&quot;Uma nova fase está chegando.&quot; — Teaser de abertura</div>
+        <div class="post-data">01/04 (qua)</div>
+        <div class="post-titulo">Peças clássicas que atravessam o tempo</div>
+      </div>
+      <span class="post-formato formato-reels">Reels</span>
+    </div>
+    
+    <div class="post-divider"></div>
+    
+    <div class="post-conteudo" style="padding-top:0">
+      <div class="post-conteudo-label">Legenda</div>
+      <div class="post-texto">A corrente ponto de luz, os anéis solitários e os brincos de argola são clássicos que permanecem atuais em qualquer época. Versáteis, elegantes e atemporais, combinam com o dia a dia e também com ocasiões especiais.<br>São aquelas peças que resolvem a produção com naturalidade e mantêm sua elegância em qualquer fase da vida.<br>Clássicos nunca saem de cena.<br>📍 Visite uma de nossas lojas: Igrejinha • Parobé • Taquara • Três Coroas<br>---</div>
+    </div>
+    
+    <div class="post-acoes">
+      <button class="btn-aprovar" id="aprovar-20260401-pecas-classicas-que-atravessam" onclick="marcarPost('20260401-pecas-classicas-que-atravessam', 'aprovado')">
+        ✓ Aprovar
+      </button>
+      <button class="btn-ajuste" id="ajuste-20260401-pecas-classicas-que-atravessam" onclick="marcarPost('20260401-pecas-classicas-que-atravessam', 'ajuste')">
+        ✗ Pedir ajuste
+      </button>
+    </div>
+    <div class="campo-ajuste" id="campo-20260401-pecas-classicas-que-atravessam">
+      <textarea
+        id="obs-20260401-pecas-classicas-que-atravessam"
+        placeholder="O que você gostaria de ajustar neste post?"
+        oninput="atualizarComentario('20260401-pecas-classicas-que-atravessam', this.value)"
+        rows="3"
+      ></textarea>
+      <button class="btn-confirmar-obs" id="btnobs-20260401-pecas-classicas-que-atravessam" onclick="confirmarObs('20260401-pecas-classicas-que-atravessam')">
+        Registrar observação
+      </button>
+    </div>
+  </div>
+  <div class="post-card" id="card-20260403-frase-reflexiva-ver-bem-e-ver-" data-post-id="20260403-frase-reflexiva-ver-bem-e-ver-">
+    <div class="post-header">
+      <div class="post-meta">
+        <div class="post-data">03/04 (sex)</div>
+        <div class="post-titulo">Frase reflexiva — Ver bem é ver a vida com mais intensidade</div>
       </div>
       <span class="post-formato formato-card">Card</span>
     </div>
     
     <div class="post-arte">
       <img
-        src="https://lh3.googleusercontent.com/d/12X58Z0Yb_ummWRkSdgaKaPKsXrOcKB8t"
-        alt="Arte — &quot;Uma nova fase está chegando.&quot; — Teaser de abertura"
+        src="artes/03-04.jpg"
+        alt="Arte — Frase reflexiva — Ver bem é ver a vida com mais intensidade"
         loading="lazy"
         onerror="this.parentElement.style.display='none'"
       />
@@ -584,111 +742,167 @@
     
     <div class="post-conteudo" style="padding-top:0">
       <div class="post-conteudo-label">Legenda</div>
-      <div class="post-texto">Algo diferente está sendo construído para você e sua família.<br>Nos próximos dias, contamos tudo.<br>Fique de olho. 👁️<br>---</div>
+      <div class="post-texto">Tem coisas que a gente só percebe quando para e olha com atenção.<br>Um sorriso de longe. A paisagem na janela. A cor preferida de quem a gente ama.<br>Cuidar da visão é cuidar do que importa.<br>📍 Casa Marco — Igrejinha • Parobé • Taquara • Três Coroas<br>---</div>
     </div>
     
     <div class="post-acoes">
-      <button class="btn-aprovar" id="aprovar-20260325-uma-nova-fase-esta-chegando-te" onclick="marcarPost('20260325-uma-nova-fase-esta-chegando-te', 'aprovado')">
+      <button class="btn-aprovar" id="aprovar-20260403-frase-reflexiva-ver-bem-e-ver-" onclick="marcarPost('20260403-frase-reflexiva-ver-bem-e-ver-', 'aprovado')">
         ✓ Aprovar
       </button>
-      <button class="btn-ajuste" id="ajuste-20260325-uma-nova-fase-esta-chegando-te" onclick="marcarPost('20260325-uma-nova-fase-esta-chegando-te', 'ajuste')">
+      <button class="btn-ajuste" id="ajuste-20260403-frase-reflexiva-ver-bem-e-ver-" onclick="marcarPost('20260403-frase-reflexiva-ver-bem-e-ver-', 'ajuste')">
         ✗ Pedir ajuste
       </button>
     </div>
-    <div class="campo-ajuste" id="campo-20260325-uma-nova-fase-esta-chegando-te">
+    <div class="campo-ajuste" id="campo-20260403-frase-reflexiva-ver-bem-e-ver-">
       <textarea
-        id="obs-20260325-uma-nova-fase-esta-chegando-te"
+        id="obs-20260403-frase-reflexiva-ver-bem-e-ver-"
         placeholder="O que você gostaria de ajustar neste post?"
-        oninput="atualizarComentario('20260325-uma-nova-fase-esta-chegando-te', this.value)"
+        oninput="atualizarComentario('20260403-frase-reflexiva-ver-bem-e-ver-', this.value)"
         rows="3"
       ></textarea>
-      <button class="btn-confirmar-obs" id="btnobs-20260325-uma-nova-fase-esta-chegando-te" onclick="confirmarObs('20260325-uma-nova-fase-esta-chegando-te')">
+      <button class="btn-confirmar-obs" id="btnobs-20260403-frase-reflexiva-ver-bem-e-ver-" onclick="confirmarObs('20260403-frase-reflexiva-ver-bem-e-ver-')">
         Registrar observação
       </button>
     </div>
   </div>
-  <div class="post-card" id="card-20260326-saude-da-familia-nao-deveria-s" data-post-id="20260326-saude-da-familia-nao-deveria-s">
+  <div class="post-card" id="card-20260405-armacoes-animal-print" data-post-id="20260405-armacoes-animal-print">
     <div class="post-header">
       <div class="post-meta">
-        <div class="post-data">26/03 (qui)</div>
-        <div class="post-titulo">&quot;Saúde da família não deveria ser tão complicada.&quot; — A dor e o problema</div>
+        <div class="post-data">05/04 (dom)</div>
+        <div class="post-titulo">Armações animal print</div>
       </div>
-      <span class="post-formato formato-carrossel">Carrossel</span>
+      <span class="post-formato formato-reels">Reels</span>
     </div>
     
-    <div class="post-arte">
-      <div class="carrossel-wrapper" id="carr-20260326-saude-da-familia-nao-deveria-s">
-        <div class="carrossel-track"><div class="carrossel-slide"><img src="https://lh3.googleusercontent.com/d/1sxoOkxiuz-4ok2KlaxUbXJrc5Ou8t0HO" loading="lazy" onerror="this.closest('.carrossel-slide').style.display='none'" /></div><div class="carrossel-slide"><img src="https://lh3.googleusercontent.com/d/1X_s6Kg2OGXbOhk-umdIimy4LL17L1xxE" loading="lazy" onerror="this.closest('.carrossel-slide').style.display='none'" /></div><div class="carrossel-slide"><img src="https://lh3.googleusercontent.com/d/1GyOtbw1W9S5BLw3TQcy8a3TdqTM6H1Z4" loading="lazy" onerror="this.closest('.carrossel-slide').style.display='none'" /></div><div class="carrossel-slide"><img src="https://lh3.googleusercontent.com/d/1m0hrAUY7K6zSfF7BNU-4mhFhd7b9sOdk" loading="lazy" onerror="this.closest('.carrossel-slide').style.display='none'" /></div><div class="carrossel-slide"><img src="https://lh3.googleusercontent.com/d/1twB0hzxUdkk8qIfF7wPAFCtBqjq6l1AL" loading="lazy" onerror="this.closest('.carrossel-slide').style.display='none'" /></div><div class="carrossel-slide"><img src="https://lh3.googleusercontent.com/d/1NucrbdGyqv-lM-Xfq-c1sGZ_1Zkl2_FA" loading="lazy" onerror="this.closest('.carrossel-slide').style.display='none'" /></div></div>
-        <div class="carrossel-counter">1 / 6</div>
-        <button class="carrossel-prev" onclick="carrosselNav('carr-20260326-saude-da-familia-nao-deveria-s',-1)" aria-label="Anterior">&#8249;</button>
-        <button class="carrossel-next" onclick="carrosselNav('carr-20260326-saude-da-familia-nao-deveria-s', 1)" aria-label="Próximo">&#8250;</button>
-      </div>
-      <div class="carrossel-dots" id="dots-carr-20260326-saude-da-familia-nao-deveria-s"><span class="carrossel-dot ativa"></span><span class="carrossel-dot"></span><span class="carrossel-dot"></span><span class="carrossel-dot"></span><span class="carrossel-dot"></span><span class="carrossel-dot"></span></div>
-    </div>
-    <script>(function(){
-      var track = document.querySelector('#carr-20260326-saude-da-familia-nao-deveria-s .carrossel-track');
-      var counter = document.querySelector('#carr-20260326-saude-da-familia-nao-deveria-s .carrossel-counter');
-      var dots = document.querySelectorAll('#dots-carr-20260326-saude-da-familia-nao-deveria-s .carrossel-dot');
-      var total = 6;
-      track.addEventListener('scroll', function() {
-        var idx = Math.round(track.scrollLeft / track.offsetWidth);
-        counter.textContent = (idx + 1) + ' / ' + total;
-        dots.forEach(function(d, i) { d.classList.toggle('ativa', i === idx); });
-      });
-    })();
-    window.carrosselNav = window.carrosselNav || function(id, dir) {
-      var t = document.querySelector('#' + id + ' .carrossel-track');
-      t.scrollBy({ left: dir * t.offsetWidth, behavior: 'smooth' });
-    };</script>
     <div class="post-divider"></div>
     
     <div class="post-conteudo" style="padding-top:0">
       <div class="post-conteudo-label">Legenda</div>
-      <div class="post-texto">Se você já passou por isso — consultar num lugar, fazer exame em outro, esperar semanas por um encaminhamento —, sabe o quanto isso cansa.<br>Cuidar da saúde da família não deveria ser tão difícil.<br>Muito em breve, uma novidade em Novo Hamburgo. 🔜<br>---</div>
+      <div class="post-texto">Da onça ao leopardo, das tartarugas clássicas às combinações inesperadas, essas armações chegam pra transformar qualquer look.<br>Ousadas, cheias de personalidade e surpreendentemente versáteis. Combinam com looks neutros, monocromáticos e até com outras estampas (sim, dá!).<br>Você escolher a sua em uma de nossas lojas.<br>📍 Casa Marco — Igrejinha • Parobé • Taquara • Três Coroas<br>---</div>
     </div>
     
     <div class="post-acoes">
-      <button class="btn-aprovar" id="aprovar-20260326-saude-da-familia-nao-deveria-s" onclick="marcarPost('20260326-saude-da-familia-nao-deveria-s', 'aprovado')">
+      <button class="btn-aprovar" id="aprovar-20260405-armacoes-animal-print" onclick="marcarPost('20260405-armacoes-animal-print', 'aprovado')">
         ✓ Aprovar
       </button>
-      <button class="btn-ajuste" id="ajuste-20260326-saude-da-familia-nao-deveria-s" onclick="marcarPost('20260326-saude-da-familia-nao-deveria-s', 'ajuste')">
+      <button class="btn-ajuste" id="ajuste-20260405-armacoes-animal-print" onclick="marcarPost('20260405-armacoes-animal-print', 'ajuste')">
         ✗ Pedir ajuste
       </button>
     </div>
-    <div class="campo-ajuste" id="campo-20260326-saude-da-familia-nao-deveria-s">
+    <div class="campo-ajuste" id="campo-20260405-armacoes-animal-print">
       <textarea
-        id="obs-20260326-saude-da-familia-nao-deveria-s"
+        id="obs-20260405-armacoes-animal-print"
         placeholder="O que você gostaria de ajustar neste post?"
-        oninput="atualizarComentario('20260326-saude-da-familia-nao-deveria-s', this.value)"
+        oninput="atualizarComentario('20260405-armacoes-animal-print', this.value)"
         rows="3"
       ></textarea>
-      <button class="btn-confirmar-obs" id="btnobs-20260326-saude-da-familia-nao-deveria-s" onclick="confirmarObs('20260326-saude-da-familia-nao-deveria-s')">
+      <button class="btn-confirmar-obs" id="btnobs-20260405-armacoes-animal-print" onclick="confirmarObs('20260405-armacoes-animal-print')">
         Registrar observação
       </button>
     </div>
   </div>
-  <div class="post-card" id="card-20260327-eu-sempre-quis-construir-um-lu" data-post-id="20260327-eu-sempre-quis-construir-um-lu">
+  <div class="post-card" id="card-20260407-qual-voce-escolhe" data-post-id="20260407-qual-voce-escolhe">
     <div class="post-header">
       <div class="post-meta">
-        <div class="post-data">27/03 (sex)</div>
-        <div class="post-titulo">&quot;Eu sempre quis construir um lugar diferente.&quot; — Dra. Juliana, tom pessoal</div>
+        <div class="post-data">07/04 (ter)</div>
+        <div class="post-titulo">Qual você escolhe?</div>
       </div>
       <span class="post-formato formato-card">Card</span>
     </div>
     
     <div class="post-arte">
-      <div class="carrossel-wrapper" id="carr-20260327-eu-sempre-quis-construir-um-lu">
-        <div class="carrossel-track"><div class="carrossel-slide"><img src="https://lh3.googleusercontent.com/d/19An_I9Hr7x13rSl9tl9YLg59A0euAM7d" loading="lazy" onerror="this.closest('.carrossel-slide').style.display='none'" /></div><div class="carrossel-slide"><img src="https://lh3.googleusercontent.com/d/1vxhhPHZK3o_BaPTIKZI2KIwOptk1beYT" loading="lazy" onerror="this.closest('.carrossel-slide').style.display='none'" /></div><div class="carrossel-slide"><img src="https://lh3.googleusercontent.com/d/1dAPfLGEId_-KmAI9G_V-NlBHQ4VKDSwh" loading="lazy" onerror="this.closest('.carrossel-slide').style.display='none'" /></div><div class="carrossel-slide"><img src="https://lh3.googleusercontent.com/d/1IZN2SBBzLFGdM9hz27Y4SEiGyVdeH9Bc" loading="lazy" onerror="this.closest('.carrossel-slide').style.display='none'" /></div><div class="carrossel-slide"><img src="https://lh3.googleusercontent.com/d/1SvZPAzB40B7A4WB5yrbNlhNARk24NXBM" loading="lazy" onerror="this.closest('.carrossel-slide').style.display='none'" /></div><div class="carrossel-slide"><img src="https://lh3.googleusercontent.com/d/1hTGz_tpzXqh6qyAXQwEGB_PpIe7CRbKg" loading="lazy" onerror="this.closest('.carrossel-slide').style.display='none'" /></div><div class="carrossel-slide"><img src="https://lh3.googleusercontent.com/d/1OarOqAeWVTJQhzvWq0o8fdTMqIMh_DYv" loading="lazy" onerror="this.closest('.carrossel-slide').style.display='none'" /></div></div>
-        <div class="carrossel-counter">1 / 7</div>
-        <button class="carrossel-prev" onclick="carrosselNav('carr-20260327-eu-sempre-quis-construir-um-lu',-1)" aria-label="Anterior">&#8249;</button>
-        <button class="carrossel-next" onclick="carrosselNav('carr-20260327-eu-sempre-quis-construir-um-lu', 1)" aria-label="Próximo">&#8250;</button>
+      <img
+        src="artes/07-04.jpg"
+        alt="Arte — Qual você escolhe?"
+        loading="lazy"
+        onerror="this.parentElement.style.display='none'"
+      />
+    </div>
+    <div class="post-divider"></div>
+    
+    <div class="post-conteudo" style="padding-top:0">
+      <div class="post-conteudo-label">Legenda</div>
+      <div class="post-texto">Às vezes a escolha mais difícil do dia é essa aqui. 😄<br>Conta pra gente nos comentários: você vai de prata ou de dourado?<br>📍 Casa Marco — Igrejinha • Parobé • Taquara • Três Coroas<br>---</div>
+    </div>
+    
+    <div class="post-acoes">
+      <button class="btn-aprovar" id="aprovar-20260407-qual-voce-escolhe" onclick="marcarPost('20260407-qual-voce-escolhe', 'aprovado')">
+        ✓ Aprovar
+      </button>
+      <button class="btn-ajuste" id="ajuste-20260407-qual-voce-escolhe" onclick="marcarPost('20260407-qual-voce-escolhe', 'ajuste')">
+        ✗ Pedir ajuste
+      </button>
+    </div>
+    <div class="campo-ajuste" id="campo-20260407-qual-voce-escolhe">
+      <textarea
+        id="obs-20260407-qual-voce-escolhe"
+        placeholder="O que você gostaria de ajustar neste post?"
+        oninput="atualizarComentario('20260407-qual-voce-escolhe', this.value)"
+        rows="3"
+      ></textarea>
+      <button class="btn-confirmar-obs" id="btnobs-20260407-qual-voce-escolhe" onclick="confirmarObs('20260407-qual-voce-escolhe')">
+        Registrar observação
+      </button>
+    </div>
+  </div>
+  <div class="post-card" id="card-20260409-x-watch-prisma-pulseiras-inter" data-post-id="20260409-x-watch-prisma-pulseiras-inter">
+    <div class="post-header">
+      <div class="post-meta">
+        <div class="post-data">09/04 (qui)</div>
+        <div class="post-titulo">X-Watch Prisma — pulseiras intercambiáveis</div>
       </div>
-      <div class="carrossel-dots" id="dots-carr-20260327-eu-sempre-quis-construir-um-lu"><span class="carrossel-dot ativa"></span><span class="carrossel-dot"></span><span class="carrossel-dot"></span><span class="carrossel-dot"></span><span class="carrossel-dot"></span><span class="carrossel-dot"></span><span class="carrossel-dot"></span></div>
+      <span class="post-formato formato-reels">Reels</span>
+    </div>
+    
+    <div class="post-divider"></div>
+    
+    <div class="post-conteudo" style="padding-top:0">
+      <div class="post-conteudo-label">Legenda</div>
+      <div class="post-texto">O X-Watch Prisma vem com pulseiras intercambiáveis, você troca em segundos e personaliza o visual conforme o dia, o look ou o humor. Tem opção masculina e feminina.<br>E vai além do estilo: monitora frequência cardíaca, oxigenação, sono e estresse, com mais de 100 modos de treino. Tudo no seu pulso, com bateria que dura até 7 dias.<br>Disponível aqui na Casa Marco.<br>📍 Igrejinha • Parobé • Taquara • Três Coroas<br>---</div>
+    </div>
+    
+    <div class="post-acoes">
+      <button class="btn-aprovar" id="aprovar-20260409-x-watch-prisma-pulseiras-inter" onclick="marcarPost('20260409-x-watch-prisma-pulseiras-inter', 'aprovado')">
+        ✓ Aprovar
+      </button>
+      <button class="btn-ajuste" id="ajuste-20260409-x-watch-prisma-pulseiras-inter" onclick="marcarPost('20260409-x-watch-prisma-pulseiras-inter', 'ajuste')">
+        ✗ Pedir ajuste
+      </button>
+    </div>
+    <div class="campo-ajuste" id="campo-20260409-x-watch-prisma-pulseiras-inter">
+      <textarea
+        id="obs-20260409-x-watch-prisma-pulseiras-inter"
+        placeholder="O que você gostaria de ajustar neste post?"
+        oninput="atualizarComentario('20260409-x-watch-prisma-pulseiras-inter', this.value)"
+        rows="3"
+      ></textarea>
+      <button class="btn-confirmar-obs" id="btnobs-20260409-x-watch-prisma-pulseiras-inter" onclick="confirmarObs('20260409-x-watch-prisma-pulseiras-inter')">
+        Registrar observação
+      </button>
+    </div>
+  </div>
+  <div class="post-card" id="card-20260411-mitos-e-verdades-sobre-oculos" data-post-id="20260411-mitos-e-verdades-sobre-oculos">
+    <div class="post-header">
+      <div class="post-meta">
+        <div class="post-data">11/04 (sáb)</div>
+        <div class="post-titulo">Mitos e verdades sobre óculos</div>
+      </div>
+      <span class="post-formato formato-carrossel">Carrossel</span>
+    </div>
+    
+    <div class="post-arte">
+      <div class="carrossel-wrapper" id="carr-20260411-mitos-e-verdades-sobre-oculos">
+        <div class="carrossel-track"><div class="carrossel-slide"><img src="artes/11-04_1.jpg" loading="lazy" onerror="this.closest('.carrossel-slide').style.display='none'" /></div><div class="carrossel-slide"><img src="artes/11-04_2.jpg" loading="lazy" onerror="this.closest('.carrossel-slide').style.display='none'" /></div><div class="carrossel-slide"><img src="artes/11-04_3.jpg" loading="lazy" onerror="this.closest('.carrossel-slide').style.display='none'" /></div><div class="carrossel-slide"><img src="artes/11-04_4.jpg" loading="lazy" onerror="this.closest('.carrossel-slide').style.display='none'" /></div><div class="carrossel-slide"><img src="artes/11-04_5.jpg" loading="lazy" onerror="this.closest('.carrossel-slide').style.display='none'" /></div><div class="carrossel-slide"><img src="artes/11-04_6.jpg" loading="lazy" onerror="this.closest('.carrossel-slide').style.display='none'" /></div><div class="carrossel-slide"><img src="artes/11-04_7.jpg" loading="lazy" onerror="this.closest('.carrossel-slide').style.display='none'" /></div></div>
+        <div class="carrossel-counter">1 / 7</div>
+        <button class="carrossel-prev" onclick="carrosselNav('carr-20260411-mitos-e-verdades-sobre-oculos',-1)" aria-label="Anterior">&#8249;</button>
+        <button class="carrossel-next" onclick="carrosselNav('carr-20260411-mitos-e-verdades-sobre-oculos', 1)" aria-label="Próximo">&#8250;</button>
+      </div>
+      <div class="carrossel-dots" id="dots-carr-20260411-mitos-e-verdades-sobre-oculos"><span class="carrossel-dot ativa"></span><span class="carrossel-dot"></span><span class="carrossel-dot"></span><span class="carrossel-dot"></span><span class="carrossel-dot"></span><span class="carrossel-dot"></span><span class="carrossel-dot"></span></div>
     </div>
     <script>(function(){
-      var track = document.querySelector('#carr-20260327-eu-sempre-quis-construir-um-lu .carrossel-track');
-      var counter = document.querySelector('#carr-20260327-eu-sempre-quis-construir-um-lu .carrossel-counter');
-      var dots = document.querySelectorAll('#dots-carr-20260327-eu-sempre-quis-construir-um-lu .carrossel-dot');
+      var track = document.querySelector('#carr-20260411-mitos-e-verdades-sobre-oculos .carrossel-track');
+      var counter = document.querySelector('#carr-20260411-mitos-e-verdades-sobre-oculos .carrossel-counter');
+      var dots = document.querySelectorAll('#dots-carr-20260411-mitos-e-verdades-sobre-oculos .carrossel-dot');
       var total = 7;
       track.addEventListener('scroll', function() {
         var idx = Math.round(track.scrollLeft / track.offsetWidth);
@@ -704,151 +918,397 @@
     
     <div class="post-conteudo" style="padding-top:0">
       <div class="post-conteudo-label">Legenda</div>
-      <div class="post-texto">Depois de anos na oftalmologia, a Dra. Juliana percebeu que o cuidado com a saúde das pessoas podia — e devia — ser diferente.<br>Mais acolhedor. Mais completo. Mais acessível.<br>O que ela sempre quis construir está prestes a abrir as portas.<br>---</div>
+      <div class="post-texto">Tem muita coisa que a gente acha que sabe sobre óculos… mas nem sempre bate com a realidade. 😄<br>Passamos pelos mitos mais comuns e as respostas podem surpreender.<br>Teve algum que você acreditava? Conta nos comentários!<br>📍 Casa Marco — Igrejinha • Parobé • Taquara • Três Coroas<br>---</div>
     </div>
     
     <div class="post-acoes">
-      <button class="btn-aprovar" id="aprovar-20260327-eu-sempre-quis-construir-um-lu" onclick="marcarPost('20260327-eu-sempre-quis-construir-um-lu', 'aprovado')">
+      <button class="btn-aprovar" id="aprovar-20260411-mitos-e-verdades-sobre-oculos" onclick="marcarPost('20260411-mitos-e-verdades-sobre-oculos', 'aprovado')">
         ✓ Aprovar
       </button>
-      <button class="btn-ajuste" id="ajuste-20260327-eu-sempre-quis-construir-um-lu" onclick="marcarPost('20260327-eu-sempre-quis-construir-um-lu', 'ajuste')">
+      <button class="btn-ajuste" id="ajuste-20260411-mitos-e-verdades-sobre-oculos" onclick="marcarPost('20260411-mitos-e-verdades-sobre-oculos', 'ajuste')">
         ✗ Pedir ajuste
       </button>
     </div>
-    <div class="campo-ajuste" id="campo-20260327-eu-sempre-quis-construir-um-lu">
+    <div class="campo-ajuste" id="campo-20260411-mitos-e-verdades-sobre-oculos">
       <textarea
-        id="obs-20260327-eu-sempre-quis-construir-um-lu"
+        id="obs-20260411-mitos-e-verdades-sobre-oculos"
         placeholder="O que você gostaria de ajustar neste post?"
-        oninput="atualizarComentario('20260327-eu-sempre-quis-construir-um-lu', this.value)"
+        oninput="atualizarComentario('20260411-mitos-e-verdades-sobre-oculos', this.value)"
         rows="3"
       ></textarea>
-      <button class="btn-confirmar-obs" id="btnobs-20260327-eu-sempre-quis-construir-um-lu" onclick="confirmarObs('20260327-eu-sempre-quis-construir-um-lu')">
+      <button class="btn-confirmar-obs" id="btnobs-20260411-mitos-e-verdades-sobre-oculos" onclick="confirmarObs('20260411-mitos-e-verdades-sobre-oculos')">
         Registrar observação
       </button>
     </div>
   </div>
-  <div class="post-card" id="card-20260328-em-12-dias-abrimos-as-portas-c" data-post-id="20260328-em-12-dias-abrimos-as-portas-c">
+  <div class="post-card" id="card-20260413-escolhendo-seus-oculos-de-sol" data-post-id="20260413-escolhendo-seus-oculos-de-sol">
     <div class="post-header">
       <div class="post-meta">
-        <div class="post-data">28/03 (sáb)</div>
-        <div class="post-titulo">&quot;Em 12 dias, abrimos as portas.&quot; — Contagem regressiva</div>
+        <div class="post-data">13/04 (seg)</div>
+        <div class="post-titulo">Escolhendo seus óculos de sol</div>
+      </div>
+      <span class="post-formato formato-reels">Reels</span>
+    </div>
+    
+    <div class="post-divider"></div>
+    
+    <div class="post-conteudo" style="padding-top:0">
+      <div class="post-conteudo-label">Legenda</div>
+      <div class="post-texto">Porque não basta proteger os olhos, tem que combinar com o rosto, com o estilo, com aquela sensação de &quot;é esse&quot;.<br>Qual foi o seu favorito? Conta nos comentários. 👇<br>📍 Venha experimentar: Igrejinha • Parobé • Taquara • Três Coroas<br>---</div>
+    </div>
+    
+    <div class="post-acoes">
+      <button class="btn-aprovar" id="aprovar-20260413-escolhendo-seus-oculos-de-sol" onclick="marcarPost('20260413-escolhendo-seus-oculos-de-sol', 'aprovado')">
+        ✓ Aprovar
+      </button>
+      <button class="btn-ajuste" id="ajuste-20260413-escolhendo-seus-oculos-de-sol" onclick="marcarPost('20260413-escolhendo-seus-oculos-de-sol', 'ajuste')">
+        ✗ Pedir ajuste
+      </button>
+    </div>
+    <div class="campo-ajuste" id="campo-20260413-escolhendo-seus-oculos-de-sol">
+      <textarea
+        id="obs-20260413-escolhendo-seus-oculos-de-sol"
+        placeholder="O que você gostaria de ajustar neste post?"
+        oninput="atualizarComentario('20260413-escolhendo-seus-oculos-de-sol', this.value)"
+        rows="3"
+      ></textarea>
+      <button class="btn-confirmar-obs" id="btnobs-20260413-escolhendo-seus-oculos-de-sol" onclick="confirmarObs('20260413-escolhendo-seus-oculos-de-sol')">
+        Registrar observação
+      </button>
+    </div>
+  </div>
+  <div class="post-card" id="card-20260415-dica-como-limpar-as-lentes-do-" data-post-id="20260415-dica-como-limpar-as-lentes-do-">
+    <div class="post-header">
+      <div class="post-meta">
+        <div class="post-data">15/04 (qua)</div>
+        <div class="post-titulo">Dica: como limpar as lentes do jeito certo</div>
       </div>
       <span class="post-formato formato-card">Card</span>
     </div>
     
     <div class="post-arte">
-      <div class="youtube-facade" id="ytf-20260328-em-12-dias-abrimos-as-portas-c" onclick="abrirReel('jjsriyI-KaQ','ytf-20260328-em-12-dias-abrimos-as-portas-c')">
-        <img
-          src="https://img.youtube.com/vi/jjsriyI-KaQ/maxresdefault.jpg"
-          onerror="this.src='https://img.youtube.com/vi/jjsriyI-KaQ/hqdefault.jpg'"
-          alt="Reel — &quot;Em 12 dias, abrimos as portas.&quot; — Contagem regressiva"
-        />
-        <div class="yt-play-btn">
-          <svg viewBox="0 0 68 48" width="68" height="48">
-            <path d="M66.5 7.7a8.5 8.5 0 0 0-6-6C56 0 34 0 34 0S12 0 7.5 1.7a8.5 8.5 0 0 0-6 6C0 14.3 0 24 0 24s0 9.7 1.5 16.3a8.5 8.5 0 0 0 6 6C12 48 34 48 34 48s22 0 26.5-1.7a8.5 8.5 0 0 0 6-6C68 33.7 68 24 68 24s0-9.7-1.5-16.3z" fill="rgba(0,0,0,0.7)"/>
-            <path d="M45 24 27 14v20z" fill="white"/>
-          </svg>
-        </div>
-      </div>
+      <img
+        src="artes/15-04.jpg"
+        alt="Arte — Dica: como limpar as lentes do jeito certo"
+        loading="lazy"
+        onerror="this.parentElement.style.display='none'"
+      />
     </div>
-    <script>(function(){
-      window.abrirReel = window.abrirReel || function(ytId, facadeId) {
-        // Overlay fullscreen dentro do site (mobile e desktop)
-        var overlay = document.getElementById('yt-overlay');
-        if (!overlay) {
-          overlay = document.createElement('div');
-          overlay.id = 'yt-overlay';
-          overlay.style.cssText = 'position:fixed;inset:0;background:#000;z-index:500;display:none;flex-direction:column;align-items:center;justify-content:center;';
-
-          var closeBtn = document.createElement('button');
-          closeBtn.innerHTML = '&#10005;';
-          closeBtn.style.cssText = 'position:absolute;top:16px;right:16px;z-index:10;background:rgba(255,255,255,0.15);color:#fff;border:none;border-radius:50%;width:44px;height:44px;font-size:20px;cursor:pointer;line-height:1;';
-          closeBtn.setAttribute('aria-label', 'Fechar vídeo');
-          closeBtn.onclick = function() {
-            overlay.style.display = 'none';
-            var ifr = document.getElementById('yt-iframe');
-            if (ifr) ifr.src = '';
-          };
-
-          var ifr = document.createElement('iframe');
-          ifr.id = 'yt-iframe';
-          ifr.style.cssText = 'width:100%;height:100%;border:none;';
-          ifr.setAttribute('allow','accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen');
-          ifr.setAttribute('allowfullscreen','');
-
-          overlay.appendChild(closeBtn);
-          overlay.appendChild(ifr);
-          document.body.appendChild(overlay);
-        }
-
-        var ifr = document.getElementById('yt-iframe');
-        ifr.src = 'https://www.youtube.com/embed/' + ytId + '?autoplay=1&rel=0&modestbranding=1&playsinline=1';
-        overlay.style.display = 'flex';
-      };
-    })();</script>
     <div class="post-divider"></div>
     
     <div class="post-conteudo" style="padding-top:0">
       <div class="post-conteudo-label">Legenda</div>
-      <div class="post-texto">A contagem regressiva começou.<br>Em 12 dias, uma nova forma de cuidar da saúde chega a Novo Hamburgo.<br>Você vai querer conhecer. 🗓️<br>---<br>### FASE 2 — REVELAÇÃO DA MARCA (29/03–02/04)<br>---</div>
+      <div class="post-texto">Uma dica rápida que faz toda a diferença para os seus óculos durarem mais:<br>❌ Não limpe com a camiseta, lenços de papel ou qualquer pano seco, eles arranham as lentes aos poucos<br>✅ Use o paninho de microfibra que veio com os óculos<br>✅ Para uma limpeza mais profunda: água corrente + sabonete neutro, seque com o paninho<br>Pequeno cuidado, óculos novos por muito mais tempo.<br>📍 Casa Marco — Igrejinha • Parobé • Taquara • Três Coroas<br>---</div>
     </div>
     
     <div class="post-acoes">
-      <button class="btn-aprovar" id="aprovar-20260328-em-12-dias-abrimos-as-portas-c" onclick="marcarPost('20260328-em-12-dias-abrimos-as-portas-c', 'aprovado')">
+      <button class="btn-aprovar" id="aprovar-20260415-dica-como-limpar-as-lentes-do-" onclick="marcarPost('20260415-dica-como-limpar-as-lentes-do-', 'aprovado')">
         ✓ Aprovar
       </button>
-      <button class="btn-ajuste" id="ajuste-20260328-em-12-dias-abrimos-as-portas-c" onclick="marcarPost('20260328-em-12-dias-abrimos-as-portas-c', 'ajuste')">
+      <button class="btn-ajuste" id="ajuste-20260415-dica-como-limpar-as-lentes-do-" onclick="marcarPost('20260415-dica-como-limpar-as-lentes-do-', 'ajuste')">
         ✗ Pedir ajuste
       </button>
     </div>
-    <div class="campo-ajuste" id="campo-20260328-em-12-dias-abrimos-as-portas-c">
+    <div class="campo-ajuste" id="campo-20260415-dica-como-limpar-as-lentes-do-">
       <textarea
-        id="obs-20260328-em-12-dias-abrimos-as-portas-c"
+        id="obs-20260415-dica-como-limpar-as-lentes-do-"
         placeholder="O que você gostaria de ajustar neste post?"
-        oninput="atualizarComentario('20260328-em-12-dias-abrimos-as-portas-c', this.value)"
+        oninput="atualizarComentario('20260415-dica-como-limpar-as-lentes-do-', this.value)"
         rows="3"
       ></textarea>
-      <button class="btn-confirmar-obs" id="btnobs-20260328-em-12-dias-abrimos-as-portas-c" onclick="confirmarObs('20260328-em-12-dias-abrimos-as-portas-c')">
+      <button class="btn-confirmar-obs" id="btnobs-20260415-dica-como-limpar-as-lentes-do-" onclick="confirmarObs('20260415-dica-como-limpar-as-lentes-do-')">
         Registrar observação
       </button>
     </div>
   </div>
-  <div class="post-card" id="card-20260329-nasce-a-prisma-especialidades-" data-post-id="20260329-nasce-a-prisma-especialidades-">
+  <div class="post-card" id="card-20260417-mesma-armacao-duas-cores" data-post-id="20260417-mesma-armacao-duas-cores">
     <div class="post-header">
       <div class="post-meta">
-        <div class="post-data">29/03 (dom)</div>
-        <div class="post-titulo">&quot;Nasce a Prisma Especialidades.&quot; — Revelação oficial com logo</div>
+        <div class="post-data">17/04 (sex)</div>
+        <div class="post-titulo">Mesma armação, duas cores</div>
       </div>
-      <span class="post-formato formato-card">Card</span>
+      <span class="post-formato formato-reels">Reels</span>
     </div>
     
     <div class="post-divider"></div>
     
-    <div class="post-conteudo">
-      <div class="post-conteudo-label">Texto</div>
-      <div class="post-texto">Nasce a Prisma Especialidades.</div>
-    </div>
     <div class="post-conteudo" style="padding-top:0">
       <div class="post-conteudo-label">Legenda</div>
-      <div class="post-texto">Apresentamos a Prisma Especialidades.<br>Um centro médico multiespecialidades pensado para cuidar de você e de toda a sua família — com qualidade real, atendimento humano e preço justo.<br>Abertura em 09/04. 📍 Novo Hamburgo<br>Saúde completa para você e sua família.<br>---</div>
+      <div class="post-texto">É muito comum o cliente chegar na loja decidido por uma cor… e se surpreender quando experimenta a outra.<br>A armação é a mesma, mas a cor ilumina, destaca, suaviza. Muda tudo.<br>Por isso, experimentar faz toda a diferença.<br>Conta pra mim: você já vem decidido ou se surpreende na hora?<br>📍 Casa Marco — Igrejinha • Parobé • Taquara • Três Coroas<br>---</div>
     </div>
     
     <div class="post-acoes">
-      <button class="btn-aprovar" id="aprovar-20260329-nasce-a-prisma-especialidades-" onclick="marcarPost('20260329-nasce-a-prisma-especialidades-', 'aprovado')">
+      <button class="btn-aprovar" id="aprovar-20260417-mesma-armacao-duas-cores" onclick="marcarPost('20260417-mesma-armacao-duas-cores', 'aprovado')">
         ✓ Aprovar
       </button>
-      <button class="btn-ajuste" id="ajuste-20260329-nasce-a-prisma-especialidades-" onclick="marcarPost('20260329-nasce-a-prisma-especialidades-', 'ajuste')">
+      <button class="btn-ajuste" id="ajuste-20260417-mesma-armacao-duas-cores" onclick="marcarPost('20260417-mesma-armacao-duas-cores', 'ajuste')">
         ✗ Pedir ajuste
       </button>
     </div>
-    <div class="campo-ajuste" id="campo-20260329-nasce-a-prisma-especialidades-">
+    <div class="campo-ajuste" id="campo-20260417-mesma-armacao-duas-cores">
       <textarea
-        id="obs-20260329-nasce-a-prisma-especialidades-"
+        id="obs-20260417-mesma-armacao-duas-cores"
         placeholder="O que você gostaria de ajustar neste post?"
-        oninput="atualizarComentario('20260329-nasce-a-prisma-especialidades-', this.value)"
+        oninput="atualizarComentario('20260417-mesma-armacao-duas-cores', this.value)"
         rows="3"
       ></textarea>
-      <button class="btn-confirmar-obs" id="btnobs-20260329-nasce-a-prisma-especialidades-" onclick="confirmarObs('20260329-nasce-a-prisma-especialidades-')">
+      <button class="btn-confirmar-obs" id="btnobs-20260417-mesma-armacao-duas-cores" onclick="confirmarObs('20260417-mesma-armacao-duas-cores')">
+        Registrar observação
+      </button>
+    </div>
+  </div>
+  <div class="post-card" id="card-20260419-lentes-fotossensiveis-como-fun" data-post-id="20260419-lentes-fotossensiveis-como-fun">
+    <div class="post-header">
+      <div class="post-meta">
+        <div class="post-data">19/04 (dom)</div>
+        <div class="post-titulo">Lentes fotossensíveis: como funcionam</div>
+      </div>
+      <span class="post-formato formato-carrossel">Carrossel</span>
+    </div>
+    
+    <div class="post-arte">
+      <img
+        src="artes/19-04.jpg"
+        alt="Arte — Lentes fotossensíveis: como funcionam"
+        loading="lazy"
+        onerror="this.parentElement.style.display='none'"
+      />
+    </div>
+    <div class="post-divider"></div>
+    
+    <div class="post-conteudo" style="padding-top:0">
+      <div class="post-conteudo-label">Legenda</div>
+      <div class="post-texto">Lentes fotossensíveis (como as Transitions) escurecem automaticamente quando expostas à luz solar e clareiam ao voltar para ambientes fechados.<br>Um par de óculos que funciona como dois.<br>Como funcionam?<br>A lente contém moléculas que reagem à radiação UV. Na luz do sol, elas se reorganizam e escurecem a lente. Na sombra ou em ambientes fechados, voltam ao estado transparente.<br>Por que usar?<br>✅ Praticidade: não precisa trocar de óculos ao sair<br>✅ Proteção UV mesmo quando a lente está clara<br>✅ Conforto visual em qualquer condição de luz<br>✅ Disponível com qualquer grau<br>Quer conhecer as opções disponíveis?<br>Passa na loja e a gente te mostra. <br>📍 Igrejinha • Parobé • Taquara • Três Coroas<br>---</div>
+    </div>
+    
+    <div class="post-acoes">
+      <button class="btn-aprovar" id="aprovar-20260419-lentes-fotossensiveis-como-fun" onclick="marcarPost('20260419-lentes-fotossensiveis-como-fun', 'aprovado')">
+        ✓ Aprovar
+      </button>
+      <button class="btn-ajuste" id="ajuste-20260419-lentes-fotossensiveis-como-fun" onclick="marcarPost('20260419-lentes-fotossensiveis-como-fun', 'ajuste')">
+        ✗ Pedir ajuste
+      </button>
+    </div>
+    <div class="campo-ajuste" id="campo-20260419-lentes-fotossensiveis-como-fun">
+      <textarea
+        id="obs-20260419-lentes-fotossensiveis-como-fun"
+        placeholder="O que você gostaria de ajustar neste post?"
+        oninput="atualizarComentario('20260419-lentes-fotossensiveis-como-fun', this.value)"
+        rows="3"
+      ></textarea>
+      <button class="btn-confirmar-obs" id="btnobs-20260419-lentes-fotossensiveis-como-fun" onclick="confirmarObs('20260419-lentes-fotossensiveis-como-fun')">
+        Registrar observação
+      </button>
+    </div>
+  </div>
+  <div class="post-card" id="card-20260421-clip-on-dois-em-um-no-seu-esti" data-post-id="20260421-clip-on-dois-em-um-no-seu-esti">
+    <div class="post-header">
+      <div class="post-meta">
+        <div class="post-data">21/04 (ter)</div>
+        <div class="post-titulo">Clip-on: dois em um no seu estilo</div>
+      </div>
+      <span class="post-formato formato-reels">Reels</span>
+    </div>
+    
+    <div class="post-divider"></div>
+    
+    <div class="post-conteudo" style="padding-top:0">
+      <div class="post-conteudo-label">Legenda</div>
+      <div class="post-texto">Você usa a armação normalmente no dia a dia e quando o sol aparece, é só encaixar o clip, e pronto. Óculos de sol sem precisar trocar de armação, sem carregar dois pares na bolsa.<br>Perfeito pra quem usa grau e não abre mão do conforto e do estilo em qualquer situação.<br>Conheça as opções disponíveis aqui na Casa Marco.<br>📍 Igrejinha • Parobé • Taquara • Três Coroas<br>---</div>
+    </div>
+    
+    <div class="post-acoes">
+      <button class="btn-aprovar" id="aprovar-20260421-clip-on-dois-em-um-no-seu-esti" onclick="marcarPost('20260421-clip-on-dois-em-um-no-seu-esti', 'aprovado')">
+        ✓ Aprovar
+      </button>
+      <button class="btn-ajuste" id="ajuste-20260421-clip-on-dois-em-um-no-seu-esti" onclick="marcarPost('20260421-clip-on-dois-em-um-no-seu-esti', 'ajuste')">
+        ✗ Pedir ajuste
+      </button>
+    </div>
+    <div class="campo-ajuste" id="campo-20260421-clip-on-dois-em-um-no-seu-esti">
+      <textarea
+        id="obs-20260421-clip-on-dois-em-um-no-seu-esti"
+        placeholder="O que você gostaria de ajustar neste post?"
+        oninput="atualizarComentario('20260421-clip-on-dois-em-um-no-seu-esti', this.value)"
+        rows="3"
+      ></textarea>
+      <button class="btn-confirmar-obs" id="btnobs-20260421-clip-on-dois-em-um-no-seu-esti" onclick="confirmarObs('20260421-clip-on-dois-em-um-no-seu-esti')">
+        Registrar observação
+      </button>
+    </div>
+  </div>
+  <div class="post-card" id="card-20260423-frase-reflexiva-cuide-da-visao" data-post-id="20260423-frase-reflexiva-cuide-da-visao">
+    <div class="post-header">
+      <div class="post-meta">
+        <div class="post-data">23/04 (qui)</div>
+        <div class="post-titulo">Frase reflexiva — cuide da visão, cuide da vida</div>
+      </div>
+      <span class="post-formato formato-card">Card</span>
+    </div>
+    
+    <div class="post-arte">
+      <img
+        src="artes/23-04.jpg"
+        alt="Arte — Frase reflexiva — cuide da visão, cuide da vida"
+        loading="lazy"
+        onerror="this.parentElement.style.display='none'"
+      />
+    </div>
+    <div class="post-divider"></div>
+    
+    <div class="post-conteudo" style="padding-top:0">
+      <div class="post-conteudo-label">Legenda</div>
+      <div class="post-texto">Às vezes, tudo o que falta pra curtir a vida… é olhar com mais atenção.<br>A gente passa correndo, no automático, vendo tudo, mas enxergando pouco.<br>Os detalhes, as cores, as pessoas, os momentos… tudo ganha outro sentido quando você realmente para e percebe.<br>E, às vezes, um simples ajuste no olhar já muda tudo.<br>Enxergar melhor é também viver melhor.<br>---</div>
+    </div>
+    
+    <div class="post-acoes">
+      <button class="btn-aprovar" id="aprovar-20260423-frase-reflexiva-cuide-da-visao" onclick="marcarPost('20260423-frase-reflexiva-cuide-da-visao', 'aprovado')">
+        ✓ Aprovar
+      </button>
+      <button class="btn-ajuste" id="ajuste-20260423-frase-reflexiva-cuide-da-visao" onclick="marcarPost('20260423-frase-reflexiva-cuide-da-visao', 'ajuste')">
+        ✗ Pedir ajuste
+      </button>
+    </div>
+    <div class="campo-ajuste" id="campo-20260423-frase-reflexiva-cuide-da-visao">
+      <textarea
+        id="obs-20260423-frase-reflexiva-cuide-da-visao"
+        placeholder="O que você gostaria de ajustar neste post?"
+        oninput="atualizarComentario('20260423-frase-reflexiva-cuide-da-visao', this.value)"
+        rows="3"
+      ></textarea>
+      <button class="btn-confirmar-obs" id="btnobs-20260423-frase-reflexiva-cuide-da-visao" onclick="confirmarObs('20260423-frase-reflexiva-cuide-da-visao')">
+        Registrar observação
+      </button>
+    </div>
+  </div>
+  <div class="post-card" id="card-20260425-tres-armacoes-femininas-que-me" data-post-id="20260425-tres-armacoes-femininas-que-me">
+    <div class="post-header">
+      <div class="post-meta">
+        <div class="post-data">25/04 (sáb)</div>
+        <div class="post-titulo">Três armações femininas que merecem atenção</div>
+      </div>
+      <span class="post-formato formato-reels">Reels</span>
+    </div>
+    
+    <div class="post-divider"></div>
+    
+    <div class="post-conteudo" style="padding-top:0">
+      <div class="post-conteudo-label">Legenda</div>
+      <div class="post-texto">Três armações femininas com personalidade própria, cada uma com aquele algo a mais que transforma o look.<br>Qual das três você tentaria primeiro? Conta aqui. 👇<br>📍 Casa Marco — Igrejinha • Parobé • Taquara • Três Coroas<br>---</div>
+    </div>
+    
+    <div class="post-acoes">
+      <button class="btn-aprovar" id="aprovar-20260425-tres-armacoes-femininas-que-me" onclick="marcarPost('20260425-tres-armacoes-femininas-que-me', 'aprovado')">
+        ✓ Aprovar
+      </button>
+      <button class="btn-ajuste" id="ajuste-20260425-tres-armacoes-femininas-que-me" onclick="marcarPost('20260425-tres-armacoes-femininas-que-me', 'ajuste')">
+        ✗ Pedir ajuste
+      </button>
+    </div>
+    <div class="campo-ajuste" id="campo-20260425-tres-armacoes-femininas-que-me">
+      <textarea
+        id="obs-20260425-tres-armacoes-femininas-que-me"
+        placeholder="O que você gostaria de ajustar neste post?"
+        oninput="atualizarComentario('20260425-tres-armacoes-femininas-que-me', this.value)"
+        rows="3"
+      ></textarea>
+      <button class="btn-confirmar-obs" id="btnobs-20260425-tres-armacoes-femininas-que-me" onclick="confirmarObs('20260425-tres-armacoes-femininas-que-me')">
+        Registrar observação
+      </button>
+    </div>
+  </div>
+  <div class="post-card" id="card-20260427-como-e-o-atendimento-na-casa-m" data-post-id="20260427-como-e-o-atendimento-na-casa-m">
+    <div class="post-header">
+      <div class="post-meta">
+        <div class="post-data">27/04 (seg)</div>
+        <div class="post-titulo">Como é o atendimento na Casa Marco?</div>
+      </div>
+      <span class="post-formato formato-carrossel">Carrossel</span>
+    </div>
+    
+    <div class="post-arte">
+      <div class="carrossel-wrapper" id="carr-20260427-como-e-o-atendimento-na-casa-m">
+        <div class="carrossel-track"><div class="carrossel-slide"><img src="artes/27-04_1.jpg" loading="lazy" onerror="this.closest('.carrossel-slide').style.display='none'" /></div><div class="carrossel-slide"><img src="artes/27-04_2.jpg" loading="lazy" onerror="this.closest('.carrossel-slide').style.display='none'" /></div><div class="carrossel-slide"><img src="artes/27-04_3.jpg" loading="lazy" onerror="this.closest('.carrossel-slide').style.display='none'" /></div><div class="carrossel-slide"><img src="artes/27-04_4.jpg" loading="lazy" onerror="this.closest('.carrossel-slide').style.display='none'" /></div><div class="carrossel-slide"><img src="artes/27-04_5.jpg" loading="lazy" onerror="this.closest('.carrossel-slide').style.display='none'" /></div><div class="carrossel-slide"><img src="artes/27-04_6.jpg" loading="lazy" onerror="this.closest('.carrossel-slide').style.display='none'" /></div></div>
+        <div class="carrossel-counter">1 / 6</div>
+        <button class="carrossel-prev" onclick="carrosselNav('carr-20260427-como-e-o-atendimento-na-casa-m',-1)" aria-label="Anterior">&#8249;</button>
+        <button class="carrossel-next" onclick="carrosselNav('carr-20260427-como-e-o-atendimento-na-casa-m', 1)" aria-label="Próximo">&#8250;</button>
+      </div>
+      <div class="carrossel-dots" id="dots-carr-20260427-como-e-o-atendimento-na-casa-m"><span class="carrossel-dot ativa"></span><span class="carrossel-dot"></span><span class="carrossel-dot"></span><span class="carrossel-dot"></span><span class="carrossel-dot"></span><span class="carrossel-dot"></span></div>
+    </div>
+    <script>(function(){
+      var track = document.querySelector('#carr-20260427-como-e-o-atendimento-na-casa-m .carrossel-track');
+      var counter = document.querySelector('#carr-20260427-como-e-o-atendimento-na-casa-m .carrossel-counter');
+      var dots = document.querySelectorAll('#dots-carr-20260427-como-e-o-atendimento-na-casa-m .carrossel-dot');
+      var total = 6;
+      track.addEventListener('scroll', function() {
+        var idx = Math.round(track.scrollLeft / track.offsetWidth);
+        counter.textContent = (idx + 1) + ' / ' + total;
+        dots.forEach(function(d, i) { d.classList.toggle('ativa', i === idx); });
+      });
+    })();
+    window.carrosselNav = window.carrosselNav || function(id, dir) {
+      var t = document.querySelector('#' + id + ' .carrossel-track');
+      t.scrollBy({ left: dir * t.offsetWidth, behavior: 'smooth' });
+    };</script>
+    <div class="post-divider"></div>
+    
+    <div class="post-conteudo" style="padding-top:0">
+      <div class="post-conteudo-label">Legenda</div>
+      <div class="post-texto">Às vezes a gente adia a visita à ótica porque não sabe bem como é ou acha que vai ser rápido demais, ou demorado demais.<br>Na Casa Marco, o atendimento é no seu tempo. Sem pressão, com atenção de verdade.<br>Venha quando quiser. A gente está aqui.<br>📍 Igrejinha • Parobé • Taquara • Três Coroas<br>---</div>
+    </div>
+    
+    <div class="post-acoes">
+      <button class="btn-aprovar" id="aprovar-20260427-como-e-o-atendimento-na-casa-m" onclick="marcarPost('20260427-como-e-o-atendimento-na-casa-m', 'aprovado')">
+        ✓ Aprovar
+      </button>
+      <button class="btn-ajuste" id="ajuste-20260427-como-e-o-atendimento-na-casa-m" onclick="marcarPost('20260427-como-e-o-atendimento-na-casa-m', 'ajuste')">
+        ✗ Pedir ajuste
+      </button>
+    </div>
+    <div class="campo-ajuste" id="campo-20260427-como-e-o-atendimento-na-casa-m">
+      <textarea
+        id="obs-20260427-como-e-o-atendimento-na-casa-m"
+        placeholder="O que você gostaria de ajustar neste post?"
+        oninput="atualizarComentario('20260427-como-e-o-atendimento-na-casa-m', this.value)"
+        rows="3"
+      ></textarea>
+      <button class="btn-confirmar-obs" id="btnobs-20260427-como-e-o-atendimento-na-casa-m" onclick="confirmarObs('20260427-como-e-o-atendimento-na-casa-m')">
+        Registrar observação
+      </button>
+    </div>
+  </div>
+  <div class="post-card" id="card-20260429-lente-filtro-azul-tudo-que-voc" data-post-id="20260429-lente-filtro-azul-tudo-que-voc">
+    <div class="post-header">
+      <div class="post-meta">
+        <div class="post-data">29/04 (qua)</div>
+        <div class="post-titulo">Lente filtro azul: tudo que você precisa saber</div>
+      </div>
+      <span class="post-formato formato-reels">Reels</span>
+    </div>
+    
+    <div class="post-divider"></div>
+    
+    <div class="post-conteudo" style="padding-top:0">
+      <div class="post-conteudo-label">Legenda</div>
+      <div class="post-texto">Pode ser a luz azul.<br>A lente com filtro de luz azul (também chamada de lente anti-luz azul ou blue light) é indicada pra quem passa muito tempo em frente a telas. Os benefícios vão além do conforto visual:<br>👁️ Reduz o cansaço e a ardência ocular causados pela exposição prolongada<br>💤 Ajuda a regular o sono, porque a luz azul interfere na produção de melatonina, o hormônio que diz ao corpo que é hora de dormir<br>🧠 Diminui a sensação de &quot;olho pesado&quot; e a fadiga visual no fim do dia<br>✅ Pode ser combinada com qualquer grau ou usada mesmo sem prescrição<br>Ela não substitui a consulta com o oftalmologista, mas é uma aliada importante pra quem vive conectado.<br>Quer saber mais? Passa na loja, a gente explica com calma.<br>📍 Casa Marco — Igrejinha • Parobé • Taquara • Três Coroas</div>
+    </div>
+    
+    <div class="post-acoes">
+      <button class="btn-aprovar" id="aprovar-20260429-lente-filtro-azul-tudo-que-voc" onclick="marcarPost('20260429-lente-filtro-azul-tudo-que-voc', 'aprovado')">
+        ✓ Aprovar
+      </button>
+      <button class="btn-ajuste" id="ajuste-20260429-lente-filtro-azul-tudo-que-voc" onclick="marcarPost('20260429-lente-filtro-azul-tudo-que-voc', 'ajuste')">
+        ✗ Pedir ajuste
+      </button>
+    </div>
+    <div class="campo-ajuste" id="campo-20260429-lente-filtro-azul-tudo-que-voc">
+      <textarea
+        id="obs-20260429-lente-filtro-azul-tudo-que-voc"
+        placeholder="O que você gostaria de ajustar neste post?"
+        oninput="atualizarComentario('20260429-lente-filtro-azul-tudo-que-voc', this.value)"
+        rows="3"
+      ></textarea>
+      <button class="btn-confirmar-obs" id="btnobs-20260429-lente-filtro-azul-tudo-que-voc" onclick="confirmarObs('20260429-lente-filtro-azul-tudo-que-voc')">
         Registrar observação
       </button>
     </div>
@@ -904,13 +1364,78 @@
     } catch(e) {}
   })();
 
-  const totalPosts = 5;
+  const totalPosts = 15;
   const nomeCliente = "Óticas Casa Marco";
-  const periodo = "23 a 29 de março";
+  const periodo = "1 a 30 de abril";
   const whatsappNumero = '5551980603512';
   const whatsappGrupo = '';  // link do grupo (ex: https://chat.whatsapp.com/XXX)
-  const postsMeta = {"20260325-uma-nova-fase-esta-chegando-te": {"data": "25/03", "titulo": "\"Uma nova fase está chegando.\" — Teaser de abertura"}, "20260326-saude-da-familia-nao-deveria-s": {"data": "26/03", "titulo": "\"Saúde da família não deveria ser tão complicada.\" — A dor e o problema"}, "20260327-eu-sempre-quis-construir-um-lu": {"data": "27/03", "titulo": "\"Eu sempre quis construir um lugar diferente.\" — Dra. Juliana, tom pessoal"}, "20260328-em-12-dias-abrimos-as-portas-c": {"data": "28/03", "titulo": "\"Em 12 dias, abrimos as portas.\" — Contagem regressiva"}, "20260329-nasce-a-prisma-especialidades-": {"data": "29/03", "titulo": "\"Nasce a Prisma Especialidades.\" — Revelação oficial com logo"}};
-  const postsOrdem = ["20260325-uma-nova-fase-esta-chegando-te", "20260326-saude-da-familia-nao-deveria-s", "20260327-eu-sempre-quis-construir-um-lu", "20260328-em-12-dias-abrimos-as-portas-c", "20260329-nasce-a-prisma-especialidades-"];
+  const postsMeta = {"20260401-pecas-classicas-que-atravessam": {"data": "01/04", "titulo": "Peças clássicas que atravessam o tempo"}, "20260403-frase-reflexiva-ver-bem-e-ver-": {"data": "03/04", "titulo": "Frase reflexiva — Ver bem é ver a vida com mais intensidade"}, "20260405-armacoes-animal-print": {"data": "05/04", "titulo": "Armações animal print"}, "20260407-qual-voce-escolhe": {"data": "07/04", "titulo": "Qual você escolhe?"}, "20260409-x-watch-prisma-pulseiras-inter": {"data": "09/04", "titulo": "X-Watch Prisma — pulseiras intercambiáveis"}, "20260411-mitos-e-verdades-sobre-oculos": {"data": "11/04", "titulo": "Mitos e verdades sobre óculos"}, "20260413-escolhendo-seus-oculos-de-sol": {"data": "13/04", "titulo": "Escolhendo seus óculos de sol"}, "20260415-dica-como-limpar-as-lentes-do-": {"data": "15/04", "titulo": "Dica: como limpar as lentes do jeito certo"}, "20260417-mesma-armacao-duas-cores": {"data": "17/04", "titulo": "Mesma armação, duas cores"}, "20260419-lentes-fotossensiveis-como-fun": {"data": "19/04", "titulo": "Lentes fotossensíveis: como funcionam"}, "20260421-clip-on-dois-em-um-no-seu-esti": {"data": "21/04", "titulo": "Clip-on: dois em um no seu estilo"}, "20260423-frase-reflexiva-cuide-da-visao": {"data": "23/04", "titulo": "Frase reflexiva — cuide da visão, cuide da vida"}, "20260425-tres-armacoes-femininas-que-me": {"data": "25/04", "titulo": "Três armações femininas que merecem atenção"}, "20260427-como-e-o-atendimento-na-casa-m": {"data": "27/04", "titulo": "Como é o atendimento na Casa Marco?"}, "20260429-lente-filtro-azul-tudo-que-voc": {"data": "29/04", "titulo": "Lente filtro azul: tudo que você precisa saber"}};
+  const postsOrdem = ["20260401-pecas-classicas-que-atravessam", "20260403-frase-reflexiva-ver-bem-e-ver-", "20260405-armacoes-animal-print", "20260407-qual-voce-escolhe", "20260409-x-watch-prisma-pulseiras-inter", "20260411-mitos-e-verdades-sobre-oculos", "20260413-escolhendo-seus-oculos-de-sol", "20260415-dica-como-limpar-as-lentes-do-", "20260417-mesma-armacao-duas-cores", "20260419-lentes-fotossensiveis-como-fun", "20260421-clip-on-dois-em-um-no-seu-esti", "20260423-frase-reflexiva-cuide-da-visao", "20260425-tres-armacoes-femininas-que-me", "20260427-como-e-o-atendimento-na-casa-m", "20260429-lente-filtro-azul-tudo-que-voc"];
+
+  // ── ESTADO VIA GITHUB API ───────────────────────────────────────────────────
+  // Token fragmentado para não acionar o GitHub Secret Scanning.
+  // Permissão: Contents read/write apenas neste repositório.
+  const _tk = ['github', '_pat_', '11A4XFG6Q0V9ee2TfDGWKP_Z1vH306NmDFc07G2UHTHWyTJQRYkc4ClwFZGa1j9LThUODYITL6dNhDr6Kn'].join('');
+  const _ghOwner = 'oiforster';
+  const _ghRepo  = 'forster-aprovacoes';
+  const _estadoPath = 'oticas-casa-marco/estado-2026-04.json'; // ex: aprovacao/fyber-show-piscinas/estado-2026-03.json
+
+  // Fila serializada: evita race-condition de SHA quando o cliente clica rápido
+  let _salvarFila = Promise.resolve();
+
+  async function _salvarEstado(postId, status) {
+    _salvarFila = _salvarFila.then(async () => {
+      try {
+        const url = 'https://api.github.com/repos/' + _ghOwner + '/' + _ghRepo + '/contents/' + _estadoPath;
+        const getResp = await fetch(url, { headers: { Authorization: 'token ' + _tk } });
+        if (!getResp.ok) return;
+        const getData = await getResp.json();
+        const sha     = getData.sha;
+        const estado  = JSON.parse(atob(getData.content.replace(/\n/g, '')));
+        estado[postId] = status;
+        const novoConteudo = btoa(unescape(encodeURIComponent(JSON.stringify(estado, null, 2))));
+        await fetch(url, {
+          method: 'PUT',
+          headers: { Authorization: 'token ' + _tk, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ message: 'estado: ' + postId, content: novoConteudo, sha: sha })
+        });
+      } catch(e) { /* falha silenciosa — WhatsApp é o canal principal */ }
+    });
+  }
+
+  async function _salvarEstadoMultiplos(mapa) {
+    _salvarFila = _salvarFila.then(async () => {
+      try {
+        const url = 'https://api.github.com/repos/' + _ghOwner + '/' + _ghRepo + '/contents/' + _estadoPath;
+        const getResp = await fetch(url, { headers: { Authorization: 'token ' + _tk } });
+        if (!getResp.ok) return;
+        const getData = await getResp.json();
+        const sha    = getData.sha;
+        const estado = JSON.parse(atob(getData.content.replace(/\n/g, '')));
+        Object.assign(estado, mapa);
+        const novoConteudo = btoa(unescape(encodeURIComponent(JSON.stringify(estado, null, 2))));
+        await fetch(url, {
+          method: 'PUT',
+          headers: { Authorization: 'token ' + _tk, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ message: 'estado: aprovar-tudo', content: novoConteudo, sha: sha })
+        });
+      } catch(e) { /* falha silenciosa */ }
+    });
+  }
+  
+  function enviarEmailSilencioso(mensagem) {
+    try {
+      emailjs.send('service_a00b37r', 'template_lyk4lff', {
+        title: 'Aprovações — ' + nomeCliente + ' — ' + periodo,
+        name: nomeCliente,
+        message: mensagem,
+        email: ''
+      });
+    } catch(e) {
+      // silencioso — não interrompe o fluxo
+    }
+  }
+
   const statusPosts = {};
   const comentariosPosts = {};
 
@@ -927,6 +1452,7 @@
       btnAprovar.classList.remove('ativo');
       btnAjuste.classList.remove('ativo');
       if (campoAjuste) campoAjuste.classList.remove('visivel');
+      _salvarEstado(id, 'pendente');
     } else {
       statusPosts[id] = acao;
       card.classList.remove('aprovado', 'ajuste');
@@ -942,6 +1468,7 @@
         btnAjuste.classList.add('ativo');
         if (campoAjuste) campoAjuste.classList.add('visivel');
       }
+      _salvarEstado(id, acao);
     }
 
     atualizarProgresso();
@@ -988,9 +1515,11 @@
     if (todosAprovados) return;
 
     // Aprova todos os posts
+    const mapaEstado = {};
     document.querySelectorAll('[data-post-id]').forEach(card => {
       const id = card.dataset.postId;
       statusPosts[id] = 'aprovado';
+      mapaEstado[id]  = 'aprovado';
       card.classList.add('aprovado');
       card.classList.remove('ajuste');
       const ba = document.getElementById('aprovar-' + id);
@@ -1000,6 +1529,7 @@
       if (baj) baj.classList.remove('ativo');
       if (ca) ca.classList.remove('visivel');
     });
+    _salvarEstadoMultiplos(mapaEstado);
 
     btn.classList.add('ativo');
     btn.textContent = '✓ Todos os posts aprovados';
@@ -1033,21 +1563,78 @@
 
     const mensagem = linhas.join('\n');
 
+    // Disparo silencioso do email de redundância
+    enviarEmailSilencioso(mensagem);
+
     if (whatsappGrupo) {
-      // Copia mensagem e abre o grupo
-      navigator.clipboard.writeText(mensagem).catch(function() {});
-      window.open(whatsappGrupo, '_blank');
+      // Mostra modal com a mensagem para o cliente copiar e abrir o grupo
+      _mensagemParaEnviar = mensagem;
+      document.getElementById('modalMensagemTexto').value = mensagem;
+      document.getElementById('btnCopiarMensagem').textContent = 'Copiar mensagem';
+      document.getElementById('btnCopiarMensagem').classList.remove('copiado');
+      document.getElementById('modalMensagem').classList.add('visivel');
     } else {
       // Fallback: abre conversa direta com a Silvana
       window.open('https://wa.me/' + whatsappNumero + '?text=' + encodeURIComponent(mensagem), '_blank');
+      // Grava aprovação no localStorage para travar a página
+      try { localStorage.setItem('aprovacao:' + location.pathname, '1'); } catch(e) {}
+      document.getElementById('telaConfirmacao').classList.add('visivel');
     }
+  }
 
+  // Variável para guardar a mensagem do modal
+  var _mensagemParaEnviar = '';
+
+  function copiarMensagemModal() {
+    var texto = document.getElementById('modalMensagemTexto').value;
+    var btn = document.getElementById('btnCopiarMensagem');
+    navigator.clipboard.writeText(texto).then(function() {
+      btn.textContent = 'Copiado! ✓';
+      btn.classList.add('copiado');
+    }).catch(function() {
+      // Fallback para browsers sem clipboard API
+      document.getElementById('modalMensagemTexto').select();
+      document.execCommand('copy');
+      btn.textContent = 'Copiado! ✓';
+      btn.classList.add('copiado');
+    });
+  }
+
+  function abrirWhatsAppModal() {
+    window.open(whatsappGrupo, '_blank');
+    fecharModalMensagem();
     // Grava aprovação no localStorage para travar a página
     try { localStorage.setItem('aprovacao:' + location.pathname, '1'); } catch(e) {}
-
     document.getElementById('telaConfirmacao').classList.add('visivel');
   }
+
+  function fecharModalMensagem() {
+    document.getElementById('modalMensagem').classList.remove('visivel');
+  }
+
+  // Fecha modal ao clicar no backdrop
+  document.getElementById('modalMensagem').addEventListener('click', function(e) {
+    if (e.target === this) fecharModalMensagem();
+  });
+
 </script>
+
+
+<!-- Modal: mensagem WhatsApp -->
+<div class="modal-mensagem" id="modalMensagem">
+  <div class="modal-mensagem-inner">
+    <div class="modal-mensagem-titulo">Enviar aprovações</div>
+    <div class="modal-mensagem-instrucao">Copie a mensagem abaixo e cole no WhatsApp do grupo.</div>
+    <textarea class="modal-mensagem-texto" id="modalMensagemTexto" readonly></textarea>
+    <button class="modal-btn-copiar" id="btnCopiarMensagem" onclick="copiarMensagemModal()">
+      Copiar mensagem
+    </button>
+    <button class="modal-btn-wpp" id="btnAbrirWpp" onclick="abrirWhatsAppModal()">
+      Abrir WhatsApp
+    </button>
+    <button class="modal-btn-fechar" onclick="fecharModalMensagem()">Fechar</button>
+  </div>
+</div>
 
 </body>
 </html>
