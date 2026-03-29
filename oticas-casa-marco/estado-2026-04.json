@@ -1,17 +1,52 @@
 {
-  "20260401-pecas-classicas-que-atravessam": "aprovado",
-  "20260403-frase-reflexiva-ver-bem-e-ver-": "aprovado",
-  "20260405-armacoes-animal-print": "aprovado",
-  "20260407-qual-voce-escolhe": "aprovado",
-  "20260409-x-watch-prisma-pulseiras-inter": "ajuste",
-  "20260411-mitos-e-verdades-sobre-oculos": "pendente",
-  "20260413-escolhendo-seus-oculos-de-sol": "aprovado",
-  "20260415-dica-como-limpar-as-lentes-do-": "ajuste",
-  "20260417-mesma-armacao-duas-cores": "aprovado",
-  "20260419-lentes-fotossensiveis-como-fun": "ajuste",
-  "20260421-clip-on-dois-em-um-no-seu-esti": "aprovado",
-  "20260423-frase-reflexiva-cuide-da-visao": "aprovado",
-  "20260425-tres-armacoes-femininas-que-me": "aprovado",
-  "20260427-como-e-o-atendimento-na-casa-m": "ajuste",
-  "20260429-lente-filtro-azul-tudo-que-voc": "aprovado"
+  "20260401-pecas-classicas-que-atravessam": {
+    "status": "aprovado"
+  },
+  "20260403-frase-reflexiva-ver-bem-e-ver-": {
+    "status": "aprovado"
+  },
+  "20260405-armacoes-animal-print": {
+    "status": "aprovado"
+  },
+  "20260407-qual-voce-escolhe": {
+    "status": "aprovado"
+  },
+  "20260409-x-watch-prisma-pulseiras-inter": {
+    "status": "ajuste",
+    "obs": "Preciso só confirmar se a bateria dura 7 dias"
+  },
+  "20260411-mitos-e-verdades-sobre-oculos": {
+    "status": "ajuste",
+    "obs": "Ficou muito bom. No post 7 como fala de óculos de sol e não transitions, sugiro colocar uma foto dele com dólar, acho que tem a imagem."
+  },
+  "20260413-escolhendo-seus-oculos-de-sol": {
+    "status": "aprovado"
+  },
+  "20260415-dica-como-limpar-as-lentes-do-": {
+    "status": "ajuste",
+    "obs": "Na verdade o paninho que vem junto com o óculos ele é só para guardar os óculos para não bater as lentes no estojo. O correto seria borrifar com spray especial (limpa lentes) e depois lenço mágico, mas a primeira opção seria embaixo da água corrente com um pingo de detergente no dedo e secar com papel macio. O lenço mágico seria a melhor opção se tiver marcas digitais na lente e estiver na rua, para não limpar na camiseta."
+  },
+  "20260417-mesma-armacao-duas-cores": {
+    "status": "aprovado"
+  },
+  "20260419-lentes-fotossensiveis-como-fun": {
+    "status": "ajuste",
+    "obs": "Talvez colocar ambiente interno ao invés de ambiente fechado"
+  },
+  "20260421-clip-on-dois-em-um-no-seu-esti": {
+    "status": "aprovado"
+  },
+  "20260423-frase-reflexiva-cuide-da-visao": {
+    "status": "aprovado"
+  },
+  "20260425-tres-armacoes-femininas-que-me": {
+    "status": "aprovado"
+  },
+  "20260427-como-e-o-atendimento-na-casa-m": {
+    "status": "ajuste",
+    "obs": "Sugiro mudar a foto, porque a Graci não é mais nossa funcionária"
+  },
+  "20260429-lente-filtro-azul-tudo-que-voc": {
+    "status": "aprovado"
+  }
 }
