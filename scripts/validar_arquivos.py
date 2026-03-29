@@ -56,17 +56,20 @@ def normalizar_nome_arte(nome):
     '30-03 (Seg)  1.jpg'    → '30-03_1.jpg'
     '01-04 (Qua) .jpg'      → '01-04.jpg'
     '09-04 (qui)_2.png'     → '09-04_2.png'
+    '27_04_1.jpg'            → '27-04_1.jpg'  (underscore entre dia-mês)
     Retorna None se não for um arquivo de arte válido.
     """
     # Normaliza NFD → NFC
     nome = unicodedata.normalize('NFC', nome)
-    # Extrai prefixo DD-MM e extensão
-    m = re.match(r'^(\d{2}-\d{2})\s*(?:\([^)]*\))?\s*[_\s]*(\d+)?\s*(\.\w+)$', nome)
+    # Extrai prefixo DD-MM ou DD_MM e extensão
+    m = re.match(r'^(\d{2})[-_](\d{2})\s*(?:\([^)]*\))?\s*[_\s]*(\d+)?\s*(\.\w+)$', nome)
     if not m:
         return None
-    prefixo = m.group(1)
-    numero = m.group(2)
-    ext = m.group(3).lower()
+    dia = m.group(1)
+    mes = m.group(2)
+    numero = m.group(3)
+    ext = m.group(4).lower()
+    prefixo = f'{dia}-{mes}'
     if numero:
         return f'{prefixo}_{numero}{ext}'
     return f'{prefixo}{ext}'
