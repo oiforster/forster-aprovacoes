@@ -4,7 +4,7 @@
 **Criado em:** março de 2026
 **Repositório:** https://github.com/oiforster/forster-aprovacoes
 **Site:** https://aprovar.forsterfilmes.com
-**Última atualização:** 2026-03-28 — Domínio próprio; URLs limpas; slugs personalizados; imagens copiadas pro repo; layout cronológico sem tabs de semana; biblioteca separada em `/entregas/`; auto-sync em todos os `.command`; fix: comentários HTML no `.md` não vazam mais para a página
+**Última atualização:** 2026-03-29 — Redesign completo da página de aprovação (Inter + Playfair Display, fundo off-white, cards com borda lateral colorida); estado persistente com observações de ajuste (formato JSON `{status, obs}`); reordenação automática (pendentes no topo, respondidos embaixo); nova estrutura de URLs (`YYYY-MM/index.html`); índice de meses na raiz do cliente; template_index.html; fix encoding UTF-8 na leitura do GitHub
 
 ---
 
@@ -67,14 +67,18 @@ _arq   _reels  _aprov                            ↓ fallback se sem .md:
 ```
 forster-aprovacoes/
 ├── CNAME                                ← domínio: aprovar.forsterfilmes.com
-├── template.html                        ← template base de todas as páginas
+├── template.html                        ← template base das páginas de aprovação (redesign Inter + Playfair)
+├── template_index.html                  ← template do índice de meses por cliente
 ├── [slug-cliente]/                      ← uma pasta por cliente (primeiro nível da URL)
-│   ├── index.html                       ← sempre aponta para a versão mais recente
-│   ├── YYYY-MM-DD.html                  ← aprovação por semana/período (recorrentes)
+│   ├── index.html                       ← ÍNDICE DE MESES com progresso visual
+│   ├── YYYY-MM/
+│   │   └── index.html                   ← aprovação do mês (URL limpa: /slug/2026-04)
+│   ├── YYYY-MM-DD.html                  ← aprovação legada (links já enviados — mantido)
 │   ├── YYYY-MM.html                     ← entrega pontual via _youtube.md
-│   ├── [mes-ano]/
-│   │   └── index.html                   ← biblioteca do mês (URL limpa sem .html)
-│   └── estado-YYYY-MM.json             ← estado de aprovação de cada post (lido pelo JS)
+│   ├── entregas/
+│   │   └── [mes-ano]/
+│   │       └── index.html               ← biblioteca do mês (URL limpa sem .html)
+│   └── estado-YYYY-MM.json             ← estado de aprovação ({status, obs} — lido pelo JS)
 ├── scripts/
 │   ├── gerar_aprovacoes.py              ← gerador de páginas de aprovação
 │   ├── gerar_biblioteca.py              ← gerador de biblioteca de entregas
@@ -93,8 +97,9 @@ forster-aprovacoes/
 **Estrutura de URLs:**
 ```
 aprovar.forsterfilmes.com/                               ← índice geral
-aprovar.forsterfilmes.com/catarata/                      ← aprovação mais recente (index.html)
-aprovar.forsterfilmes.com/catarata/2026-04-01            ← aprovação de abril (por período)
+aprovar.forsterfilmes.com/catarata/                      ← índice de meses do cliente
+aprovar.forsterfilmes.com/catarata/2026-04               ← aprovação de abril (URL limpa)
+aprovar.forsterfilmes.com/catarata/2026-04-01            ← aprovação legada (links já enviados — mantido)
 aprovar.forsterfilmes.com/catarata/entregas/             ← biblioteca de entregas (índice)
 aprovar.forsterfilmes.com/catarata/entregas/abril-2026   ← biblioteca de abril
 aprovar.forsterfilmes.com/fyber-show-piscinas/           ← outro cliente (slug automático)
@@ -103,9 +108,11 @@ aprovar.forsterfilmes.com/fyber-show-piscinas/           ← outro cliente (slug
 **Estrutura de arquivos no repo por cliente:**
 ```
 {slug}/
-├── index.html          ← aprovação mais recente (atualizado a cada geração)
-├── YYYY-MM-DD.html     ← aprovação por período (permanente)
-├── estado-YYYY-MM.json ← estado de aprovação (lido pelo JS via GitHub raw)
+├── index.html          ← ÍNDICE DE MESES com progresso visual (gerado automaticamente)
+├── YYYY-MM/
+│   └── index.html      ← aprovação do mês (URL limpa: /slug/2026-04)
+├── YYYY-MM-DD.html     ← aprovação legada por período (mantida para links já enviados)
+├── estado-YYYY-MM.json ← estado de aprovação (formato: {"post-id": {"status": "aprovado", "obs": "..."}})
 ├── artes/              ← imagens copiadas do Synology (quando xattr não disponível)
 │   ├── DD-MM.jpg
 │   └── DD-MM_N.jpg
@@ -266,7 +273,8 @@ Script principal. Lê os arquivos `.md` de Conteúdo Mensal e gera as páginas H
 | `encontrar_arte(data, pasta_cliente, output_dir=None)` | Busca arte em `Posts_Fixos/`. Tenta: (1) xattr/Drive URL, (2) `_links.md`, (3) copia o arquivo para `{slug}/artes/` no repo e retorna URL relativa |
 | `ler_youtube_id(pasta_videos, reel_nome)` | Lê `Videos/_youtube.md` e retorna YouTube ID pelo nome do Reel |
 | `parse_conteudo_mensal(arquivo, datas, pasta_estrategia, output_dir)` | Parse do `.md`: extrai posts do período; passa `output_dir` para `encontrar_arte()` |
-| `gerar_pagina_aprovacao(...)` | Monta a página HTML; todos os posts em ordem cronológica (sem tabs de semana) |
+| `gerar_pagina_aprovacao(...)` | Monta a página HTML; todos os posts em ordem cronológica |
+| `gerar_indice_meses(cliente, pasta_cliente, base_url)` | Gera `index.html` na raiz do cliente com listagem de todos os meses e progresso visual |
 | `gerar_para_cliente_reels(cliente, ano_mes, ...)` | Fallback para pontuais: gera página direto do `_youtube.md`, sem calendário |
 
 **Estratégia de imagens (ordem de prioridade):**
@@ -283,7 +291,18 @@ Script principal. Lê os arquivos `.md` de Conteúdo Mensal e gera as páginas H
 --fim YYYY-MM-DD     # fim do período personalizado
 ```
 
-**Layout:** uma página por período (mês ou semana personalizada), posts em ordem cronológica, sem navegação por semanas.
+**Layout:** uma página por mês em `YYYY-MM/index.html` (URL limpa). Posts em ordem cronológica na geração; ao carregar, o JS reordena: pendentes no topo, ajustes depois, aprovados no final.
+
+**Estado JSON (formato novo — março/2026):**
+```json
+{
+  "post-id": { "status": "aprovado" },
+  "post-id": { "status": "ajuste", "obs": "Trocar o fundo para bege" }
+}
+```
+Retrocompatível: aceita formato antigo (string pura) e migra automaticamente para o novo formato ao regerar.
+
+**Índice de meses:** ao gerar uma página, `gerar_indice_meses()` atualiza automaticamente o `index.html` na raiz do cliente. Lista todos os meses com barra de progresso e fração (ex: "8/13"). Usa `template_index.html` se existir, senão gera inline.
 
 **Comentários HTML no `.md`:** o parser interrompe a leitura de uma seção ao encontrar `<!--`. Isso permite incluir notas internas (como instruções para o Claude da Silvana) no final do arquivo sem que vazem para a página de aprovação.
 
@@ -334,9 +353,20 @@ REEL 12 - Dia da Mulher: https://youtu.be/jjsriyI-KaQ
 
 ---
 
-### 5. `aprovacao/template.html`
+### 5. `template.html` + `template_index.html`
 
-Template HTML base. Substituições feitas pelo `gerar_aprovacoes.py`:
+`template.html` — template base das páginas de aprovação. Redesenhado em março/2026 com identidade visual Forster Filmes:
+- **Tipografia:** Inter (corpo) + Playfair Display (títulos)
+- **Cores:** fundo off-white (#FAFAF8), cards brancos, sombras sutis
+- **Cards aprovados:** borda lateral verde, badge "Aprovado", opacidade 0.8
+- **Cards com ajuste:** borda lateral âmbar, badge "Ajuste solicitado", caixa amarela com observação do cliente
+- **Reordenação:** ao carregar estado do GitHub, pendentes vão para o topo, ajustes depois, aprovados no final
+- **Loading overlay:** spinner enquanto busca estado do GitHub
+- **Seção de Frames:** placeholder `{{FRAMES_HTML}}` para galeria com lightbox (swipe mobile + setas desktop)
+
+`template_index.html` — template do índice de meses. Card por mês com título, progresso (X/Y) e barra visual.
+
+Substituições feitas pelo `gerar_aprovacoes.py`:
 
 | Placeholder | Substituído por |
 |-------------|----------------|
@@ -354,6 +384,9 @@ Template HTML base. Substituições feitas pelo `gerar_aprovacoes.py`:
 | `{{FORM_ID}}` | ID único do formulário |
 | `{{WHATSAPP_SILVANA}}` | Número da Silvana (fallback) |
 | `{{WHATSAPP_GRUPO}}` | Link do grupo WhatsApp do cliente (ou vazio) |
+| `{{ESTADO_PATH}}` | Caminho do estado JSON no repo (ex: `oticas-casa-marco/estado-2026-04.json`) |
+| `{{GH_TOKEN_BODY}}` | Token GitHub fragmentado (read/write contents) |
+| `{{FRAMES_HTML}}` | HTML da seção de frames (vazio se não houver frames) |
 
 **Comportamento de vídeo (Reel):**
 - Exibe facade: thumbnail do YouTube com botão play overlay
@@ -361,9 +394,18 @@ Template HTML base. Substituições feitas pelo `gerar_aprovacoes.py`:
 - Botão ✕ fecha o overlay
 - Funciona em celular e desktop sem abrir app externo
 
+**Persistência de estado (redesign março/2026):**
+- Ao clicar "Aprovar" ou "Pedir ajuste": estado salvo no GitHub via API (`PUT /contents/`)
+- Formato: `{ "status": "aprovado" }` ou `{ "status": "ajuste", "obs": "texto do cliente" }`
+- Ao carregar a página: `_carregarEstado()` busca o JSON do GitHub e aplica visualmente
+- Observações de ajuste aparecem em caixa amarela no card do post
+- Posts são reordenados: pendentes no topo, ajustes depois, aprovados no final
+- Decode UTF-8: `decodeURIComponent(escape(atob(...)))` para acentos corretos
+- Fila serializada (`_salvarFila = Promise.resolve().then(...)`) evita race-condition de SHA
+
 **Comportamento pós-envio (page lock):**
 - Após clicar "Enviar aprovações": `localStorage.setItem('aprovacao:' + pathname, '1')`
-- Na próxima visita: mostra tela "Tudo certo por aqui! Você já enviou suas aprovações desta semana."
+- Na próxima visita: mostra tela "Tudo certo por aqui! Você já enviou suas aprovações."
 - Impede que o cliente envie em duplicata por acidente
 
 **Notificação automática por email (EmailJS):**

@@ -1,7 +1,7 @@
 # Guia de Aprovações — Silvana
 
 Sistema de aprovação de conteúdo da Forster Filmes.
-Última atualização: 2026-03-28 — domínio próprio `aprovar.forsterfilmes.com`; auto-sync; normalização automática de nomes de artes; opção "Mês completo"; busca de artes em todas as pastas de entrega.
+Última atualização: 2026-03-29 — redesign visual (Inter + Playfair Display, fundo off-white, cards refinados); aprovações persistem ao recarregar; observações de ajuste salvas e visíveis; posts pendentes no topo; índice de meses na raiz do cliente.
 
 ---
 
@@ -126,25 +126,35 @@ Copie e envie no WhatsApp do cliente.
 
 ## O que o cliente vê
 
-- Lista de todos os posts do período com data, título e formato
-- A arte de cada post (imagem, carrossel ou vídeo)
-- A legenda que vai no Instagram
-- Botão **✓ Aprovar** ou **✗ Pedir ajuste** em cada post
-- Se pedir ajuste: campo de texto para registrar a observação
+### Índice de meses
+Ao acessar o link do cliente (ex: `aprovar.forsterfilmes.com/oticas-casa-marco/`), o cliente vê uma lista de meses com o progresso de cada um (ex: "Abril de 2026 — 8/15"). Ao clicar em um mês, abre a página de aprovação daquele mês.
+
+### Página de aprovação (redesign março/2026)
+- **Header** com nome do cliente em fonte serifada (Playfair Display) e barra de progresso
 - Botão geral **Aprovar todos os posts**
-- Barra de progresso mostrando quantos já foram respondidos
+- **Posts pendentes** aparecem no topo, separados por "Aguardando sua aprovação"
+- **Posts já respondidos** aparecem embaixo, separados por "Já respondidos"
+- Cada post mostra: data, título, formato (Card/Carrossel/Reels), arte e legenda
+- Botões **Aprovar** e **Pedir ajuste** em cada post
+- Se pedir ajuste: campo de texto para registrar a observação + botão "Registrar observação"
+- Cards aprovados: borda verde lateral, badge "Aprovado", visual discreto (opacidade reduzida)
+- Cards com ajuste: borda âmbar, badge "Ajuste solicitado", caixa amarela com a observação
 - Ao finalizar: botão **Enviar aprovações**
 
+### Persistência de aprovações
+**As aprovações persistem ao recarregar a página.** O cliente pode fechar o celular e voltar depois — os posts que já foram aprovados ou ajustados continuam marcados, e as observações continuam visíveis. Isso acontece porque o estado é salvo no GitHub a cada clique.
+
+### Envio da aprovação
 Ao clicar "Enviar aprovações":
 - A mensagem com todos os status é copiada automaticamente para o clipboard do cliente
 - O WhatsApp do grupo do cliente (ou contato da Silvana/Samuel) é aberto
 - O cliente cola e envia
 
-Depois de enviar, a página mostra: **"Tudo certo por aqui! Você já enviou suas aprovações desta semana."** — e fica bloqueada para evitar envio duplicado.
+Depois de enviar, a página mostra: **"Tudo certo por aqui! Você já enviou suas aprovações."** — e fica bloqueada para evitar envio duplicado.
 
 ### Como o cliente assiste um Reel
 
-Ao tocar na capa do vídeo, um player abre por cima da página (tela cheia, proporção 9:16) com o vídeo rodando direto. Botão ✕ fecha. Funciona no celular e no computador.
+Ao tocar na capa do vídeo, um player abre por cima da página (tela cheia, proporção 9:16) com o vídeo rodando direto. Botão X fecha. Funciona no celular e no computador.
 
 ---
 

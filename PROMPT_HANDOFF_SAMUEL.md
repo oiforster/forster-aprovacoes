@@ -1,7 +1,7 @@
 # Prompt de continuação — Mac do Samuel
 
 > Copiar o bloco abaixo e colar direto no Claude no Mac do Samuel.
-> Última atualização: 2026-03-28
+> Última atualização: 2026-03-29
 
 ---
 
@@ -78,9 +78,11 @@ template.html estava em aprovacao/template.html → movido para a raiz do repo.
 ## ESTRUTURA DE ARQUIVOS POR CLIENTE
 
 {slug}/
-├── index.html              ← aprovação mais recente (sobrescrito a cada geração)
-├── YYYY-MM-DD.html         ← aprovação por período (permanente)
-├── estado-YYYY-MM.json     ← estado de aprovação (lido pelo JS via GitHub raw)
+├── index.html              ← ÍNDICE DE MESES com progresso visual (gerado automaticamente)
+├── YYYY-MM/
+│   └── index.html          ← aprovação do mês (URL limpa: /slug/2026-04)
+├── YYYY-MM-DD.html         ← aprovação legada (links já enviados — mantido)
+├── estado-YYYY-MM.json     ← estado de aprovação (formato: {"post-id": {"status": "aprovado", "obs": "..."}})
 ├── artes/                  ← imagens copiadas do Synology (fallback sem xattr)
 │   └── DD-MM.jpg
 └── entregas/               ← gerado por gerar_biblioteca.py
@@ -103,6 +105,33 @@ Resolvia o bug em que as notas internas do template (bloco de instruções para 
 
 ### 12. URL corrigida no Entrega de Vídeos.command
 Trocada `oiforster.github.io/forster-aprovacoes` por `aprovar.forsterfilmes.com`.
+
+---
+
+## O QUE FOI FEITO (sessão 2026-03-29 — Redesign)
+
+### 13. Redesign completo da página de aprovação
+- Tipografia: Inter (corpo) + Playfair Display (títulos)
+- Fundo off-white (#FAFAF8), cards com borda lateral colorida (verde/âmbar)
+- Badges de status: "Aprovado" (verde) e "Ajuste solicitado" (âmbar)
+- Caixa amarela com observação do cliente nos posts com ajuste
+
+### 14. Persistência de estado com observações
+- Estado JSON migrado de `"post-id": "aprovado"` para `"post-id": {"status": "aprovado", "obs": "..."}`
+- `_carregarEstado()` busca do GitHub ao abrir a página e aplica visualmente
+- Fix encoding UTF-8: `decodeURIComponent(escape(atob(...)))` para acentos corretos
+- Observações preenchidas automaticamente na textarea + caixa amarela
+
+### 15. Reordenação automática
+- Pendentes no topo, ajustes depois, aprovados no final
+- Separadores visuais: "Aguardando sua aprovação" e "Já respondidos"
+- Loading overlay enquanto busca estado do GitHub
+
+### 16. Nova estrutura de URLs
+- Páginas geradas em `YYYY-MM/index.html` (URL limpa: `/slug/2026-04`)
+- `index.html` na raiz do cliente agora é um ÍNDICE DE MESES com progresso visual
+- Novo arquivo `template_index.html` para o índice
+- Páginas legadas (YYYY-MM-DD.html) mantidas para links já enviados
 
 ---
 
