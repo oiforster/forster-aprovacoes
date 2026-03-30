@@ -1448,9 +1448,8 @@ def gerar_para_cliente(cliente, datas_semana, agencia_path, base_url, output_dir
     gerar_indice_meses(cliente, pasta_cliente, base_url)
 
     url = f"{base_url}/{slug_c}/{ano_mes_posts}"
-    url_index = f"{base_url}/{slug_c}/"
 
-    mensagem = gerar_mensagem_whatsapp(cliente, periodo_label, url_index)
+    mensagem = gerar_mensagem_whatsapp(cliente, periodo_label, url)
 
     return caminho_saida, mensagem
 
