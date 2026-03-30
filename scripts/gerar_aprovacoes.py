@@ -459,7 +459,8 @@ def encontrar_arquivo_mensal(cliente, ano_mes, agencia_path):
                     break
         if pasta.exists():
             for arquivo in pasta.iterdir():
-                if arquivo.suffix == '.md' and ano_mes in arquivo.name and 'Conte' in arquivo.name:
+                if (arquivo.suffix == '.md' and ano_mes in arquivo.name
+                        and 'Conte' in arquivo.name and '_BACKUP' not in arquivo.name):
                     return arquivo
     return None
 
