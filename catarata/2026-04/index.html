@@ -1,0 +1,2314 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Aprovação — Catarata Center</title>
+  <meta property="og:title"       content="Aprovação — Catarata Center — 1 a 30 de abril" />
+  <meta property="og:description" content="Acesse para aprovar ou pedir ajuste nos vídeos de 1 a 30 de abril." />
+  <meta property="og:image"       content="https://img.youtube.com/vi/tsb7chgGsog/maxresdefault.jpg" />
+  <meta property="og:type"        content="website" />
+  <!-- Inter + Playfair Display -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #FAFAF8;
+      color: #1d1d1f;
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    /* HEADER */
+    .header {
+      background: #fff;
+      padding: 32px 20px 24px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      border-bottom: 1px solid rgba(0,0,0,0.06);
+    }
+    .header-label {
+      font-size: 0.6875rem;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #86868b;
+      margin-bottom: 8px;
+    }
+    .header-cliente {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 1.625rem;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      line-height: 1.15;
+      color: #1d1d1f;
+    }
+    .header-periodo {
+      font-size: 0.8125rem;
+      font-weight: 400;
+      color: #86868b;
+      margin-top: 4px;
+    }
+    .header-progress {
+      margin-top: 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .progress-bar-bg {
+      flex: 1;
+      height: 3px;
+      background: #e8e8ed;
+      border-radius: 2px;
+      overflow: hidden;
+    }
+    .progress-bar-fill {
+      height: 100%;
+      background: #34c759;
+      border-radius: 2px;
+      width: 0%;
+      transition: width 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .progress-text {
+      font-size: 0.6875rem;
+      font-weight: 500;
+      color: #86868b;
+      white-space: nowrap;
+    }
+
+    /* APROVAR TUDO */
+    .aprovar-tudo-container {
+      padding: 16px 16px 8px;
+    }
+    .btn-aprovar-tudo {
+      width: 100%;
+      padding: 14px;
+      background: #1d1d1f;
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      font-size: 0.9375rem;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .btn-aprovar-tudo:hover { background: #333; }
+    .btn-aprovar-tudo.ativo {
+      background: #34c759;
+    }
+
+    /* SEPARADORES DE SEÇÃO */
+    .secao-separador {
+      padding: 20px 16px 8px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .secao-separador h2 {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 1.0625rem;
+      font-weight: 500;
+      color: #1d1d1f;
+      white-space: nowrap;
+    }
+    .secao-separador.respondidos h2 {
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: #86868b;
+    }
+    .secao-linha {
+      flex: 1;
+      height: 1px;
+      background: #e8e8ed;
+    }
+
+    /* POSTS */
+    .posts-container {
+      padding: 8px 16px 120px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .post-card {
+      background: #fff;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.03), 0 4px 16px rgba(0,0,0,0.04);
+      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      border-left: 4px solid transparent;
+    }
+    .post-card.aprovado {
+      border-left-color: #34c759;
+      opacity: 0.8;
+    }
+    .post-card.ajuste {
+      border-left-color: #ff9f0a;
+    }
+
+    /* Badge de status */
+    .post-status-badge {
+      display: none;
+      font-size: 0.6875rem;
+      font-weight: 600;
+      padding: 3px 10px;
+      border-radius: 20px;
+      letter-spacing: 0.02em;
+    }
+    .post-card.aprovado .post-status-badge {
+      display: inline-block;
+      background: #e6f4ea;
+      color: #1e8e3e;
+    }
+    .post-card.ajuste .post-status-badge {
+      display: inline-block;
+      background: #fef3e2;
+      color: #e65100;
+    }
+
+    .post-header {
+      padding: 16px 16px 12px;
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 8px;
+    }
+    .post-meta {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      flex: 1;
+    }
+    .post-data {
+      font-size: 0.6875rem;
+      font-weight: 600;
+      color: #86868b;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+    .post-titulo {
+      font-size: 0.9375rem;
+      font-weight: 700;
+      color: #1d1d1f;
+      letter-spacing: -0.01em;
+      line-height: 1.3;
+    }
+    .post-header-right {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 6px;
+      flex-shrink: 0;
+    }
+    .post-formato {
+      display: inline-block;
+      font-size: 0.6875rem;
+      font-weight: 600;
+      padding: 3px 8px;
+      border-radius: 6px;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+    .formato-card    { background: #e8f0fe; color: #1a73e8; }
+    .formato-reels   { background: #fce8ef; color: #d93025; }
+    .formato-carrossel { background: #f3e8fd; color: #8430ce; }
+    .formato-video   { background: #e6f4ea; color: #1e8e3e; }
+
+    .post-divider {
+      height: 1px;
+      background: #f5f5f7;
+      margin: 0 16px;
+    }
+
+    .post-conteudo {
+      padding: 12px 16px;
+    }
+    .post-conteudo-label {
+      font-size: 0.625rem;
+      font-weight: 600;
+      color: #86868b;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+    .post-texto {
+      font-size: 0.875rem;
+      color: #6e6e73;
+      line-height: 1.6;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+    .post-legenda {
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px solid #f5f5f7;
+    }
+
+    /* ARTE INLINE */
+    .post-arte {
+      width: 100%;
+      background: #000;
+      overflow: hidden;
+    }
+
+    /* PLAYER YOUTUBE */
+    .youtube-wrapper {
+      position: relative;
+      width: 100%;
+      padding-bottom: 177.78%;
+      height: 0;
+      background: #000;
+    }
+    .youtube-wrapper iframe {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      border: none;
+    }
+    .post-arte > img {
+      width: 100%;
+      aspect-ratio: 3 / 4;
+      object-fit: contain;
+      display: block;
+    }
+
+    /* YOUTUBE FACADE */
+    .youtube-facade {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 9 / 16;
+      background: #000;
+      cursor: pointer;
+      overflow: hidden;
+    }
+    .youtube-facade img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    .yt-play-btn {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+      filter: drop-shadow(0 2px 8px rgba(0,0,0,0.4));
+      transition: transform 0.15s;
+    }
+    .youtube-facade:active .yt-play-btn {
+      transform: translate(-50%, -50%) scale(0.92);
+    }
+
+    /* CARROSSEL */
+    .carrossel-wrapper {
+      position: relative;
+      width: 100%;
+      background: #000;
+      overflow: hidden;
+    }
+    .carrossel-track {
+      display: flex;
+      overflow-x: scroll;
+      scroll-snap-type: x mandatory;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+      scroll-behavior: smooth;
+    }
+    .carrossel-track::-webkit-scrollbar { display: none; }
+    .carrossel-slide {
+      min-width: 100%;
+      scroll-snap-align: start;
+    }
+    .carrossel-slide img {
+      width: 100%;
+      aspect-ratio: 3 / 4;
+      object-fit: contain;
+      display: block;
+      background: #000;
+    }
+    .carrossel-counter {
+      position: absolute;
+      top: 10px;
+      right: 12px;
+      background: rgba(0,0,0,0.55);
+      color: #fff;
+      font-size: 12px;
+      font-weight: 600;
+      padding: 3px 9px;
+      border-radius: 20px;
+      letter-spacing: 0.03em;
+    }
+    .carrossel-prev, .carrossel-next {
+      display: none;
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 36px;
+      height: 36px;
+      background: rgba(0,0,0,0.52);
+      color: #fff;
+      border: none;
+      border-radius: 50%;
+      font-size: 22px;
+      line-height: 1;
+      cursor: pointer;
+      align-items: center;
+      justify-content: center;
+      z-index: 10;
+      transition: background 0.15s;
+    }
+    .carrossel-prev:hover, .carrossel-next:hover { background: rgba(0,0,0,0.78); }
+    .carrossel-prev { left: 10px; }
+    .carrossel-next { right: 10px; }
+    @media (hover: hover) {
+      .carrossel-prev, .carrossel-next { display: flex; }
+    }
+    .carrossel-dots {
+      display: flex;
+      justify-content: center;
+      gap: 6px;
+      padding: 9px 0 5px;
+      background: #FAFAF8;
+    }
+    .carrossel-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #c7c7cc;
+      transition: background 0.2s;
+    }
+    .carrossel-dot.ativa {
+      background: #1d1d1f;
+    }
+
+    /* MEDIA LINK */
+    .post-media {
+      padding: 0 16px 12px;
+    }
+    .btn-ver-midia {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 14px;
+      background: #f5f5f7;
+      border-radius: 10px;
+      text-decoration: none;
+      color: #1d1d1f;
+      font-size: 0.8125rem;
+      font-weight: 600;
+      border: none;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .btn-ver-midia:hover { background: #e8e8ed; }
+    .btn-ver-midia svg { flex-shrink: 0; }
+
+    /* APROVACAO */
+    .post-acoes {
+      display: flex;
+      gap: 8px;
+      padding: 12px 16px 14px;
+    }
+    .btn-aprovar, .btn-ajuste {
+      flex: 1;
+      padding: 12px;
+      border: none;
+      border-radius: 12px;
+      font-size: 0.875rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+    .btn-aprovar {
+      background: #e6f4ea;
+      color: #1e8e3e;
+    }
+    .btn-aprovar:active, .btn-aprovar.ativo {
+      background: #34c759;
+      color: #fff;
+    }
+    .btn-ajuste {
+      background: #fef3e2;
+      color: #e65100;
+    }
+    .btn-ajuste:active, .btn-ajuste.ativo {
+      background: #ff9f0a;
+      color: #fff;
+    }
+
+    /* CAMPO DE AJUSTE */
+    .campo-ajuste {
+      display: none;
+      padding: 0 16px 14px;
+    }
+    .campo-ajuste.visivel { display: block; }
+    .campo-ajuste textarea {
+      width: 100%;
+      padding: 12px;
+      border: 1.5px solid #ff9f0a;
+      border-radius: 12px;
+      font-size: 0.875rem;
+      font-family: inherit;
+      color: #1d1d1f;
+      background: #fffbf5;
+      resize: none;
+      outline: none;
+      min-height: 80px;
+      line-height: 1.5;
+    }
+    .campo-ajuste textarea:focus {
+      border-color: #e65100;
+    }
+    .campo-ajuste textarea::placeholder { color: #c7c7cc; }
+
+    /* Observação salva (exibida ao restaurar estado) */
+    .obs-salva {
+      display: none;
+      padding: 0 16px 14px;
+    }
+    .obs-salva.visivel { display: block; }
+    .obs-salva-inner {
+      background: #FFF8E1;
+      border: 1px solid #FFE082;
+      border-radius: 12px;
+      padding: 12px 14px;
+    }
+    .obs-salva-label {
+      font-size: 0.625rem;
+      font-weight: 600;
+      color: #e65100;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+    .obs-salva-texto {
+      font-size: 0.875rem;
+      color: #5D4037;
+      font-style: italic;
+      line-height: 1.5;
+    }
+
+    .btn-confirmar-obs {
+      display: block;
+      width: 100%;
+      margin-top: 8px;
+      padding: 10px;
+      background: #ff9f0a;
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      font-size: 0.875rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      text-align: center;
+    }
+    .btn-confirmar-obs:active { background: #e65100; }
+    .btn-confirmar-obs.confirmado {
+      background: #34c759;
+    }
+
+    /* RODAPE FLUTUANTE */
+    .rodape {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: 12px 16px 24px;
+      background: linear-gradient(to top, #FAFAF8 70%, transparent);
+    }
+    .btn-enviar {
+      width: 100%;
+      padding: 16px;
+      background: #1d1d1f;
+      color: #fff;
+      border: none;
+      border-radius: 14px;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      letter-spacing: -0.02em;
+    }
+    .btn-enviar:disabled {
+      background: #c7c7cc;
+      cursor: not-allowed;
+    }
+    .btn-enviar:not(:disabled):hover { background: #333; }
+
+    /* JA APROVADA */
+    .tela-ja-aprovada {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: #FAFAF8;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 32px;
+      text-align: center;
+      z-index: 300;
+    }
+    .tela-ja-aprovada.visivel { display: flex; }
+
+    /* CONFIRMACAO */
+    .tela-confirmacao {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: #FAFAF8;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 32px;
+      text-align: center;
+      z-index: 200;
+    }
+    .tela-confirmacao.visivel { display: flex; }
+    .confirmacao-icone {
+      width: 72px;
+      height: 72px;
+      background: #34c759;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 28px;
+    }
+    .confirmacao-titulo {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: #1d1d1f;
+      margin-bottom: 12px;
+      letter-spacing: -0.02em;
+    }
+    .confirmacao-texto {
+      font-size: 0.9375rem;
+      color: #6e6e73;
+      line-height: 1.7;
+    }
+
+    /* SEMANA OCULTA */
+    .semana-bloco { display: none; flex-direction: column; gap: 28px; }
+    .semana-bloco.ativa { display: flex; }
+
+    /* LOADING OVERLAY */
+    .loading-overlay {
+      position: fixed;
+      inset: 0;
+      background: #FAFAF8;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 250;
+      transition: opacity 0.4s ease;
+    }
+    .loading-overlay.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+    .loading-spinner {
+      width: 32px;
+      height: 32px;
+      border: 3px solid #e8e8ed;
+      border-top-color: #1d1d1f;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .loading-text {
+      margin-top: 16px;
+      font-size: 0.8125rem;
+      color: #86868b;
+    }
+
+    @media (min-width: 480px) {
+      .posts-container { max-width: 440px; margin: 0 auto; }
+      .aprovar-tudo-container { max-width: 440px; margin: 0 auto; }
+      .secao-separador { max-width: 440px; margin-left: auto; margin-right: auto; }
+      .rodape { max-width: 440px; left: 50%; transform: translateX(-50%); }
+    }
+
+    /* MODAL MENSAGEM WHATSAPP */
+    .modal-mensagem {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.4);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      z-index: 400;
+      align-items: flex-end;
+      justify-content: center;
+      padding-bottom: 0;
+    }
+    .modal-mensagem.visivel { display: flex; }
+    .modal-mensagem-inner {
+      background: #fff;
+      border-radius: 20px 20px 0 0;
+      padding: 28px 24px 40px;
+      width: 100%;
+      max-width: 540px;
+      max-height: 85vh;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    @keyframes slideUp {
+      from { transform: translateY(60px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+    .modal-mensagem-titulo {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 1.0625rem;
+      font-weight: 600;
+      color: #1d1d1f;
+      text-align: center;
+    }
+    .modal-mensagem-instrucao {
+      font-size: 0.875rem;
+      color: #6e6e73;
+      text-align: center;
+      line-height: 1.5;
+    }
+    .modal-mensagem-texto {
+      background: #f5f5f7;
+      border-radius: 12px;
+      padding: 16px;
+      font-size: 0.875rem;
+      color: #6e6e73;
+      line-height: 1.6;
+      white-space: pre-wrap;
+      font-family: inherit;
+      border: none;
+      resize: none;
+      width: 100%;
+      box-sizing: border-box;
+      min-height: 120px;
+    }
+    .modal-btn-copiar {
+      background: #25D366;
+      color: #fff;
+      border: none;
+      border-radius: 14px;
+      padding: 16px;
+      font-size: 1rem;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      cursor: pointer;
+      width: 100%;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .modal-btn-copiar:active { background: #1ebe5a; }
+    .modal-btn-copiar.copiado { background: #34c759; }
+    .modal-btn-wpp {
+      background: #fff;
+      color: #1d1d1f;
+      border: 1.5px solid #e8e8ed;
+      border-radius: 14px;
+      padding: 14px;
+      font-size: 0.9375rem;
+      font-weight: 600;
+      cursor: pointer;
+      width: 100%;
+      transition: all 0.2s;
+    }
+    .modal-btn-wpp:active { background: #f5f5f7; }
+    .modal-btn-fechar {
+      background: none;
+      border: none;
+      color: #86868b;
+      font-size: 0.875rem;
+      cursor: pointer;
+      text-align: center;
+      padding: 4px;
+    }
+
+    /* FRAMES */
+    .frames-section {
+      padding: 0 16px 40px;
+    }
+    .frames-section h2 {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: #1d1d1f;
+      margin-bottom: 16px;
+    }
+    .frames-grupo-titulo {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: #86868b;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin: 16px 0 8px;
+    }
+    .frames-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+    .frames-grid img {
+      width: 100%;
+      aspect-ratio: 9 / 16;
+      object-fit: cover;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+    .frames-grid img:active { opacity: 0.8; }
+
+    /* LIGHTBOX */
+    .lightbox {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.95);
+      z-index: 500;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    .lightbox.visivel { display: flex; }
+    .lightbox-close {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      background: rgba(255,255,255,0.15);
+      color: #fff;
+      border: none;
+      border-radius: 50%;
+      width: 44px;
+      height: 44px;
+      font-size: 20px;
+      cursor: pointer;
+    }
+    .lightbox img {
+      max-width: 95vw;
+      max-height: 85vh;
+      object-fit: contain;
+    }
+    .lightbox-hint {
+      position: absolute;
+      bottom: 24px;
+      color: rgba(255,255,255,0.5);
+      font-size: 0.75rem;
+    }
+    .lightbox-nav {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      background: rgba(255,255,255,0.15);
+      color: #fff;
+      border: none;
+      border-radius: 50%;
+      width: 44px;
+      height: 44px;
+      font-size: 22px;
+      cursor: pointer;
+    }
+    .lightbox-nav.prev { left: 12px; }
+    .lightbox-nav.next { right: 12px; }
+
+    @media (min-width: 480px) {
+      .frames-section { max-width: 440px; margin: 0 auto; }
+    }
+  </style>
+  <!-- EmailJS SDK -->
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+  <script>emailjs.init({ publicKey: '-xrMYz7vRGvZg8ZOY' });</script>
+</head>
+<body>
+
+<!-- LOADING OVERLAY -->
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="loading-spinner"></div>
+  <div class="loading-text">Carregando aprovações...</div>
+</div>
+
+<!-- CABECALHO -->
+<div class="header">
+  <div class="header-label">Aprovação de conteúdo</div>
+  <div class="header-cliente">Catarata Center</div>
+  <div class="header-periodo">1 a 30 de abril</div>
+  <div class="header-progress">
+    <div class="progress-bar-bg">
+      <div class="progress-bar-fill" id="progressBar"></div>
+    </div>
+    <div class="progress-text" id="progressText">0 de 13 aprovados</div>
+  </div>
+</div>
+
+<!-- APROVAR TUDO -->
+<div class="aprovar-tudo-container">
+  <button class="btn-aprovar-tudo" id="btnAprovarTudo" onclick="aprovarTudo()">
+    Aprovar todos os posts
+  </button>
+</div>
+
+<!-- SEPARADOR PENDENTES -->
+<div class="secao-separador" id="secaoPendentes" style="display:none">
+  <h2>Aguardando sua aprovação</h2>
+  <div class="secao-linha"></div>
+</div>
+
+<!-- POSTS -->
+<div class="posts-container" id="postsContainer">
+  
+  <div class="post-card" id="card-20260401-cada-olho-e-unico-por-que-o-ex" data-post-id="20260401-cada-olho-e-unico-por-que-o-ex">
+    <div class="post-header">
+      <div class="post-meta">
+        <div class="post-data">01/04 (qua)</div>
+        <div class="post-titulo">Cada olho é único: por que o exame precisa ser personalizado?</div>
+      </div>
+      <div class="post-header-right">
+        <span class="post-formato formato-card">Card</span>
+        <span class="post-status-badge"></span>
+      </div>
+    </div>
+    
+    <div class="post-arte">
+      <img
+        src="../artes/01-04.jpg"
+        alt="Arte — Cada olho é único: por que o exame precisa ser personalizado?"
+        loading="lazy"
+        onerror="this.parentElement.style.display='none'"
+      />
+    </div>
+    <div class="post-divider"></div>
+    
+    <div class="post-conteudo" style="padding-top:0">
+      <div class="post-conteudo-label">Legenda</div>
+      <div class="post-texto">Quando você vem ao Catarata Center, não aplicamos um protocolo genérico. Cada exame é montado de acordo com o problema que você traz, a sua história e o que queremos investigar.<br>A córnea tem curvaturas únicas. A pressão intraocular varia de pessoa para pessoa. O campo visual muda conforme a condição. Avaliar tudo isso exige exames diferentes e saber interpretar cada um deles juntos.<br>É por isso que, antes de qualquer decisão clínica, nossos oftalmologistas avaliam o conjunto completo. O resultado cirúrgico começa muito antes da sala de operações.<br>👁 Ver bem é importante. Se sentir seguro também.<br>#cataratacenter #oftalmologia #exameocular #saúdeocular #novohamburgors<br>---</div>
+    </div>
+    
+    <div class="obs-salva" id="obs-salva-20260401-cada-olho-e-unico-por-que-o-ex">
+      <div class="obs-salva-inner">
+        <div class="obs-salva-label">Observação do cliente</div>
+        <div class="obs-salva-texto"></div>
+      </div>
+    </div>
+    <div class="post-acoes">
+      <button class="btn-aprovar" id="aprovar-20260401-cada-olho-e-unico-por-que-o-ex" onclick="marcarPost('20260401-cada-olho-e-unico-por-que-o-ex', 'aprovado')">
+        Aprovar
+      </button>
+      <button class="btn-ajuste" id="ajuste-20260401-cada-olho-e-unico-por-que-o-ex" onclick="marcarPost('20260401-cada-olho-e-unico-por-que-o-ex', 'ajuste')">
+        Pedir ajuste
+      </button>
+    </div>
+    <div class="campo-ajuste" id="campo-20260401-cada-olho-e-unico-por-que-o-ex">
+      <textarea
+        id="obs-20260401-cada-olho-e-unico-por-que-o-ex"
+        placeholder="O que você gostaria de ajustar neste post?"
+        oninput="atualizarComentario('20260401-cada-olho-e-unico-por-que-o-ex', this.value)"
+        rows="3"
+      ></textarea>
+      <button class="btn-confirmar-obs" id="btnobs-20260401-cada-olho-e-unico-por-que-o-ex" onclick="confirmarObs('20260401-cada-olho-e-unico-por-que-o-ex')">
+        Registrar observação
+      </button>
+    </div>
+  </div>
+  <div class="post-card" id="card-20260403-paquimetria" data-post-id="20260403-paquimetria">
+    <div class="post-header">
+      <div class="post-meta">
+        <div class="post-data">03/04 (sex)</div>
+        <div class="post-titulo">Paquimetria</div>
+      </div>
+      <div class="post-header-right">
+        <span class="post-formato formato-reels">Reels</span>
+        <span class="post-status-badge"></span>
+      </div>
+    </div>
+    
+    <div class="post-arte">
+      <div class="youtube-facade" id="ytf-20260403-paquimetria" onclick="abrirReel('tsb7chgGsog','ytf-20260403-paquimetria')">
+        <img
+          src="https://img.youtube.com/vi/tsb7chgGsog/maxresdefault.jpg"
+          onerror="this.src='https://img.youtube.com/vi/tsb7chgGsog/hqdefault.jpg'"
+          alt="Reel — Paquimetria"
+        />
+        <div class="yt-play-btn">
+          <svg viewBox="0 0 68 48" width="68" height="48">
+            <path d="M66.5 7.7a8.5 8.5 0 0 0-6-6C56 0 34 0 34 0S12 0 7.5 1.7a8.5 8.5 0 0 0-6 6C0 14.3 0 24 0 24s0 9.7 1.5 16.3a8.5 8.5 0 0 0 6 6C12 48 34 48 34 48s22 0 26.5-1.7a8.5 8.5 0 0 0 6-6C68 33.7 68 24 68 24s0-9.7-1.5-16.3z" fill="rgba(0,0,0,0.7)"/>
+            <path d="M45 24 27 14v20z" fill="white"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+    <script>(function(){
+      window.abrirReel = window.abrirReel || function(ytId, facadeId) {
+        // Overlay fullscreen dentro do site (mobile e desktop)
+        var overlay = document.getElementById('yt-overlay');
+        if (!overlay) {
+          overlay = document.createElement('div');
+          overlay.id = 'yt-overlay';
+          overlay.style.cssText = 'position:fixed;inset:0;background:#000;z-index:500;display:none;flex-direction:column;align-items:center;justify-content:center;';
+
+          var closeBtn = document.createElement('button');
+          closeBtn.innerHTML = '&#10005;';
+          closeBtn.style.cssText = 'position:absolute;top:16px;right:16px;z-index:10;background:rgba(255,255,255,0.15);color:#fff;border:none;border-radius:50%;width:44px;height:44px;font-size:20px;cursor:pointer;line-height:1;';
+          closeBtn.setAttribute('aria-label', 'Fechar vídeo');
+          closeBtn.onclick = function() {
+            overlay.style.display = 'none';
+            var ifr = document.getElementById('yt-iframe');
+            if (ifr) ifr.src = '';
+          };
+
+          var ifr = document.createElement('iframe');
+          ifr.id = 'yt-iframe';
+          ifr.style.cssText = 'width:100%;height:100%;border:none;';
+          ifr.setAttribute('allow','accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen');
+          ifr.setAttribute('allowfullscreen','');
+
+          overlay.appendChild(closeBtn);
+          overlay.appendChild(ifr);
+          document.body.appendChild(overlay);
+        }
+
+        var ifr = document.getElementById('yt-iframe');
+        ifr.src = 'https://www.youtube.com/embed/' + ytId + '?autoplay=1&rel=0&modestbranding=1&playsinline=1';
+        overlay.style.display = 'flex';
+      };
+    })();</script>
+    <div class="post-divider"></div>
+    
+    <div class="post-conteudo" style="padding-top:0">
+      <div class="post-conteudo-label">Legenda</div>
+      <div class="post-texto">Você sabia que a espessura da sua córnea é um dado essencial antes de qualquer cirurgia nos olhos? 👁<br>A paquimetria mede exatamente isso e esse número pode determinar se você é candidato a um procedimento, qual técnica usar e como proteger sua córnea ao longo do tempo.<br>É um exame rápido, indolor e com muita informação dentro dele.<br>👁 Ver bem é importante. Se sentir seguro também.<br>#paquimetria #exameocular #cataratacenter #oftalmologia #novohamburgors<br>---</div>
+    </div>
+    
+    <div class="obs-salva" id="obs-salva-20260403-paquimetria">
+      <div class="obs-salva-inner">
+        <div class="obs-salva-label">Observação do cliente</div>
+        <div class="obs-salva-texto"></div>
+      </div>
+    </div>
+    <div class="post-acoes">
+      <button class="btn-aprovar" id="aprovar-20260403-paquimetria" onclick="marcarPost('20260403-paquimetria', 'aprovado')">
+        Aprovar
+      </button>
+      <button class="btn-ajuste" id="ajuste-20260403-paquimetria" onclick="marcarPost('20260403-paquimetria', 'ajuste')">
+        Pedir ajuste
+      </button>
+    </div>
+    <div class="campo-ajuste" id="campo-20260403-paquimetria">
+      <textarea
+        id="obs-20260403-paquimetria"
+        placeholder="O que você gostaria de ajustar neste post?"
+        oninput="atualizarComentario('20260403-paquimetria', this.value)"
+        rows="3"
+      ></textarea>
+      <button class="btn-confirmar-obs" id="btnobs-20260403-paquimetria" onclick="confirmarObs('20260403-paquimetria')">
+        Registrar observação
+      </button>
+    </div>
+  </div>
+  <div class="post-card" id="card-20260406-planejamento-cirurgico-o-que-d" data-post-id="20260406-planejamento-cirurgico-o-que-d">
+    <div class="post-header">
+      <div class="post-meta">
+        <div class="post-data">06/04 (seg)</div>
+        <div class="post-titulo">Planejamento cirúrgico: o que define um bom resultado?</div>
+      </div>
+      <div class="post-header-right">
+        <span class="post-formato formato-card">Card</span>
+        <span class="post-status-badge"></span>
+      </div>
+    </div>
+    
+    <div class="post-arte">
+      <img
+        src="../artes/06-04.jpg"
+        alt="Arte — Planejamento cirúrgico: o que define um bom resultado?"
+        loading="lazy"
+        onerror="this.parentElement.style.display='none'"
+      />
+    </div>
+    <div class="post-divider"></div>
+    
+    <div class="post-conteudo" style="padding-top:0">
+      <div class="post-conteudo-label">Legenda</div>
+      <div class="post-texto">Antes de operar uma catarata, o oftalmologista reúne um conjunto de informações que nenhum olho tem igual: a curvatura da córnea, o comprimento do olho, a saúde das células, o comportamento da pressão.<br>É esse conjunto que define qual lente será implantada, qual técnica será usada e o que esperar depois.<br>Cirurgia sem planejamento é achismo. Com planejamento, é precisão.<br>Se você está considerando operar, o primeiro passo é uma avaliação completa. A gente cuida de cada detalhe. Agende seu exames através do link que está na bio.<br>👁 Ver bem é importante. Se sentir seguro também.<br>#cirurgiadecatarata #planejamentocirurgico #cataratacenter #oftalmologia #novohamburgors<br>---</div>
+    </div>
+    
+    <div class="obs-salva" id="obs-salva-20260406-planejamento-cirurgico-o-que-d">
+      <div class="obs-salva-inner">
+        <div class="obs-salva-label">Observação do cliente</div>
+        <div class="obs-salva-texto"></div>
+      </div>
+    </div>
+    <div class="post-acoes">
+      <button class="btn-aprovar" id="aprovar-20260406-planejamento-cirurgico-o-que-d" onclick="marcarPost('20260406-planejamento-cirurgico-o-que-d', 'aprovado')">
+        Aprovar
+      </button>
+      <button class="btn-ajuste" id="ajuste-20260406-planejamento-cirurgico-o-que-d" onclick="marcarPost('20260406-planejamento-cirurgico-o-que-d', 'ajuste')">
+        Pedir ajuste
+      </button>
+    </div>
+    <div class="campo-ajuste" id="campo-20260406-planejamento-cirurgico-o-que-d">
+      <textarea
+        id="obs-20260406-planejamento-cirurgico-o-que-d"
+        placeholder="O que você gostaria de ajustar neste post?"
+        oninput="atualizarComentario('20260406-planejamento-cirurgico-o-que-d', this.value)"
+        rows="3"
+      ></textarea>
+      <button class="btn-confirmar-obs" id="btnobs-20260406-planejamento-cirurgico-o-que-d" onclick="confirmarObs('20260406-planejamento-cirurgico-o-que-d')">
+        Registrar observação
+      </button>
+    </div>
+  </div>
+  <div class="post-card" id="card-20260408-pentacam" data-post-id="20260408-pentacam">
+    <div class="post-header">
+      <div class="post-meta">
+        <div class="post-data">08/04 (qua)</div>
+        <div class="post-titulo">Pentacam</div>
+      </div>
+      <div class="post-header-right">
+        <span class="post-formato formato-reels">Reels</span>
+        <span class="post-status-badge"></span>
+      </div>
+    </div>
+    
+    <div class="post-arte">
+      <div class="youtube-facade" id="ytf-20260408-pentacam" onclick="abrirReel('Kjid4s2xus0','ytf-20260408-pentacam')">
+        <img
+          src="https://img.youtube.com/vi/Kjid4s2xus0/maxresdefault.jpg"
+          onerror="this.src='https://img.youtube.com/vi/Kjid4s2xus0/hqdefault.jpg'"
+          alt="Reel — Pentacam"
+        />
+        <div class="yt-play-btn">
+          <svg viewBox="0 0 68 48" width="68" height="48">
+            <path d="M66.5 7.7a8.5 8.5 0 0 0-6-6C56 0 34 0 34 0S12 0 7.5 1.7a8.5 8.5 0 0 0-6 6C0 14.3 0 24 0 24s0 9.7 1.5 16.3a8.5 8.5 0 0 0 6 6C12 48 34 48 34 48s22 0 26.5-1.7a8.5 8.5 0 0 0 6-6C68 33.7 68 24 68 24s0-9.7-1.5-16.3z" fill="rgba(0,0,0,0.7)"/>
+            <path d="M45 24 27 14v20z" fill="white"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+    <script>(function(){
+      window.abrirReel = window.abrirReel || function(ytId, facadeId) {
+        // Overlay fullscreen dentro do site (mobile e desktop)
+        var overlay = document.getElementById('yt-overlay');
+        if (!overlay) {
+          overlay = document.createElement('div');
+          overlay.id = 'yt-overlay';
+          overlay.style.cssText = 'position:fixed;inset:0;background:#000;z-index:500;display:none;flex-direction:column;align-items:center;justify-content:center;';
+
+          var closeBtn = document.createElement('button');
+          closeBtn.innerHTML = '&#10005;';
+          closeBtn.style.cssText = 'position:absolute;top:16px;right:16px;z-index:10;background:rgba(255,255,255,0.15);color:#fff;border:none;border-radius:50%;width:44px;height:44px;font-size:20px;cursor:pointer;line-height:1;';
+          closeBtn.setAttribute('aria-label', 'Fechar vídeo');
+          closeBtn.onclick = function() {
+            overlay.style.display = 'none';
+            var ifr = document.getElementById('yt-iframe');
+            if (ifr) ifr.src = '';
+          };
+
+          var ifr = document.createElement('iframe');
+          ifr.id = 'yt-iframe';
+          ifr.style.cssText = 'width:100%;height:100%;border:none;';
+          ifr.setAttribute('allow','accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen');
+          ifr.setAttribute('allowfullscreen','');
+
+          overlay.appendChild(closeBtn);
+          overlay.appendChild(ifr);
+          document.body.appendChild(overlay);
+        }
+
+        var ifr = document.getElementById('yt-iframe');
+        ifr.src = 'https://www.youtube.com/embed/' + ytId + '?autoplay=1&rel=0&modestbranding=1&playsinline=1';
+        overlay.style.display = 'flex';
+      };
+    })();</script>
+    <div class="post-divider"></div>
+    
+    <div class="post-conteudo" style="padding-top:0">
+      <div class="post-conteudo-label">Legenda</div>
+      <div class="post-texto">O Pentacam faz um mapeamento tridimensional completo da córnea: frente, verso e tudo entre os dois. 👁️<br>É um dos exames mais completos que existem para avaliar se a córnea está saudável o suficiente para uma cirurgia refrativa ou para o implante de uma lente premium.<br>Em segundos, ele entrega dados que fazem toda a diferença no planejamento.<br>Agende seu exames através do link que está na bio.<br>👁 Ver bem é importante. Se sentir seguro também.<br>#pentacam #exameocular #cataratacenter #oftalmologia #novohamburgors<br>---</div>
+    </div>
+    
+    <div class="obs-salva" id="obs-salva-20260408-pentacam">
+      <div class="obs-salva-inner">
+        <div class="obs-salva-label">Observação do cliente</div>
+        <div class="obs-salva-texto"></div>
+      </div>
+    </div>
+    <div class="post-acoes">
+      <button class="btn-aprovar" id="aprovar-20260408-pentacam" onclick="marcarPost('20260408-pentacam', 'aprovado')">
+        Aprovar
+      </button>
+      <button class="btn-ajuste" id="ajuste-20260408-pentacam" onclick="marcarPost('20260408-pentacam', 'ajuste')">
+        Pedir ajuste
+      </button>
+    </div>
+    <div class="campo-ajuste" id="campo-20260408-pentacam">
+      <textarea
+        id="obs-20260408-pentacam"
+        placeholder="O que você gostaria de ajustar neste post?"
+        oninput="atualizarComentario('20260408-pentacam', this.value)"
+        rows="3"
+      ></textarea>
+      <button class="btn-confirmar-obs" id="btnobs-20260408-pentacam" onclick="confirmarObs('20260408-pentacam')">
+        Registrar observação
+      </button>
+    </div>
+  </div>
+  <div class="post-card" id="card-20260410-laser-nos-olhos-doi" data-post-id="20260410-laser-nos-olhos-doi">
+    <div class="post-header">
+      <div class="post-meta">
+        <div class="post-data">10/04 (sex)</div>
+        <div class="post-titulo">Laser nos olhos dói?</div>
+      </div>
+      <div class="post-header-right">
+        <span class="post-formato formato-card">Card</span>
+        <span class="post-status-badge"></span>
+      </div>
+    </div>
+    
+    <div class="post-arte">
+      <img
+        src="../artes/10-04.jpg"
+        alt="Arte — Laser nos olhos dói?"
+        loading="lazy"
+        onerror="this.parentElement.style.display='none'"
+      />
+    </div>
+    <div class="post-divider"></div>
+    
+    <div class="post-conteudo" style="padding-top:0">
+      <div class="post-conteudo-label">Legenda</div>
+      <div class="post-texto">Essa é uma das perguntas que mais ouvimos aqui no Catarata Center. E faz todo sentido ter esse medo, afinal, estamos falando dos seus olhos.<br>A resposta é: não. O procedimento é realizado com anestesia local em colírio, você fica acordado, mas o olho não sente dor. O que algumas pessoas relatam é uma leve pressão ou desconforto, que passa rapidamente.<br>O laser é preciso, controlado e dura poucos minutos. Depois, você vai embora caminhando.<br>Entender o procedimento antes de fazer é parte do cuidado que a gente tem com você.<br>Agende seu exames através do link que está na bio.<br>👁 Ver bem é importante. Se sentir seguro também.<br>#lasernoolhos #cirurgiaocular #cataratacenter #oftalmologia #novohamburgors<br>---</div>
+    </div>
+    
+    <div class="obs-salva" id="obs-salva-20260410-laser-nos-olhos-doi">
+      <div class="obs-salva-inner">
+        <div class="obs-salva-label">Observação do cliente</div>
+        <div class="obs-salva-texto"></div>
+      </div>
+    </div>
+    <div class="post-acoes">
+      <button class="btn-aprovar" id="aprovar-20260410-laser-nos-olhos-doi" onclick="marcarPost('20260410-laser-nos-olhos-doi', 'aprovado')">
+        Aprovar
+      </button>
+      <button class="btn-ajuste" id="ajuste-20260410-laser-nos-olhos-doi" onclick="marcarPost('20260410-laser-nos-olhos-doi', 'ajuste')">
+        Pedir ajuste
+      </button>
+    </div>
+    <div class="campo-ajuste" id="campo-20260410-laser-nos-olhos-doi">
+      <textarea
+        id="obs-20260410-laser-nos-olhos-doi"
+        placeholder="O que você gostaria de ajustar neste post?"
+        oninput="atualizarComentario('20260410-laser-nos-olhos-doi', this.value)"
+        rows="3"
+      ></textarea>
+      <button class="btn-confirmar-obs" id="btnobs-20260410-laser-nos-olhos-doi" onclick="confirmarObs('20260410-laser-nos-olhos-doi')">
+        Registrar observação
+      </button>
+    </div>
+  </div>
+  <div class="post-card" id="card-20260413-topografia-corneana" data-post-id="20260413-topografia-corneana">
+    <div class="post-header">
+      <div class="post-meta">
+        <div class="post-data">13/04 (seg)</div>
+        <div class="post-titulo">Topografia Corneana</div>
+      </div>
+      <div class="post-header-right">
+        <span class="post-formato formato-reels">Reels</span>
+        <span class="post-status-badge"></span>
+      </div>
+    </div>
+    
+    <div class="post-arte">
+      <div class="youtube-facade" id="ytf-20260413-topografia-corneana" onclick="abrirReel('peElhl8BUPk','ytf-20260413-topografia-corneana')">
+        <img
+          src="https://img.youtube.com/vi/peElhl8BUPk/maxresdefault.jpg"
+          onerror="this.src='https://img.youtube.com/vi/peElhl8BUPk/hqdefault.jpg'"
+          alt="Reel — Topografia Corneana"
+        />
+        <div class="yt-play-btn">
+          <svg viewBox="0 0 68 48" width="68" height="48">
+            <path d="M66.5 7.7a8.5 8.5 0 0 0-6-6C56 0 34 0 34 0S12 0 7.5 1.7a8.5 8.5 0 0 0-6 6C0 14.3 0 24 0 24s0 9.7 1.5 16.3a8.5 8.5 0 0 0 6 6C12 48 34 48 34 48s22 0 26.5-1.7a8.5 8.5 0 0 0 6-6C68 33.7 68 24 68 24s0-9.7-1.5-16.3z" fill="rgba(0,0,0,0.7)"/>
+            <path d="M45 24 27 14v20z" fill="white"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+    <script>(function(){
+      window.abrirReel = window.abrirReel || function(ytId, facadeId) {
+        // Overlay fullscreen dentro do site (mobile e desktop)
+        var overlay = document.getElementById('yt-overlay');
+        if (!overlay) {
+          overlay = document.createElement('div');
+          overlay.id = 'yt-overlay';
+          overlay.style.cssText = 'position:fixed;inset:0;background:#000;z-index:500;display:none;flex-direction:column;align-items:center;justify-content:center;';
+
+          var closeBtn = document.createElement('button');
+          closeBtn.innerHTML = '&#10005;';
+          closeBtn.style.cssText = 'position:absolute;top:16px;right:16px;z-index:10;background:rgba(255,255,255,0.15);color:#fff;border:none;border-radius:50%;width:44px;height:44px;font-size:20px;cursor:pointer;line-height:1;';
+          closeBtn.setAttribute('aria-label', 'Fechar vídeo');
+          closeBtn.onclick = function() {
+            overlay.style.display = 'none';
+            var ifr = document.getElementById('yt-iframe');
+            if (ifr) ifr.src = '';
+          };
+
+          var ifr = document.createElement('iframe');
+          ifr.id = 'yt-iframe';
+          ifr.style.cssText = 'width:100%;height:100%;border:none;';
+          ifr.setAttribute('allow','accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen');
+          ifr.setAttribute('allowfullscreen','');
+
+          overlay.appendChild(closeBtn);
+          overlay.appendChild(ifr);
+          document.body.appendChild(overlay);
+        }
+
+        var ifr = document.getElementById('yt-iframe');
+        ifr.src = 'https://www.youtube.com/embed/' + ytId + '?autoplay=1&rel=0&modestbranding=1&playsinline=1';
+        overlay.style.display = 'flex';
+      };
+    })();</script>
+    <div class="post-divider"></div>
+    
+    <div class="post-conteudo" style="padding-top:0">
+      <div class="post-conteudo-label">Legenda</div>
+      <div class="post-texto">A topografia corneana é como um mapa de elevação da sua córnea.<br>Cada ponto tem uma curvatura diferente e identificar irregularidades nesse mapa é o que nos permite planejar cirurgias com precisão, detectar condições como o ceratocone e escolher a melhor lente para cada caso.<br>É um exame indolor que leva segundos e diz muito sobre a saúde dos seus olhos.<br>👁 Ver bem é importante. Se sentir seguro também.<br>#topografiacorneana #exameocular #cataratacenter #oftalmologia #novohamburgors<br>---</div>
+    </div>
+    
+    <div class="obs-salva" id="obs-salva-20260413-topografia-corneana">
+      <div class="obs-salva-inner">
+        <div class="obs-salva-label">Observação do cliente</div>
+        <div class="obs-salva-texto"></div>
+      </div>
+    </div>
+    <div class="post-acoes">
+      <button class="btn-aprovar" id="aprovar-20260413-topografia-corneana" onclick="marcarPost('20260413-topografia-corneana', 'aprovado')">
+        Aprovar
+      </button>
+      <button class="btn-ajuste" id="ajuste-20260413-topografia-corneana" onclick="marcarPost('20260413-topografia-corneana', 'ajuste')">
+        Pedir ajuste
+      </button>
+    </div>
+    <div class="campo-ajuste" id="campo-20260413-topografia-corneana">
+      <textarea
+        id="obs-20260413-topografia-corneana"
+        placeholder="O que você gostaria de ajustar neste post?"
+        oninput="atualizarComentario('20260413-topografia-corneana', this.value)"
+        rows="3"
+      ></textarea>
+      <button class="btn-confirmar-obs" id="btnobs-20260413-topografia-corneana" onclick="confirmarObs('20260413-topografia-corneana')">
+        Registrar observação
+      </button>
+    </div>
+  </div>
+  <div class="post-card" id="card-20260415-o-que-diferencia-um-centro-esp" data-post-id="20260415-o-que-diferencia-um-centro-esp">
+    <div class="post-header">
+      <div class="post-meta">
+        <div class="post-data">15/04 (qua)</div>
+        <div class="post-titulo">O que diferencia um centro especializado?</div>
+      </div>
+      <div class="post-header-right">
+        <span class="post-formato formato-card">Card</span>
+        <span class="post-status-badge"></span>
+      </div>
+    </div>
+    
+    <div class="post-arte">
+      <img
+        src="../artes/15-04.jpg"
+        alt="Arte — O que diferencia um centro especializado?"
+        loading="lazy"
+        onerror="this.parentElement.style.display='none'"
+      />
+    </div>
+    <div class="post-divider"></div>
+    
+    <div class="post-conteudo" style="padding-top:0">
+      <div class="post-conteudo-label">Legenda</div>
+      <div class="post-texto">No Catarata Center, você não precisa ir a um lugar para consultar, a outro para examinar e a outro para operar. Todo o ciclo de atendimento acontece aqui, com a mesma equipe que te conhece do início ao fim.<br>Isso muda tudo. O oftalmologista que pediu os exames é a mesma que interpreta os resultados e realiza a cirurgia. Não tem informação perdida. Não tem recomeço.<br>Além disso: já são 10 anos atendendo em Novo Hamburgo e 3 anos com foco exclusivo em cirurgia de catarata.<br>Agende sua consulta através do link que está na bio.<br>👁 Ver bem é importante. Se sentir seguro também.<br>#cataratacenter #oftalmologia #cirurgiadecatarata #novohamburgors #saúdeocular<br>---</div>
+    </div>
+    
+    <div class="obs-salva" id="obs-salva-20260415-o-que-diferencia-um-centro-esp">
+      <div class="obs-salva-inner">
+        <div class="obs-salva-label">Observação do cliente</div>
+        <div class="obs-salva-texto"></div>
+      </div>
+    </div>
+    <div class="post-acoes">
+      <button class="btn-aprovar" id="aprovar-20260415-o-que-diferencia-um-centro-esp" onclick="marcarPost('20260415-o-que-diferencia-um-centro-esp', 'aprovado')">
+        Aprovar
+      </button>
+      <button class="btn-ajuste" id="ajuste-20260415-o-que-diferencia-um-centro-esp" onclick="marcarPost('20260415-o-que-diferencia-um-centro-esp', 'ajuste')">
+        Pedir ajuste
+      </button>
+    </div>
+    <div class="campo-ajuste" id="campo-20260415-o-que-diferencia-um-centro-esp">
+      <textarea
+        id="obs-20260415-o-que-diferencia-um-centro-esp"
+        placeholder="O que você gostaria de ajustar neste post?"
+        oninput="atualizarComentario('20260415-o-que-diferencia-um-centro-esp', this.value)"
+        rows="3"
+      ></textarea>
+      <button class="btn-confirmar-obs" id="btnobs-20260415-o-que-diferencia-um-centro-esp" onclick="confirmarObs('20260415-o-que-diferencia-um-centro-esp')">
+        Registrar observação
+      </button>
+    </div>
+  </div>
+  <div class="post-card" id="card-20260417-biometria-optica" data-post-id="20260417-biometria-optica">
+    <div class="post-header">
+      <div class="post-meta">
+        <div class="post-data">17/04 (sex)</div>
+        <div class="post-titulo">Biometria Óptica</div>
+      </div>
+      <div class="post-header-right">
+        <span class="post-formato formato-reels">Reels</span>
+        <span class="post-status-badge"></span>
+      </div>
+    </div>
+    
+    <div class="post-arte">
+      <div class="youtube-facade" id="ytf-20260417-biometria-optica" onclick="abrirReel('53EZncKU6jE','ytf-20260417-biometria-optica')">
+        <img
+          src="https://img.youtube.com/vi/53EZncKU6jE/maxresdefault.jpg"
+          onerror="this.src='https://img.youtube.com/vi/53EZncKU6jE/hqdefault.jpg'"
+          alt="Reel — Biometria Óptica"
+        />
+        <div class="yt-play-btn">
+          <svg viewBox="0 0 68 48" width="68" height="48">
+            <path d="M66.5 7.7a8.5 8.5 0 0 0-6-6C56 0 34 0 34 0S12 0 7.5 1.7a8.5 8.5 0 0 0-6 6C0 14.3 0 24 0 24s0 9.7 1.5 16.3a8.5 8.5 0 0 0 6 6C12 48 34 48 34 48s22 0 26.5-1.7a8.5 8.5 0 0 0 6-6C68 33.7 68 24 68 24s0-9.7-1.5-16.3z" fill="rgba(0,0,0,0.7)"/>
+            <path d="M45 24 27 14v20z" fill="white"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+    <script>(function(){
+      window.abrirReel = window.abrirReel || function(ytId, facadeId) {
+        // Overlay fullscreen dentro do site (mobile e desktop)
+        var overlay = document.getElementById('yt-overlay');
+        if (!overlay) {
+          overlay = document.createElement('div');
+          overlay.id = 'yt-overlay';
+          overlay.style.cssText = 'position:fixed;inset:0;background:#000;z-index:500;display:none;flex-direction:column;align-items:center;justify-content:center;';
+
+          var closeBtn = document.createElement('button');
+          closeBtn.innerHTML = '&#10005;';
+          closeBtn.style.cssText = 'position:absolute;top:16px;right:16px;z-index:10;background:rgba(255,255,255,0.15);color:#fff;border:none;border-radius:50%;width:44px;height:44px;font-size:20px;cursor:pointer;line-height:1;';
+          closeBtn.setAttribute('aria-label', 'Fechar vídeo');
+          closeBtn.onclick = function() {
+            overlay.style.display = 'none';
+            var ifr = document.getElementById('yt-iframe');
+            if (ifr) ifr.src = '';
+          };
+
+          var ifr = document.createElement('iframe');
+          ifr.id = 'yt-iframe';
+          ifr.style.cssText = 'width:100%;height:100%;border:none;';
+          ifr.setAttribute('allow','accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen');
+          ifr.setAttribute('allowfullscreen','');
+
+          overlay.appendChild(closeBtn);
+          overlay.appendChild(ifr);
+          document.body.appendChild(overlay);
+        }
+
+        var ifr = document.getElementById('yt-iframe');
+        ifr.src = 'https://www.youtube.com/embed/' + ytId + '?autoplay=1&rel=0&modestbranding=1&playsinline=1';
+        overlay.style.display = 'flex';
+      };
+    })();</script>
+    <div class="post-divider"></div>
+    
+    <div class="post-conteudo" style="padding-top:0">
+      <div class="post-conteudo-label">Legenda</div>
+      <div class="post-texto">A biometria óptica mede o comprimento do olho com precisão milimétrica. <br>Esse dado é fundamental para calcular exatamente qual lente intraocular vai ser implantada na cirurgia de catarata e é o que garante que, depois da operação, você enxergue com nitidez.<br>Um milímetro errado muda o resultado. É por isso que não abrimos mão desse exame.<br>Agende sua consulta através do link que está na bio.<br>👁 Ver bem é importante. Se sentir seguro também.<br>#biometriaoptica #cirurgiadecatarata #cataratacenter #oftalmologia #novohamburgors<br>---</div>
+    </div>
+    
+    <div class="obs-salva" id="obs-salva-20260417-biometria-optica">
+      <div class="obs-salva-inner">
+        <div class="obs-salva-label">Observação do cliente</div>
+        <div class="obs-salva-texto"></div>
+      </div>
+    </div>
+    <div class="post-acoes">
+      <button class="btn-aprovar" id="aprovar-20260417-biometria-optica" onclick="marcarPost('20260417-biometria-optica', 'aprovado')">
+        Aprovar
+      </button>
+      <button class="btn-ajuste" id="ajuste-20260417-biometria-optica" onclick="marcarPost('20260417-biometria-optica', 'ajuste')">
+        Pedir ajuste
+      </button>
+    </div>
+    <div class="campo-ajuste" id="campo-20260417-biometria-optica">
+      <textarea
+        id="obs-20260417-biometria-optica"
+        placeholder="O que você gostaria de ajustar neste post?"
+        oninput="atualizarComentario('20260417-biometria-optica', this.value)"
+        rows="3"
+      ></textarea>
+      <button class="btn-confirmar-obs" id="btnobs-20260417-biometria-optica" onclick="confirmarObs('20260417-biometria-optica')">
+        Registrar observação
+      </button>
+    </div>
+  </div>
+  <div class="post-card" id="card-20260420-visao-embacada-tem-cura" data-post-id="20260420-visao-embacada-tem-cura">
+    <div class="post-header">
+      <div class="post-meta">
+        <div class="post-data">20/04 (seg)</div>
+        <div class="post-titulo">Visão embaçada tem cura?</div>
+      </div>
+      <div class="post-header-right">
+        <span class="post-formato formato-card">Card</span>
+        <span class="post-status-badge"></span>
+      </div>
+    </div>
+    
+    <div class="post-arte">
+      <img
+        src="../artes/20-04.jpg"
+        alt="Arte — Visão embaçada tem cura?"
+        loading="lazy"
+        onerror="this.parentElement.style.display='none'"
+      />
+    </div>
+    <div class="post-divider"></div>
+    
+    <div class="post-conteudo" style="padding-top:0">
+      <div class="post-conteudo-label">Legenda</div>
+      <div class="post-texto">Muita gente normaliza a visão embaçada. &quot;É cansaço.&quot; &quot;É a idade chegando.&quot; &quot;Já fui ao médico há dois anos, tá bom.&quot;<br>Mas o embaçamento pode ser sinal de catarata, uma condição que avança devagar, sem dor, sem aviso. E que tem tratamento. Uma cirurgia de 20 minutos pode devolver a nitidez que você já não lembrava que era possível ter.<br>O problema não é o olho. É o tempo que passa sem avaliação.<br>Se você ou alguém da sua família está com visão embaçada, não deixa para depois. Agende a consulta através do link da bio.<br>👁 Ver bem é importante. Se sentir seguro também.<br>#visaoembaçada #catarata #cataratacenter #oftalmologia #novohamburgors #saúdeocular<br>---</div>
+    </div>
+    
+    <div class="obs-salva" id="obs-salva-20260420-visao-embacada-tem-cura">
+      <div class="obs-salva-inner">
+        <div class="obs-salva-label">Observação do cliente</div>
+        <div class="obs-salva-texto"></div>
+      </div>
+    </div>
+    <div class="post-acoes">
+      <button class="btn-aprovar" id="aprovar-20260420-visao-embacada-tem-cura" onclick="marcarPost('20260420-visao-embacada-tem-cura', 'aprovado')">
+        Aprovar
+      </button>
+      <button class="btn-ajuste" id="ajuste-20260420-visao-embacada-tem-cura" onclick="marcarPost('20260420-visao-embacada-tem-cura', 'ajuste')">
+        Pedir ajuste
+      </button>
+    </div>
+    <div class="campo-ajuste" id="campo-20260420-visao-embacada-tem-cura">
+      <textarea
+        id="obs-20260420-visao-embacada-tem-cura"
+        placeholder="O que você gostaria de ajustar neste post?"
+        oninput="atualizarComentario('20260420-visao-embacada-tem-cura', this.value)"
+        rows="3"
+      ></textarea>
+      <button class="btn-confirmar-obs" id="btnobs-20260420-visao-embacada-tem-cura" onclick="confirmarObs('20260420-visao-embacada-tem-cura')">
+        Registrar observação
+      </button>
+    </div>
+  </div>
+  <div class="post-card" id="card-20260422-aberrometria" data-post-id="20260422-aberrometria">
+    <div class="post-header">
+      <div class="post-meta">
+        <div class="post-data">22/04 (qua)</div>
+        <div class="post-titulo">Aberrometria</div>
+      </div>
+      <div class="post-header-right">
+        <span class="post-formato formato-reels">Reels</span>
+        <span class="post-status-badge"></span>
+      </div>
+    </div>
+    
+    <div class="post-arte">
+      <div class="youtube-facade" id="ytf-20260422-aberrometria" onclick="abrirReel('HIMs6kruQeg','ytf-20260422-aberrometria')">
+        <img
+          src="https://img.youtube.com/vi/HIMs6kruQeg/maxresdefault.jpg"
+          onerror="this.src='https://img.youtube.com/vi/HIMs6kruQeg/hqdefault.jpg'"
+          alt="Reel — Aberrometria"
+        />
+        <div class="yt-play-btn">
+          <svg viewBox="0 0 68 48" width="68" height="48">
+            <path d="M66.5 7.7a8.5 8.5 0 0 0-6-6C56 0 34 0 34 0S12 0 7.5 1.7a8.5 8.5 0 0 0-6 6C0 14.3 0 24 0 24s0 9.7 1.5 16.3a8.5 8.5 0 0 0 6 6C12 48 34 48 34 48s22 0 26.5-1.7a8.5 8.5 0 0 0 6-6C68 33.7 68 24 68 24s0-9.7-1.5-16.3z" fill="rgba(0,0,0,0.7)"/>
+            <path d="M45 24 27 14v20z" fill="white"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+    <script>(function(){
+      window.abrirReel = window.abrirReel || function(ytId, facadeId) {
+        // Overlay fullscreen dentro do site (mobile e desktop)
+        var overlay = document.getElementById('yt-overlay');
+        if (!overlay) {
+          overlay = document.createElement('div');
+          overlay.id = 'yt-overlay';
+          overlay.style.cssText = 'position:fixed;inset:0;background:#000;z-index:500;display:none;flex-direction:column;align-items:center;justify-content:center;';
+
+          var closeBtn = document.createElement('button');
+          closeBtn.innerHTML = '&#10005;';
+          closeBtn.style.cssText = 'position:absolute;top:16px;right:16px;z-index:10;background:rgba(255,255,255,0.15);color:#fff;border:none;border-radius:50%;width:44px;height:44px;font-size:20px;cursor:pointer;line-height:1;';
+          closeBtn.setAttribute('aria-label', 'Fechar vídeo');
+          closeBtn.onclick = function() {
+            overlay.style.display = 'none';
+            var ifr = document.getElementById('yt-iframe');
+            if (ifr) ifr.src = '';
+          };
+
+          var ifr = document.createElement('iframe');
+          ifr.id = 'yt-iframe';
+          ifr.style.cssText = 'width:100%;height:100%;border:none;';
+          ifr.setAttribute('allow','accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen');
+          ifr.setAttribute('allowfullscreen','');
+
+          overlay.appendChild(closeBtn);
+          overlay.appendChild(ifr);
+          document.body.appendChild(overlay);
+        }
+
+        var ifr = document.getElementById('yt-iframe');
+        ifr.src = 'https://www.youtube.com/embed/' + ytId + '?autoplay=1&rel=0&modestbranding=1&playsinline=1';
+        overlay.style.display = 'flex';
+      };
+    })();</script>
+    <div class="post-divider"></div>
+    
+    <div class="post-conteudo" style="padding-top:0">
+      <div class="post-conteudo-label">Legenda</div>
+      <div class="post-texto">A aberrometria analisa como a luz passa pelo seu olho e se comporta até chegar à retina. 💡<br>Ela detecta imperfeições ópticas chamadas aberrações, que causam sintomas como halos ao redor das luzes, dificuldade de enxergar à noite e visão &quot;fantasma&quot;. É um exame essencial para personalizar o tratamento e, em cirurgias, escolher a lente mais adequada para cada pessoa.<br>Cada olho tem o seu padrão e a gente precisa conhecer o seu.<br>👁 Ver bem é importante. Se sentir seguro também.<br>#aberrometria #exameocular #cataratacenter #oftalmologia #novohamburgors<br>---</div>
+    </div>
+    
+    <div class="obs-salva" id="obs-salva-20260422-aberrometria">
+      <div class="obs-salva-inner">
+        <div class="obs-salva-label">Observação do cliente</div>
+        <div class="obs-salva-texto"></div>
+      </div>
+    </div>
+    <div class="post-acoes">
+      <button class="btn-aprovar" id="aprovar-20260422-aberrometria" onclick="marcarPost('20260422-aberrometria', 'aprovado')">
+        Aprovar
+      </button>
+      <button class="btn-ajuste" id="ajuste-20260422-aberrometria" onclick="marcarPost('20260422-aberrometria', 'ajuste')">
+        Pedir ajuste
+      </button>
+    </div>
+    <div class="campo-ajuste" id="campo-20260422-aberrometria">
+      <textarea
+        id="obs-20260422-aberrometria"
+        placeholder="O que você gostaria de ajustar neste post?"
+        oninput="atualizarComentario('20260422-aberrometria', this.value)"
+        rows="3"
+      ></textarea>
+      <button class="btn-confirmar-obs" id="btnobs-20260422-aberrometria" onclick="confirmarObs('20260422-aberrometria')">
+        Registrar observação
+      </button>
+    </div>
+  </div>
+  <div class="post-card" id="card-20260424-como-e-a-recuperacao-depois-da" data-post-id="20260424-como-e-a-recuperacao-depois-da">
+    <div class="post-header">
+      <div class="post-meta">
+        <div class="post-data">24/04 (sex)</div>
+        <div class="post-titulo">Como é a recuperação depois da cirurgia de catarata?</div>
+      </div>
+      <div class="post-header-right">
+        <span class="post-formato formato-card">Card</span>
+        <span class="post-status-badge"></span>
+      </div>
+    </div>
+    
+    <div class="post-arte">
+      <img
+        src="../artes/24-04.jpg"
+        alt="Arte — Como é a recuperação depois da cirurgia de catarata?"
+        loading="lazy"
+        onerror="this.parentElement.style.display='none'"
+      />
+    </div>
+    <div class="post-divider"></div>
+    
+    <div class="post-conteudo" style="padding-top:0">
+      <div class="post-conteudo-label">Legenda</div>
+      <div class="post-texto">A cirurgia de catarata é ambulatorial, você não fica internado. O procedimento dura em média 15 a 20 minutos, é feito com anestesia local e você vai embora no mesmo dia, com um acompanhante.<br>Nos primeiros dias: uso de colírios, proteção solar e evitar esforços. Na primeira semana, a maioria dos pacientes já percebe melhora significativa na visão. Em alguns dias, você já retoma as atividades do dia a dia.<br>O que mais surpreende quem opera? A rapidez. E a nitidez que aparece logo nos primeiros dias.<br>Se você está adiando por medo da recuperação, a gente pode conversar. Agende uma avaliação e tire todas as suas dúvidas antes de decidir.<br>👁 Ver bem é importante. Se sentir seguro também.<br>#cirurgiadecatarata #recuperacaocirurgica #cataratacenter #oftalmologia #novohamburgors<br>---</div>
+    </div>
+    
+    <div class="obs-salva" id="obs-salva-20260424-como-e-a-recuperacao-depois-da">
+      <div class="obs-salva-inner">
+        <div class="obs-salva-label">Observação do cliente</div>
+        <div class="obs-salva-texto"></div>
+      </div>
+    </div>
+    <div class="post-acoes">
+      <button class="btn-aprovar" id="aprovar-20260424-como-e-a-recuperacao-depois-da" onclick="marcarPost('20260424-como-e-a-recuperacao-depois-da', 'aprovado')">
+        Aprovar
+      </button>
+      <button class="btn-ajuste" id="ajuste-20260424-como-e-a-recuperacao-depois-da" onclick="marcarPost('20260424-como-e-a-recuperacao-depois-da', 'ajuste')">
+        Pedir ajuste
+      </button>
+    </div>
+    <div class="campo-ajuste" id="campo-20260424-como-e-a-recuperacao-depois-da">
+      <textarea
+        id="obs-20260424-como-e-a-recuperacao-depois-da"
+        placeholder="O que você gostaria de ajustar neste post?"
+        oninput="atualizarComentario('20260424-como-e-a-recuperacao-depois-da', this.value)"
+        rows="3"
+      ></textarea>
+      <button class="btn-confirmar-obs" id="btnobs-20260424-como-e-a-recuperacao-depois-da" onclick="confirmarObs('20260424-como-e-a-recuperacao-depois-da')">
+        Registrar observação
+      </button>
+    </div>
+  </div>
+  <div class="post-card" id="card-20260427-microscopia-especular" data-post-id="20260427-microscopia-especular">
+    <div class="post-header">
+      <div class="post-meta">
+        <div class="post-data">27/04 (seg)</div>
+        <div class="post-titulo">Microscopia Especular</div>
+      </div>
+      <div class="post-header-right">
+        <span class="post-formato formato-reels">Reels</span>
+        <span class="post-status-badge"></span>
+      </div>
+    </div>
+    
+    <div class="post-arte">
+      <div class="youtube-facade" id="ytf-20260427-microscopia-especular" onclick="abrirReel('QHY1nvkdpmU','ytf-20260427-microscopia-especular')">
+        <img
+          src="https://img.youtube.com/vi/QHY1nvkdpmU/maxresdefault.jpg"
+          onerror="this.src='https://img.youtube.com/vi/QHY1nvkdpmU/hqdefault.jpg'"
+          alt="Reel — Microscopia Especular"
+        />
+        <div class="yt-play-btn">
+          <svg viewBox="0 0 68 48" width="68" height="48">
+            <path d="M66.5 7.7a8.5 8.5 0 0 0-6-6C56 0 34 0 34 0S12 0 7.5 1.7a8.5 8.5 0 0 0-6 6C0 14.3 0 24 0 24s0 9.7 1.5 16.3a8.5 8.5 0 0 0 6 6C12 48 34 48 34 48s22 0 26.5-1.7a8.5 8.5 0 0 0 6-6C68 33.7 68 24 68 24s0-9.7-1.5-16.3z" fill="rgba(0,0,0,0.7)"/>
+            <path d="M45 24 27 14v20z" fill="white"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+    <script>(function(){
+      window.abrirReel = window.abrirReel || function(ytId, facadeId) {
+        // Overlay fullscreen dentro do site (mobile e desktop)
+        var overlay = document.getElementById('yt-overlay');
+        if (!overlay) {
+          overlay = document.createElement('div');
+          overlay.id = 'yt-overlay';
+          overlay.style.cssText = 'position:fixed;inset:0;background:#000;z-index:500;display:none;flex-direction:column;align-items:center;justify-content:center;';
+
+          var closeBtn = document.createElement('button');
+          closeBtn.innerHTML = '&#10005;';
+          closeBtn.style.cssText = 'position:absolute;top:16px;right:16px;z-index:10;background:rgba(255,255,255,0.15);color:#fff;border:none;border-radius:50%;width:44px;height:44px;font-size:20px;cursor:pointer;line-height:1;';
+          closeBtn.setAttribute('aria-label', 'Fechar vídeo');
+          closeBtn.onclick = function() {
+            overlay.style.display = 'none';
+            var ifr = document.getElementById('yt-iframe');
+            if (ifr) ifr.src = '';
+          };
+
+          var ifr = document.createElement('iframe');
+          ifr.id = 'yt-iframe';
+          ifr.style.cssText = 'width:100%;height:100%;border:none;';
+          ifr.setAttribute('allow','accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen');
+          ifr.setAttribute('allowfullscreen','');
+
+          overlay.appendChild(closeBtn);
+          overlay.appendChild(ifr);
+          document.body.appendChild(overlay);
+        }
+
+        var ifr = document.getElementById('yt-iframe');
+        ifr.src = 'https://www.youtube.com/embed/' + ytId + '?autoplay=1&rel=0&modestbranding=1&playsinline=1';
+        overlay.style.display = 'flex';
+      };
+    })();</script>
+    <div class="post-divider"></div>
+    
+    <div class="post-conteudo" style="padding-top:0">
+      <div class="post-conteudo-label">Legenda</div>
+      <div class="post-texto">A microscopia especular fotografa as células do endotélio corneano, a camada mais interna da córnea, responsável por mantê-la transparente. <br>Esse exame mostra quantas células você tem, como elas estão distribuídas e se estão saudáveis o suficiente para suportar uma cirurgia. É um critério de segurança que não pode ser ignorado antes de operar.<br>Ver o que o olho nu não vê. Isso é o que fazemos aqui.<br>Agende seus exames através do link da bio.<br>👁 Ver bem é importante. Se sentir seguro também.<br>#microscopiaespecular #exameocular #cataratacenter #oftalmologia #novohamburgors<br>---</div>
+    </div>
+    
+    <div class="obs-salva" id="obs-salva-20260427-microscopia-especular">
+      <div class="obs-salva-inner">
+        <div class="obs-salva-label">Observação do cliente</div>
+        <div class="obs-salva-texto"></div>
+      </div>
+    </div>
+    <div class="post-acoes">
+      <button class="btn-aprovar" id="aprovar-20260427-microscopia-especular" onclick="marcarPost('20260427-microscopia-especular', 'aprovado')">
+        Aprovar
+      </button>
+      <button class="btn-ajuste" id="ajuste-20260427-microscopia-especular" onclick="marcarPost('20260427-microscopia-especular', 'ajuste')">
+        Pedir ajuste
+      </button>
+    </div>
+    <div class="campo-ajuste" id="campo-20260427-microscopia-especular">
+      <textarea
+        id="obs-20260427-microscopia-especular"
+        placeholder="O que você gostaria de ajustar neste post?"
+        oninput="atualizarComentario('20260427-microscopia-especular', this.value)"
+        rows="3"
+      ></textarea>
+      <button class="btn-confirmar-obs" id="btnobs-20260427-microscopia-especular" onclick="confirmarObs('20260427-microscopia-especular')">
+        Registrar observação
+      </button>
+    </div>
+  </div>
+  <div class="post-card" id="card-20260429-voce-pode-escolher-a-lente-da-" data-post-id="20260429-voce-pode-escolher-a-lente-da-">
+    <div class="post-header">
+      <div class="post-meta">
+        <div class="post-data">29/04 (qua)</div>
+        <div class="post-titulo">Você pode escolher a lente da sua cirurgia?</div>
+      </div>
+      <div class="post-header-right">
+        <span class="post-formato formato-card">Card</span>
+        <span class="post-status-badge"></span>
+      </div>
+    </div>
+    
+    <div class="post-arte">
+      <img
+        src="../artes/29-04.jpg"
+        alt="Arte — Você pode escolher a lente da sua cirurgia?"
+        loading="lazy"
+        onerror="this.parentElement.style.display='none'"
+      />
+    </div>
+    <div class="post-divider"></div>
+    
+    <div class="post-conteudo" style="padding-top:0">
+      <div class="post-conteudo-label">Legenda</div>
+      <div class="post-texto">Na cirurgia de catarata, a lente natural do olho é substituída por uma lente intraocular. E não existe só um tipo, existem várias, com características diferentes para necessidades diferentes.<br>Lente monofocal: corrige visão para longe ou para perto. Lente multifocal: permite enxergar bem em múltiplas distâncias. Lente tórica: indicada para quem tem astigmatismo.<br>A escolha depende do seu estilo de vida, da sua profissão, dos seus hábitos. E dos dados que os exames revelam sobre o seu olho.<br>Não é uma decisão que o médico toma sozinho. É uma conversa!<br>👁 Ver bem é importante. Se sentir seguro também.<br>#lenteintraocular #cirurgiadecatarata #cataratacenter #oftalmologia #novohamburgors<br>---</div>
+    </div>
+    
+    <div class="obs-salva" id="obs-salva-20260429-voce-pode-escolher-a-lente-da-">
+      <div class="obs-salva-inner">
+        <div class="obs-salva-label">Observação do cliente</div>
+        <div class="obs-salva-texto"></div>
+      </div>
+    </div>
+    <div class="post-acoes">
+      <button class="btn-aprovar" id="aprovar-20260429-voce-pode-escolher-a-lente-da-" onclick="marcarPost('20260429-voce-pode-escolher-a-lente-da-', 'aprovado')">
+        Aprovar
+      </button>
+      <button class="btn-ajuste" id="ajuste-20260429-voce-pode-escolher-a-lente-da-" onclick="marcarPost('20260429-voce-pode-escolher-a-lente-da-', 'ajuste')">
+        Pedir ajuste
+      </button>
+    </div>
+    <div class="campo-ajuste" id="campo-20260429-voce-pode-escolher-a-lente-da-">
+      <textarea
+        id="obs-20260429-voce-pode-escolher-a-lente-da-"
+        placeholder="O que você gostaria de ajustar neste post?"
+        oninput="atualizarComentario('20260429-voce-pode-escolher-a-lente-da-', this.value)"
+        rows="3"
+      ></textarea>
+      <button class="btn-confirmar-obs" id="btnobs-20260429-voce-pode-escolher-a-lente-da-" onclick="confirmarObs('20260429-voce-pode-escolher-a-lente-da-')">
+        Registrar observação
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- SEPARADOR RESPONDIDOS (inserido por JS) -->
+
+
+
+<!-- RODAPE FIXO -->
+<div class="rodape">
+  <button class="btn-enviar" id="btnEnviar" onclick="enviarAprovacao()" disabled>
+    Enviar aprovações
+  </button>
+</div>
+
+<!-- TELA JA APROVADA -->
+<div class="tela-ja-aprovada" id="telaJaAprovada">
+  <div class="confirmacao-icone" style="background:#1A1A1A">
+    <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+      <polyline points="20 6 9 17 4 12"></polyline>
+    </svg>
+  </div>
+  <div class="confirmacao-titulo">Tudo certo por aqui!</div>
+  <div class="confirmacao-texto">
+    Você já enviou suas aprovações.<br>
+    Quando houver novos conteúdos para revisar,<br>
+    a Silvana vai te enviar um novo link.
+  </div>
+</div>
+
+<!-- TELA DE CONFIRMACAO -->
+<div class="tela-confirmacao" id="telaConfirmacao">
+  <div class="confirmacao-icone">
+    <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+      <polyline points="20 6 9 17 4 12"></polyline>
+    </svg>
+  </div>
+  <div class="confirmacao-titulo">Aprovações enviadas!</div>
+  <div class="confirmacao-texto">
+    A Silvana já recebeu suas respostas.<br>
+    Qualquer dúvida, é só chamar no WhatsApp.
+  </div>
+</div>
+
+<script>
+  // Verifica se já aprovou antes (persiste entre refreshes)
+  (function() {
+    try {
+      if (localStorage.getItem('aprovacao:' + location.pathname) === '1') {
+        document.addEventListener('DOMContentLoaded', function() {
+          var t = document.getElementById('telaJaAprovada');
+          if (t) t.classList.add('visivel');
+        });
+      }
+    } catch(e) {}
+  })();
+
+  const totalPosts = 13;
+  const nomeCliente = "Catarata Center";
+  const periodo = "1 a 30 de abril";
+  const whatsappNumero = '5551980603512';
+  const whatsappGrupo = 'https://chat.whatsapp.com/IaRIEEaIpynDy8NURSxGTW?mode=gi_t';
+  const postsMeta = {"20260401-cada-olho-e-unico-por-que-o-ex": {"data": "01/04", "titulo": "Cada olho é único: por que o exame precisa ser personalizado?"}, "20260403-paquimetria": {"data": "03/04", "titulo": "Paquimetria"}, "20260406-planejamento-cirurgico-o-que-d": {"data": "06/04", "titulo": "Planejamento cirúrgico: o que define um bom resultado?"}, "20260408-pentacam": {"data": "08/04", "titulo": "Pentacam"}, "20260410-laser-nos-olhos-doi": {"data": "10/04", "titulo": "Laser nos olhos dói?"}, "20260413-topografia-corneana": {"data": "13/04", "titulo": "Topografia Corneana"}, "20260415-o-que-diferencia-um-centro-esp": {"data": "15/04", "titulo": "O que diferencia um centro especializado?"}, "20260417-biometria-optica": {"data": "17/04", "titulo": "Biometria Óptica"}, "20260420-visao-embacada-tem-cura": {"data": "20/04", "titulo": "Visão embaçada tem cura?"}, "20260422-aberrometria": {"data": "22/04", "titulo": "Aberrometria"}, "20260424-como-e-a-recuperacao-depois-da": {"data": "24/04", "titulo": "Como é a recuperação depois da cirurgia de catarata?"}, "20260427-microscopia-especular": {"data": "27/04", "titulo": "Microscopia Especular"}, "20260429-voce-pode-escolher-a-lente-da-": {"data": "29/04", "titulo": "Você pode escolher a lente da sua cirurgia?"}};
+  const postsOrdem = ["20260401-cada-olho-e-unico-por-que-o-ex", "20260403-paquimetria", "20260406-planejamento-cirurgico-o-que-d", "20260408-pentacam", "20260410-laser-nos-olhos-doi", "20260413-topografia-corneana", "20260415-o-que-diferencia-um-centro-esp", "20260417-biometria-optica", "20260420-visao-embacada-tem-cura", "20260422-aberrometria", "20260424-como-e-a-recuperacao-depois-da", "20260427-microscopia-especular", "20260429-voce-pode-escolher-a-lente-da-"];
+
+  // ── ESTADO VIA GITHUB API ──────────────────────────────────────
+  const _tk = ['github', '_pat_', '11A4XFG6Q0V9ee2TfDGWKP_Z1vH306NmDFc07G2UHTHWyTJQRYkc4ClwFZGa1j9LThUODYITL6dNhDr6Kn'].join('');
+  const _ghOwner = 'oiforster';
+  const _ghRepo  = 'forster-aprovacoes';
+  const _estadoPath = 'catarata/estado-2026-04.json';
+
+  let _salvarFila = Promise.resolve();
+
+  // Novo formato de estado: { "post-id": { "status": "aprovado", "obs": "..." } }
+  // Retrocompat: aceita string pura (formato antigo)
+  function _parseEstadoItem(val) {
+    if (typeof val === 'string') return { status: val, obs: '' };
+    if (val && typeof val === 'object') return { status: val.status || 'pendente', obs: val.obs || '' };
+    return { status: 'pendente', obs: '' };
+  }
+
+  async function _salvarEstado(postId, status, obs) {
+    _salvarFila = _salvarFila.then(async () => {
+      try {
+        const url = 'https://api.github.com/repos/' + _ghOwner + '/' + _ghRepo + '/contents/' + _estadoPath;
+        const getResp = await fetch(url, { headers: { Authorization: 'token ' + _tk } });
+        if (!getResp.ok) return;
+        const getData = await getResp.json();
+        const sha     = getData.sha;
+        const estado  = JSON.parse(atob(getData.content.replace(/\n/g, '')));
+        const item = { status: status };
+        if (obs) item.obs = obs;
+        estado[postId] = item;
+        const novoConteudo = btoa(unescape(encodeURIComponent(JSON.stringify(estado, null, 2))));
+        await fetch(url, {
+          method: 'PUT',
+          headers: { Authorization: 'token ' + _tk, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ message: 'estado: ' + postId, content: novoConteudo, sha: sha })
+        });
+      } catch(e) {}
+    });
+  }
+
+  async function _salvarEstadoMultiplos(mapa) {
+    _salvarFila = _salvarFila.then(async () => {
+      try {
+        const url = 'https://api.github.com/repos/' + _ghOwner + '/' + _ghRepo + '/contents/' + _estadoPath;
+        const getResp = await fetch(url, { headers: { Authorization: 'token ' + _tk } });
+        if (!getResp.ok) return;
+        const getData = await getResp.json();
+        const sha    = getData.sha;
+        const estado = JSON.parse(atob(getData.content.replace(/\n/g, '')));
+        for (const [k, v] of Object.entries(mapa)) {
+          estado[k] = v;
+        }
+        const novoConteudo = btoa(unescape(encodeURIComponent(JSON.stringify(estado, null, 2))));
+        await fetch(url, {
+          method: 'PUT',
+          headers: { Authorization: 'token ' + _tk, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ message: 'estado: lote', content: novoConteudo, sha: sha })
+        });
+      } catch(e) {}
+    });
+  }
+
+  // ── CARREGAR ESTADO DO GITHUB ──────────────────────────────────
+  async function _carregarEstado() {
+    try {
+      const url = 'https://api.github.com/repos/' + _ghOwner + '/' + _ghRepo + '/contents/' + _estadoPath;
+      const resp = await fetch(url, { headers: { Authorization: 'token ' + _tk } });
+      if (!resp.ok) return null;
+      const data = await resp.json();
+      const raw = atob(data.content.replace(/\n/g, ''));
+      // Decode UTF-8 corretamente (atob retorna Latin-1, precisamos de UTF-8)
+      const texto = decodeURIComponent(escape(raw));
+      return JSON.parse(texto);
+    } catch(e) {
+      return null;
+    }
+  }
+
+  function _aplicarEstado(estado) {
+    if (!estado) return;
+
+    for (const [postId, val] of Object.entries(estado)) {
+      const parsed = _parseEstadoItem(val);
+      if (parsed.status === 'pendente') continue;
+
+      const card = document.getElementById('card-' + postId);
+      if (!card) continue;
+
+      statusPosts[postId] = parsed.status;
+
+      if (parsed.status === 'aprovado') {
+        card.classList.add('aprovado');
+        const ba = document.getElementById('aprovar-' + postId);
+        if (ba) ba.classList.add('ativo');
+        // Mostra badge
+        const badge = card.querySelector('.post-status-badge');
+        if (badge) { badge.textContent = '\u2713 Aprovado'; }
+      } else if (parsed.status === 'ajuste') {
+        card.classList.add('ajuste');
+        const baj = document.getElementById('ajuste-' + postId);
+        if (baj) baj.classList.add('ativo');
+        const badge = card.querySelector('.post-status-badge');
+        if (badge) { badge.textContent = 'Ajuste solicitado'; }
+
+        // Mostrar observação salva (só a caixa amarela, sem a textarea)
+        if (parsed.obs) {
+          comentariosPosts[postId] = parsed.obs;
+          const obsSalva = document.getElementById('obs-salva-' + postId);
+          if (obsSalva) {
+            obsSalva.querySelector('.obs-salva-texto').textContent = parsed.obs;
+            obsSalva.classList.add('visivel');
+          }
+          // Esconde o campo-ajuste (textarea) — a caixa amarela já mostra a obs
+          // O campo só reaparece se o cliente desmarcar e remarcar "Pedir ajuste"
+        }
+      }
+    }
+
+    atualizarProgresso();
+    _reordenarPosts();
+  }
+
+  function _reordenarPosts() {
+    const container = document.getElementById('postsContainer');
+    const cards = Array.from(container.querySelectorAll('.post-card'));
+
+    const pendentes = [];
+    const ajustes = [];
+    const aprovados = [];
+
+    cards.forEach(card => {
+      const id = card.dataset.postId;
+      const s = statusPosts[id];
+      if (s === 'aprovado') aprovados.push(card);
+      else if (s === 'ajuste') ajustes.push(card);
+      else pendentes.push(card);
+    });
+
+    // Limpar container
+    cards.forEach(c => c.remove());
+
+    // Remove separadores antigos
+    document.querySelectorAll('.secao-separador-dinamico').forEach(e => e.remove());
+
+    const secaoPendentes = document.getElementById('secaoPendentes');
+    const haRespondidos = aprovados.length > 0 || ajustes.length > 0;
+    const haPendentes = pendentes.length > 0;
+
+    // Mostra separador pendentes
+    if (haPendentes && haRespondidos) {
+      secaoPendentes.style.display = 'flex';
+    }
+
+    // Insere pendentes primeiro
+    pendentes.forEach(c => container.appendChild(c));
+
+    // Cria separador de respondidos se necessario
+    if (haRespondidos) {
+      const sep = document.createElement('div');
+      sep.className = 'secao-separador respondidos secao-separador-dinamico';
+      sep.innerHTML = '<h2>Já respondidos</h2><div class="secao-linha"></div>';
+      container.appendChild(sep);
+    }
+
+    // Insere ajustes depois aprovados
+    ajustes.forEach(c => container.appendChild(c));
+    aprovados.forEach(c => container.appendChild(c));
+  }
+
+  function enviarEmailSilencioso(mensagem) {
+    try {
+      emailjs.send('service_a00b37r', 'template_lyk4lff', {
+        title: 'Aprovações — ' + nomeCliente + ' — ' + periodo,
+        name: nomeCliente,
+        message: mensagem,
+        email: ''
+      });
+    } catch(e) {}
+  }
+
+  const statusPosts = {};
+  const comentariosPosts = {};
+
+  function marcarPost(id, acao) {
+    const card = document.getElementById('card-' + id);
+    const btnAprovar = document.getElementById('aprovar-' + id);
+    const btnAjuste = document.getElementById('ajuste-' + id);
+    const campoAjuste = document.getElementById('campo-' + id);
+    const obsSalva = document.getElementById('obs-salva-' + id);
+
+    // Toggle: clicar novamente desmarca
+    if (statusPosts[id] === acao) {
+      statusPosts[id] = null;
+      card.classList.remove('aprovado', 'ajuste');
+      btnAprovar.classList.remove('ativo');
+      btnAjuste.classList.remove('ativo');
+      if (campoAjuste) campoAjuste.classList.remove('visivel');
+      if (obsSalva) obsSalva.classList.remove('visivel');
+      card.querySelector('.post-status-badge').style.display = 'none';
+      _salvarEstado(id, 'pendente');
+    } else {
+      statusPosts[id] = acao;
+      card.classList.remove('aprovado', 'ajuste');
+      btnAprovar.classList.remove('ativo');
+      btnAjuste.classList.remove('ativo');
+
+      if (acao === 'aprovado') {
+        card.classList.add('aprovado');
+        btnAprovar.classList.add('ativo');
+        if (campoAjuste) campoAjuste.classList.remove('visivel');
+        if (obsSalva) obsSalva.classList.remove('visivel');
+        _salvarEstado(id, 'aprovado');
+      } else {
+        card.classList.add('ajuste');
+        btnAjuste.classList.add('ativo');
+        if (campoAjuste) campoAjuste.classList.add('visivel');
+        // Obs sera salva ao confirmar
+      }
+    }
+
+    atualizarProgresso();
+  }
+
+  function atualizarComentario(id, valor) {
+    comentariosPosts[id] = valor;
+  }
+
+  function confirmarObs(id) {
+    var ta = document.getElementById('obs-' + id);
+    var btn = document.getElementById('btnobs-' + id);
+    if (!ta || !ta.value.trim()) {
+      ta.focus();
+      ta.placeholder = 'Por favor escreva a observação antes de confirmar.';
+      return;
+    }
+    var obs = ta.value.trim();
+    comentariosPosts[id] = obs;
+    ta.disabled = true;
+    btn.textContent = '\u2713 Observação registrada';
+    btn.classList.add('confirmado');
+    btn.disabled = true;
+
+    // Salva estado com observação
+    _salvarEstado(id, 'ajuste', obs);
+
+    // Mostra caixa de obs salva
+    var obsSalva = document.getElementById('obs-salva-' + id);
+    if (obsSalva) {
+      obsSalva.querySelector('.obs-salva-texto').textContent = obs;
+      obsSalva.classList.add('visivel');
+    }
+  }
+
+  function atualizarProgresso() {
+    const aprovados = Object.values(statusPosts).filter(s => s === 'aprovado').length;
+    const respondidos = Object.values(statusPosts).filter(s => s !== null && s !== undefined).length;
+    const pct = totalPosts > 0 ? (respondidos / totalPosts * 100) : 0;
+
+    document.getElementById('progressBar').style.width = pct + '%';
+    document.getElementById('progressText').textContent = aprovados + ' de ' + totalPosts + ' aprovados';
+
+    const btnEnviar = document.getElementById('btnEnviar');
+    btnEnviar.disabled = respondidos < totalPosts;
+    if (respondidos === totalPosts) {
+      btnEnviar.textContent = 'Enviar aprovações \u2713';
+    }
+  }
+
+  function aprovarTudo() {
+    const btn = document.getElementById('btnAprovarTudo');
+    const todosAprovados = Object.values(statusPosts).filter(s => s === 'aprovado').length === totalPosts;
+
+    if (todosAprovados) return;
+
+    const mapaEstado = {};
+    document.querySelectorAll('[data-post-id]').forEach(card => {
+      const id = card.dataset.postId;
+      statusPosts[id] = 'aprovado';
+      mapaEstado[id]  = { status: 'aprovado' };
+      card.classList.add('aprovado');
+      card.classList.remove('ajuste');
+      const ba = document.getElementById('aprovar-' + id);
+      const baj = document.getElementById('ajuste-' + id);
+      const ca = document.getElementById('campo-' + id);
+      if (ba) ba.classList.add('ativo');
+      if (baj) baj.classList.remove('ativo');
+      if (ca) ca.classList.remove('visivel');
+    });
+    _salvarEstadoMultiplos(mapaEstado);
+
+    btn.classList.add('ativo');
+    btn.textContent = '\u2713 Todos os posts aprovados';
+    atualizarProgresso();
+  }
+
+  function mudarSemana(semanaId) {
+    document.querySelectorAll('.semana-bloco').forEach(b => b.classList.remove('ativa'));
+    document.querySelectorAll('.tab-semana').forEach(t => t.classList.remove('ativa'));
+    const bloco = document.getElementById('semana-' + semanaId);
+    const tab = document.getElementById('tab-' + semanaId);
+    if (bloco) bloco.classList.add('ativa');
+    if (tab) tab.classList.add('ativa');
+  }
+
+  function enviarAprovacao() {
+    const linhas = ['*Aprovações — ' + nomeCliente + ' — ' + periodo + '*', ''];
+
+    for (const id of postsOrdem) {
+      const status = statusPosts[id];
+      const meta = postsMeta[id];
+      if (!meta || !status) continue;
+      if (status === 'aprovado') {
+        linhas.push('\u2705 ' + meta.data + ' — ' + meta.titulo + ' — Aprovado');
+      } else {
+        const obs = (comentariosPosts[id] || '').trim();
+        linhas.push('\u26A0\uFE0F ' + meta.data + ' — ' + meta.titulo + ' — Ajuste' + (obs ? ': "' + obs + '"' : ''));
+      }
+    }
+
+    const mensagem = linhas.join('\n');
+    enviarEmailSilencioso(mensagem);
+
+    if (whatsappGrupo) {
+      _mensagemParaEnviar = mensagem;
+      document.getElementById('modalMensagemTexto').value = mensagem;
+      document.getElementById('btnCopiarMensagem').textContent = 'Copiar mensagem';
+      document.getElementById('btnCopiarMensagem').classList.remove('copiado');
+      document.getElementById('modalMensagem').classList.add('visivel');
+    } else {
+      window.open('https://wa.me/' + whatsappNumero + '?text=' + encodeURIComponent(mensagem), '_blank');
+      try { localStorage.setItem('aprovacao:' + location.pathname, '1'); } catch(e) {}
+      document.getElementById('telaConfirmacao').classList.add('visivel');
+    }
+  }
+
+  var _mensagemParaEnviar = '';
+
+  function copiarMensagemModal() {
+    var texto = document.getElementById('modalMensagemTexto').value;
+    var btn = document.getElementById('btnCopiarMensagem');
+    navigator.clipboard.writeText(texto).then(function() {
+      btn.textContent = 'Copiado! \u2713';
+      btn.classList.add('copiado');
+    }).catch(function() {
+      document.getElementById('modalMensagemTexto').select();
+      document.execCommand('copy');
+      btn.textContent = 'Copiado! \u2713';
+      btn.classList.add('copiado');
+    });
+  }
+
+  function abrirWhatsAppModal() {
+    window.open(whatsappGrupo, '_blank');
+    fecharModalMensagem();
+    try { localStorage.setItem('aprovacao:' + location.pathname, '1'); } catch(e) {}
+    document.getElementById('telaConfirmacao').classList.add('visivel');
+  }
+
+  function fecharModalMensagem() {
+    document.getElementById('modalMensagem').classList.remove('visivel');
+  }
+
+  // ── LIGHTBOX PARA FRAMES ──────────────────────────────────────
+  var _lbFrames = [];
+  var _lbIdx = 0;
+
+  function abrirLightbox(grupo, idx) {
+    var imgs = document.querySelectorAll('.frames-grupo[data-grupo="' + grupo + '"] img');
+    _lbFrames = Array.from(imgs).map(function(img) { return img.dataset.full || img.src; });
+    _lbIdx = idx;
+    var lb = document.getElementById('lightbox');
+    lb.querySelector('img').src = _lbFrames[_lbIdx];
+    lb.classList.add('visivel');
+  }
+
+  function fecharLightbox() {
+    document.getElementById('lightbox').classList.remove('visivel');
+  }
+
+  function navLightbox(dir) {
+    _lbIdx = (_lbIdx + dir + _lbFrames.length) % _lbFrames.length;
+    document.getElementById('lightbox').querySelector('img').src = _lbFrames[_lbIdx];
+  }
+
+  // Swipe no lightbox
+  (function() {
+    var lb = document.getElementById('lightbox');
+    if (!lb) return;
+    var startX = 0;
+    lb.addEventListener('touchstart', function(e) { startX = e.touches[0].clientX; });
+    lb.addEventListener('touchend', function(e) {
+      var diff = e.changedTouches[0].clientX - startX;
+      if (Math.abs(diff) > 50) navLightbox(diff > 0 ? -1 : 1);
+    });
+  })();
+
+  // ── INIT: CARREGAR ESTADO ──────────────────────────────────────
+  document.addEventListener('DOMContentLoaded', async function() {
+    const estado = await _carregarEstado();
+    _aplicarEstado(estado);
+    // Remove loading overlay
+    var overlay = document.getElementById('loadingOverlay');
+    if (overlay) overlay.classList.add('hidden');
+  });
+
+</script>
+
+<!-- Modal: mensagem WhatsApp -->
+<div class="modal-mensagem" id="modalMensagem">
+  <div class="modal-mensagem-inner">
+    <div class="modal-mensagem-titulo">Enviar aprovações</div>
+    <div class="modal-mensagem-instrucao">Copie a mensagem abaixo e cole no WhatsApp do grupo.</div>
+    <textarea class="modal-mensagem-texto" id="modalMensagemTexto" readonly></textarea>
+    <button class="modal-btn-copiar" id="btnCopiarMensagem" onclick="copiarMensagemModal()">
+      Copiar mensagem
+    </button>
+    <button class="modal-btn-wpp" id="btnAbrirWpp" onclick="abrirWhatsAppModal()">
+      Abrir WhatsApp
+    </button>
+    <button class="modal-btn-fechar" onclick="fecharModalMensagem()">Fechar</button>
+  </div>
+</div>
+<script>
+  document.getElementById('modalMensagem').addEventListener('click', function(e) {
+    if (e.target === this) fecharModalMensagem();
+  });
+</script>
+
+<!-- Lightbox -->
+<div class="lightbox" id="lightbox">
+  <button class="lightbox-close" onclick="fecharLightbox()">&times;</button>
+  <button class="lightbox-nav prev" onclick="navLightbox(-1)">&#8249;</button>
+  <img src="" alt="Frame" />
+  <button class="lightbox-nav next" onclick="navLightbox(1)">&#8250;</button>
+  <div class="lightbox-hint">Segure o dedo sobre a imagem para salvar na galeria</div>
+</div>
+
+</body>
+</html>

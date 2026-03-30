@@ -1,15 +1,41 @@
 {
-  "20260401-cada-olho-e-unico-por-que-o-ex": "pendente",
-  "20260403-paquimetria": "pendente",
-  "20260406-planejamento-cirurgico-o-que-d": "pendente",
-  "20260408-pentacam": "pendente",
-  "20260410-laser-nos-olhos-doi": "pendente",
-  "20260413-topografia-corneana": "pendente",
-  "20260415-o-que-diferencia-um-centro-esp": "pendente",
-  "20260417-biometria-optica": "pendente",
-  "20260420-visao-embacada-tem-cura": "pendente",
-  "20260422-aberrometria": "pendente",
-  "20260424-como-e-a-recuperacao-depois-da": "pendente",
-  "20260427-microscopia-especular": "pendente",
-  "20260429-voce-pode-escolher-a-lente-da-": "pendente"
+  "20260401-cada-olho-e-unico-por-que-o-ex": {
+    "status": "pendente"
+  },
+  "20260403-paquimetria": {
+    "status": "pendente"
+  },
+  "20260406-planejamento-cirurgico-o-que-d": {
+    "status": "pendente"
+  },
+  "20260408-pentacam": {
+    "status": "pendente"
+  },
+  "20260410-laser-nos-olhos-doi": {
+    "status": "pendente"
+  },
+  "20260413-topografia-corneana": {
+    "status": "pendente"
+  },
+  "20260415-o-que-diferencia-um-centro-esp": {
+    "status": "pendente"
+  },
+  "20260417-biometria-optica": {
+    "status": "pendente"
+  },
+  "20260420-visao-embacada-tem-cura": {
+    "status": "pendente"
+  },
+  "20260422-aberrometria": {
+    "status": "pendente"
+  },
+  "20260424-como-e-a-recuperacao-depois-da": {
+    "status": "pendente"
+  },
+  "20260427-microscopia-especular": {
+    "status": "pendente"
+  },
+  "20260429-voce-pode-escolher-a-lente-da-": {
+    "status": "pendente"
+  }
 }
