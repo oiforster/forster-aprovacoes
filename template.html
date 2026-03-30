@@ -1036,7 +1036,7 @@
         const badge = card.querySelector('.post-status-badge');
         if (badge) { badge.textContent = 'Ajuste solicitado'; }
 
-        // Mostrar observação salva
+        // Mostrar observação salva (só a caixa amarela, sem a textarea)
         if (parsed.obs) {
           comentariosPosts[postId] = parsed.obs;
           const obsSalva = document.getElementById('obs-salva-' + postId);
@@ -1044,20 +1044,8 @@
             obsSalva.querySelector('.obs-salva-texto').textContent = parsed.obs;
             obsSalva.classList.add('visivel');
           }
-          // Pre-fill textarea
-          const ta = document.getElementById('obs-' + postId);
-          if (ta) {
-            ta.value = parsed.obs;
-            ta.disabled = true;
-          }
-          const campoAjuste = document.getElementById('campo-' + postId);
-          if (campoAjuste) campoAjuste.classList.add('visivel');
-          const btnObs = document.getElementById('btnobs-' + postId);
-          if (btnObs) {
-            btnObs.textContent = '\u2713 Observação registrada';
-            btnObs.classList.add('confirmado');
-            btnObs.disabled = true;
-          }
+          // Esconde o campo-ajuste (textarea) — a caixa amarela já mostra a obs
+          // O campo só reaparece se o cliente desmarcar e remarcar "Pedir ajuste"
         }
       }
     }

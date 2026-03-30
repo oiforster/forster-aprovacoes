@@ -928,12 +928,16 @@
       </div>
     </div>
     
+    <div class="post-arte">
+      <img
+        src="artes/03-04.jpg"
+        alt="Arte — Frase reflexiva — Ver bem é ver a vida com mais intensidade"
+        loading="lazy"
+        onerror="this.parentElement.style.display='none'"
+      />
+    </div>
     <div class="post-divider"></div>
     
-    <div class="post-conteudo">
-      <div class="post-conteudo-label">Texto</div>
-      <div class="post-texto">&quot;Ver bem é ver a vida com mais intensidade.&quot;</div>
-    </div>
     <div class="post-conteudo" style="padding-top:0">
       <div class="post-conteudo-label">Legenda</div>
       <div class="post-texto">Tem coisas que a gente só percebe quando para e olha com atenção.<br>Um sorriso de longe. A paisagem na janela. A cor preferida de quem a gente ama.<br>Cuidar da visão é cuidar do que importa.<br>📍 Casa Marco — Igrejinha • Parobé • Taquara • Três Coroas<br>---</div>
@@ -1022,12 +1026,16 @@
       </div>
     </div>
     
+    <div class="post-arte">
+      <img
+        src="artes/07-04.jpg"
+        alt="Arte — Qual você escolhe?"
+        loading="lazy"
+        onerror="this.parentElement.style.display='none'"
+      />
+    </div>
     <div class="post-divider"></div>
     
-    <div class="post-conteudo">
-      <div class="post-conteudo-label">Texto</div>
-      <div class="post-texto">Qual dessas você sairia usando agora?<br>Colar em prata ou dourado?</div>
-    </div>
     <div class="post-conteudo" style="padding-top:0">
       <div class="post-conteudo-label">Legenda</div>
       <div class="post-texto">Às vezes a escolha mais difícil do dia é essa aqui. 😄<br>Conta pra gente nos comentários: você vai de prata ou de dourado?<br>📍 Casa Marco — Igrejinha • Parobé • Taquara • Três Coroas<br>---</div>
@@ -1116,11 +1124,32 @@
       </div>
     </div>
     
+    <div class="post-arte">
+      <div class="carrossel-wrapper" id="carr-20260411-mitos-e-verdades-sobre-oculos">
+        <div class="carrossel-track"><div class="carrossel-slide"><img src="artes/11-04_1.jpg" loading="lazy" onerror="this.closest('.carrossel-slide').style.display='none'" /></div><div class="carrossel-slide"><img src="artes/11-04_2.jpg" loading="lazy" onerror="this.closest('.carrossel-slide').style.display='none'" /></div><div class="carrossel-slide"><img src="artes/11-04_3.jpg" loading="lazy" onerror="this.closest('.carrossel-slide').style.display='none'" /></div><div class="carrossel-slide"><img src="artes/11-04_4.jpg" loading="lazy" onerror="this.closest('.carrossel-slide').style.display='none'" /></div><div class="carrossel-slide"><img src="artes/11-04_5.jpg" loading="lazy" onerror="this.closest('.carrossel-slide').style.display='none'" /></div><div class="carrossel-slide"><img src="artes/11-04_6.jpg" loading="lazy" onerror="this.closest('.carrossel-slide').style.display='none'" /></div><div class="carrossel-slide"><img src="artes/11-04_7.jpg" loading="lazy" onerror="this.closest('.carrossel-slide').style.display='none'" /></div></div>
+        <div class="carrossel-counter">1 / 7</div>
+        <button class="carrossel-prev" onclick="carrosselNav('carr-20260411-mitos-e-verdades-sobre-oculos',-1)" aria-label="Anterior">&#8249;</button>
+        <button class="carrossel-next" onclick="carrosselNav('carr-20260411-mitos-e-verdades-sobre-oculos', 1)" aria-label="Próximo">&#8250;</button>
+      </div>
+      <div class="carrossel-dots" id="dots-carr-20260411-mitos-e-verdades-sobre-oculos"><span class="carrossel-dot ativa"></span><span class="carrossel-dot"></span><span class="carrossel-dot"></span><span class="carrossel-dot"></span><span class="carrossel-dot"></span><span class="carrossel-dot"></span><span class="carrossel-dot"></span></div>
+    </div>
+    <script>(function(){
+      var track = document.querySelector('#carr-20260411-mitos-e-verdades-sobre-oculos .carrossel-track');
+      var counter = document.querySelector('#carr-20260411-mitos-e-verdades-sobre-oculos .carrossel-counter');
+      var dots = document.querySelectorAll('#dots-carr-20260411-mitos-e-verdades-sobre-oculos .carrossel-dot');
+      var total = 7;
+      track.addEventListener('scroll', function() {
+        var idx = Math.round(track.scrollLeft / track.offsetWidth);
+        counter.textContent = (idx + 1) + ' / ' + total;
+        dots.forEach(function(d, i) { d.classList.toggle('ativa', i === idx); });
+      });
+    })();
+    window.carrosselNav = window.carrosselNav || function(id, dir) {
+      var t = document.querySelector('#' + id + ' .carrossel-track');
+      t.scrollBy({ left: dir * t.offsetWidth, behavior: 'smooth' });
+    };</script>
     <div class="post-divider"></div>
     
-    <div class="post-conteudo">
-      <div class="post-conteudo-label" style="margin-top:0px">Slide 1</div><div class="post-texto">Mitos e verdades sobre óculos<br>Você sabe mesmo o que é verdade? 👀</div><div class="post-conteudo-label" style="margin-top:8px">Slide 2</div><div class="post-texto">MITO<br>&quot;Usar óculos enfraquece a vista.&quot;<br>Os óculos corrigem a visão — eles não a enfraquecem. O que acontece é que, sem eles, o esforço visual aumenta. Com óculos, você enxerga bem e seus olhos descansam.</div><div class="post-conteudo-label" style="margin-top:8px">Slide 3</div><div class="post-texto">MITO<br>&quot;Ler com pouca luz prejudica os olhos.&quot;<br>Leitura com pouca luz causa cansaço ocular e dor de cabeça, mas não danifica a visão permanentemente. Ainda assim, vale evitar: conforto faz diferença no dia a dia.</div><div class="post-conteudo-label" style="margin-top:8px">Slide 4</div><div class="post-texto">VERDADE<br>&quot;Óculos de sol barato pode não proteger.&quot;<br>A proteção UV não depende do preço — mas depende da certificação. Óculos sem filtro UV 400 podem ser ainda mais prejudiciais: as lentes escuras dilatam a pupila e deixam entrar mais radiação. Sempre confirme a proteção antes de comprar.</div><div class="post-conteudo-label" style="margin-top:8px">Slide 5</div><div class="post-texto">MITO<br>&quot;Criança só precisa de óculos se reclamar que não enxerga.&quot;<br>Crianças muitas vezes não percebem que enxergam mal — é o único mundo que conhecem. O ideal é fazer o exame oftalmológico antes dos 3 anos. Quanto antes, melhor.</div><div class="post-conteudo-label" style="margin-top:8px">Slide 6</div><div class="post-texto">VERDADE<br>&quot;Dá pra fazer óculos de sol com grau.&quot;<br>Sim! Você não precisa escolher entre enxergar bem e se proteger do sol. Óculos de sol graduados são uma solução prática — e a gente tem opções pra todos os gostos.</div>
-    </div>
     <div class="post-conteudo" style="padding-top:0">
       <div class="post-conteudo-label">Legenda</div>
       <div class="post-texto">Tem muita coisa que a gente acha que sabe sobre óculos… mas nem sempre bate com a realidade. 😄<br>Passamos pelos mitos mais comuns e as respostas podem surpreender.<br>Teve algum que você acreditava? Conta nos comentários!<br>📍 Casa Marco — Igrejinha • Parobé • Taquara • Três Coroas<br>---</div>
@@ -1209,12 +1238,16 @@
       </div>
     </div>
     
+    <div class="post-arte">
+      <img
+        src="artes/15-04.jpg"
+        alt="Arte — Dica: como limpar as lentes do jeito certo"
+        loading="lazy"
+        onerror="this.parentElement.style.display='none'"
+      />
+    </div>
     <div class="post-divider"></div>
     
-    <div class="post-conteudo">
-      <div class="post-conteudo-label">Texto</div>
-      <div class="post-texto">Camiseta não. Nunca mais. 🙅‍♀️</div>
-    </div>
     <div class="post-conteudo" style="padding-top:0">
       <div class="post-conteudo-label">Legenda</div>
       <div class="post-texto">Uma dica rápida que faz toda a diferença para os seus óculos durarem mais:<br>❌ Não limpe com a camiseta, lenços de papel ou qualquer pano seco, eles arranham as lentes aos poucos<br>✅ Use o paninho de microfibra que veio com os óculos<br>✅ Para uma limpeza mais profunda: água corrente + sabonete neutro, seque com o paninho<br>Pequeno cuidado, óculos novos por muito mais tempo.<br>📍 Casa Marco — Igrejinha • Parobé • Taquara • Três Coroas<br>---</div>
@@ -1303,12 +1336,16 @@
       </div>
     </div>
     
+    <div class="post-arte">
+      <img
+        src="artes/19-04.jpg"
+        alt="Arte — Lentes fotossensíveis: como funcionam"
+        loading="lazy"
+        onerror="this.parentElement.style.display='none'"
+      />
+    </div>
     <div class="post-divider"></div>
     
-    <div class="post-conteudo">
-      <div class="post-conteudo-label">Texto</div>
-      <div class="post-texto">A lente que se adapta à luz.<br>Você conhece as lentes fotossensíveis?</div>
-    </div>
     <div class="post-conteudo" style="padding-top:0">
       <div class="post-conteudo-label">Legenda</div>
       <div class="post-texto">Lentes fotossensíveis (como as Transitions) escurecem automaticamente quando expostas à luz solar e clareiam ao voltar para ambientes fechados.<br>Um par de óculos que funciona como dois.<br>Como funcionam?<br>A lente contém moléculas que reagem à radiação UV. Na luz do sol, elas se reorganizam e escurecem a lente. Na sombra ou em ambientes fechados, voltam ao estado transparente.<br>Por que usar?<br>✅ Praticidade: não precisa trocar de óculos ao sair<br>✅ Proteção UV mesmo quando a lente está clara<br>✅ Conforto visual em qualquer condição de luz<br>✅ Disponível com qualquer grau<br>Quer conhecer as opções disponíveis?<br>Passa na loja e a gente te mostra. <br>📍 Igrejinha • Parobé • Taquara • Três Coroas<br>---</div>
@@ -1397,12 +1434,16 @@
       </div>
     </div>
     
+    <div class="post-arte">
+      <img
+        src="artes/23-04.jpg"
+        alt="Arte — Frase reflexiva — cuide da visão, cuide da vida"
+        loading="lazy"
+        onerror="this.parentElement.style.display='none'"
+      />
+    </div>
     <div class="post-divider"></div>
     
-    <div class="post-conteudo">
-      <div class="post-conteudo-label">Texto</div>
-      <div class="post-texto">&quot;Às vezes, tudo o que falta pra curtir a vida… é olhar com mais atenção.&quot;</div>
-    </div>
     <div class="post-conteudo" style="padding-top:0">
       <div class="post-conteudo-label">Legenda</div>
       <div class="post-texto">Às vezes, tudo o que falta pra curtir a vida… é olhar com mais atenção.<br>A gente passa correndo, no automático, vendo tudo, mas enxergando pouco.<br>Os detalhes, as cores, as pessoas, os momentos… tudo ganha outro sentido quando você realmente para e percebe.<br>E, às vezes, um simples ajuste no olhar já muda tudo.<br>Enxergar melhor é também viver melhor.<br>---</div>
@@ -1491,11 +1532,32 @@
       </div>
     </div>
     
+    <div class="post-arte">
+      <div class="carrossel-wrapper" id="carr-20260427-como-e-o-atendimento-na-casa-m">
+        <div class="carrossel-track"><div class="carrossel-slide"><img src="artes/27-04_1.jpg" loading="lazy" onerror="this.closest('.carrossel-slide').style.display='none'" /></div><div class="carrossel-slide"><img src="artes/27-04_2.jpg" loading="lazy" onerror="this.closest('.carrossel-slide').style.display='none'" /></div><div class="carrossel-slide"><img src="artes/27-04_3.jpg" loading="lazy" onerror="this.closest('.carrossel-slide').style.display='none'" /></div><div class="carrossel-slide"><img src="artes/27-04_4.jpg" loading="lazy" onerror="this.closest('.carrossel-slide').style.display='none'" /></div><div class="carrossel-slide"><img src="artes/27-04_5.jpg" loading="lazy" onerror="this.closest('.carrossel-slide').style.display='none'" /></div><div class="carrossel-slide"><img src="artes/27-04_6.jpg" loading="lazy" onerror="this.closest('.carrossel-slide').style.display='none'" /></div></div>
+        <div class="carrossel-counter">1 / 6</div>
+        <button class="carrossel-prev" onclick="carrosselNav('carr-20260427-como-e-o-atendimento-na-casa-m',-1)" aria-label="Anterior">&#8249;</button>
+        <button class="carrossel-next" onclick="carrosselNav('carr-20260427-como-e-o-atendimento-na-casa-m', 1)" aria-label="Próximo">&#8250;</button>
+      </div>
+      <div class="carrossel-dots" id="dots-carr-20260427-como-e-o-atendimento-na-casa-m"><span class="carrossel-dot ativa"></span><span class="carrossel-dot"></span><span class="carrossel-dot"></span><span class="carrossel-dot"></span><span class="carrossel-dot"></span><span class="carrossel-dot"></span></div>
+    </div>
+    <script>(function(){
+      var track = document.querySelector('#carr-20260427-como-e-o-atendimento-na-casa-m .carrossel-track');
+      var counter = document.querySelector('#carr-20260427-como-e-o-atendimento-na-casa-m .carrossel-counter');
+      var dots = document.querySelectorAll('#dots-carr-20260427-como-e-o-atendimento-na-casa-m .carrossel-dot');
+      var total = 6;
+      track.addEventListener('scroll', function() {
+        var idx = Math.round(track.scrollLeft / track.offsetWidth);
+        counter.textContent = (idx + 1) + ' / ' + total;
+        dots.forEach(function(d, i) { d.classList.toggle('ativa', i === idx); });
+      });
+    })();
+    window.carrosselNav = window.carrosselNav || function(id, dir) {
+      var t = document.querySelector('#' + id + ' .carrossel-track');
+      t.scrollBy({ left: dir * t.offsetWidth, behavior: 'smooth' });
+    };</script>
     <div class="post-divider"></div>
     
-    <div class="post-conteudo">
-      <div class="post-conteudo-label" style="margin-top:0px">Slide 1</div><div class="post-texto">Você sabe como funciona uma visita à Casa Marco? 🤍</div><div class="post-conteudo-label" style="margin-top:8px">Slide 2</div><div class="post-texto">Você chega.<br>Sem senha, sem fila, sem pressa. Nossa equipe te recebe e entende o que você está buscando — seja uma troca, uma novidade ou só uma olhadinha.</div><div class="post-conteudo-label" style="margin-top:8px">Slide 3</div><div class="post-texto">A gente escuta.<br>Grau novo? Armação que combina mais? Algo pra usar no trabalho ou pra ocasião especial? Cada detalhe importa na hora de encontrar o par certo.</div><div class="post-conteudo-label" style="margin-top:8px">Slide 4</div><div class="post-texto">Você experimenta à vontade.<br>Sem pressão. Mostramos as opções que fazem sentido pra você e deixamos o tempo necessário pra sentir qual é o seu.</div><div class="post-conteudo-label" style="margin-top:8px">Slide 5</div><div class="post-texto">A gente cuida de tudo.<br>Montagem, ajuste, garantia. Depois que você escolhe, a gente acompanha até o óculos estar perfeito no seu rosto.</div>
-    </div>
     <div class="post-conteudo" style="padding-top:0">
       <div class="post-conteudo-label">Legenda</div>
       <div class="post-texto">Às vezes a gente adia a visita à ótica porque não sabe bem como é ou acha que vai ser rápido demais, ou demorado demais.<br>Na Casa Marco, o atendimento é no seu tempo. Sem pressão, com atenção de verdade.<br>Venha quando quiser. A gente está aqui.<br>📍 Igrejinha • Parobé • Taquara • Três Coroas<br>---</div>
@@ -1737,7 +1799,7 @@
         const badge = card.querySelector('.post-status-badge');
         if (badge) { badge.textContent = 'Ajuste solicitado'; }
 
-        // Mostrar observação salva
+        // Mostrar observação salva (só a caixa amarela, sem a textarea)
         if (parsed.obs) {
           comentariosPosts[postId] = parsed.obs;
           const obsSalva = document.getElementById('obs-salva-' + postId);
@@ -1745,20 +1807,8 @@
             obsSalva.querySelector('.obs-salva-texto').textContent = parsed.obs;
             obsSalva.classList.add('visivel');
           }
-          // Pre-fill textarea
-          const ta = document.getElementById('obs-' + postId);
-          if (ta) {
-            ta.value = parsed.obs;
-            ta.disabled = true;
-          }
-          const campoAjuste = document.getElementById('campo-' + postId);
-          if (campoAjuste) campoAjuste.classList.add('visivel');
-          const btnObs = document.getElementById('btnobs-' + postId);
-          if (btnObs) {
-            btnObs.textContent = '\u2713 Observação registrada';
-            btnObs.classList.add('confirmado');
-            btnObs.disabled = true;
-          }
+          // Esconde o campo-ajuste (textarea) — a caixa amarela já mostra a obs
+          // O campo só reaparece se o cliente desmarcar e remarcar "Pedir ajuste"
         }
       }
     }

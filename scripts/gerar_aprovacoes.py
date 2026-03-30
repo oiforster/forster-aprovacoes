@@ -403,12 +403,29 @@ def encontrar_arte(data, pasta_estrategia, output_dir=None):
         import shutil
         pasta_artes_local = Path(output_dir) / 'artes'
         pasta_artes_local.mkdir(parents=True, exist_ok=True)
+
+        # Verifica se as artes já existem no repo (evita copiar de novo do Synology)
         if slides:
+            urls = []
+            todos_existem = True
+            for i, slide in enumerate(slides, 1):
+                nome_limpo = f'{prefixo}_{i}{slide.suffix.lower()}'
+                dest = pasta_artes_local / nome_limpo
+                if dest.exists():
+                    urls.append(f'artes/{nome_limpo}')
+                else:
+                    todos_existem = False
+                    break
+            if todos_existem and urls:
+                print(f"    📁  {len(urls)} slide(s) já no repo")
+                return urls
+            # Se não existem todos, copia do Synology
             urls = []
             for i, slide in enumerate(slides, 1):
                 nome_limpo = f'{prefixo}_{i}{slide.suffix.lower()}'
                 dest = pasta_artes_local / nome_limpo
-                shutil.copy2(slide, dest)
+                if not dest.exists():
+                    shutil.copy2(slide, dest)
                 urls.append(f'artes/{nome_limpo}')
             print(f"    📁  Copiado {len(urls)} slide(s) para o repo")
             return urls
@@ -416,6 +433,9 @@ def encontrar_arte(data, pasta_estrategia, output_dir=None):
             arquivo = candidatos[0]
             nome_limpo = f'{prefixo}{arquivo.suffix.lower()}'
             dest = pasta_artes_local / nome_limpo
+            if dest.exists():
+                print(f"    📁  {nome_limpo} já no repo")
+                return f'artes/{nome_limpo}'
             shutil.copy2(arquivo, dest)
             print(f"    📁  Copiado {arquivo.name} → {nome_limpo}")
             return f'artes/{nome_limpo}'
@@ -1406,6 +1426,11 @@ def gerar_para_cliente(cliente, datas_semana, agencia_path, base_url, output_dir
     )
 
     # Nova estrutura: YYYY-MM/index.html (URL limpa)
+    # Ajustar paths relativos: página vive um nível abaixo da raiz do cliente
+    # artes/DD-MM.jpg → ../artes/DD-MM.jpg
+    html = html.replace('src="artes/', 'src="../artes/')
+    html = html.replace('href="artes/', 'href="../artes/')
+
     pasta_mes = pasta_cliente / ano_mes_posts
     pasta_mes.mkdir(parents=True, exist_ok=True)
     caminho_saida = pasta_mes / 'index.html'
