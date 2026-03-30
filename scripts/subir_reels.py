@@ -122,7 +122,7 @@ def ler_youtube_md(pasta_videos):
             idx = linha.find(': http')
             if idx == -1:
                 continue
-            chave = linha[:idx].strip()
+            chave = unicodedata.normalize('NFC', linha[:idx].strip())
             url   = linha[idx+2:].strip()
             m = re.search(r'(?:youtu\.be/|[?&]v=)([a-zA-Z0-9_\-]{11})', url)
             if m:
@@ -263,7 +263,7 @@ def processar_cliente(youtube, cliente, ano_mes, agencia_path):
     novos = False
 
     for video in videos:
-        reel_nome = video.stem  # "REEL 01 – Nome do Vídeo"
+        reel_nome = unicodedata.normalize('NFC', video.stem)  # "REEL 01 – Nome do Vídeo"
 
         if reel_nome in ids:
             print(f"  ✓ {video.name} — já enviado (youtu.be/{ids[reel_nome]})")

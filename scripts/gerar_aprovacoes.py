@@ -265,7 +265,7 @@ def ler_youtube_id(pasta_videos, reel_nome):
     arquivo = pasta_videos / '_youtube.md'
     if not arquivo.exists():
         return None
-    reel_lower = reel_nome.strip().lower()
+    reel_lower = unicodedata.normalize('NFC', reel_nome.strip().lower())
     with open(arquivo, 'r', encoding='utf-8') as f:
         for linha in f:
             linha = linha.strip()
@@ -275,7 +275,7 @@ def ler_youtube_id(pasta_videos, reel_nome):
             idx = linha.find(': http')
             if idx == -1:
                 continue
-            chave = linha[:idx].strip().lower()
+            chave = unicodedata.normalize('NFC', linha[:idx].strip().lower())
             url   = linha[idx+2:].strip()
             if chave == reel_lower:
                 m = re.search(r'(?:youtu\.be/|[?&]v=)([a-zA-Z0-9_\-]{11})', url)
@@ -653,10 +653,15 @@ def parse_conteudo_mensal(arquivo_path, datas_semana=None, pasta_estrategia=None
                 if youtube_id:
                     print(f"    🎬  Reel '{reel_nome}' encontrado para {data.strftime('%d/%m')}")
                 # Caminho local do vídeo (para upload futuro)
+                # Tenta nome direto e com NFD (macOS Synology)
                 for ext in ['.mov', '.mp4', '.m4v']:
                     candidato = pasta_videos / f"{reel_nome}{ext}"
                     if candidato.exists():
                         video_path = str(candidato)
+                        break
+                    candidato_nfd = pasta_videos / f"{unicodedata.normalize('NFD', reel_nome)}{ext}"
+                    if candidato_nfd.exists():
+                        video_path = str(candidato_nfd)
                         break
 
         posts.append({

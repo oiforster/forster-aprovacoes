@@ -350,7 +350,8 @@ def validar_cliente(cliente, ano_mes, agencia_path, data_inicio=None, data_fim=N
                 if pv.exists():
                     for f in pv.iterdir():
                         if f.suffix.lower() in EXT_VIDEO and '(capa)' not in f.name.lower():
-                            all_videos[f.stem.lower()] = f
+                            # Normaliza NFC para evitar mismatch NFD/NFC do macOS
+                            all_videos[unicodedata.normalize('NFC', f.stem.lower())] = f
 
     if posts_reel:
         if not all_videos:
@@ -366,7 +367,7 @@ def validar_cliente(cliente, ano_mes, agencia_path, data_inicio=None, data_fim=N
                     )
                     continue
 
-                reel_lower = post['reel_nome'].lower()
+                reel_lower = unicodedata.normalize('NFC', post['reel_nome'].lower())
                 if reel_lower in all_videos:
                     ok.append(f"Reel {post['data'].strftime('%d/%m')}: {post['reel_nome']}")
                 else:
@@ -392,7 +393,7 @@ def validar_cliente(cliente, ano_mes, agencia_path, data_inicio=None, data_fim=N
 
             # Vídeos sem post correspondente
             nomes_referenciados = {
-                p['reel_nome'].lower()
+                unicodedata.normalize('NFC', p['reel_nome'].lower())
                 for p in posts_reel
                 if p['reel_nome']
             }
