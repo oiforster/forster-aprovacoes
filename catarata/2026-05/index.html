@@ -1,0 +1,2063 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Aprovação — Catarata Center</title>
+  <meta property="og:title"       content="Aprovação — Catarata Center — 1 a 31 de maio" />
+  <meta property="og:description" content="Acesse para aprovar ou pedir ajuste nos vídeos de 1 a 31 de maio." />
+  <meta property="og:image"       content="" />
+  <meta property="og:type"        content="website" />
+  <!-- Inter + Playfair Display -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #FAFAF8;
+      color: #1d1d1f;
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    /* HEADER */
+    .header {
+      background: #fff;
+      padding: 32px 20px 24px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      border-bottom: 1px solid rgba(0,0,0,0.06);
+    }
+    .header-label {
+      font-size: 0.6875rem;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #86868b;
+      margin-bottom: 8px;
+    }
+    .header-cliente {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 1.625rem;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      line-height: 1.15;
+      color: #1d1d1f;
+    }
+    .header-periodo {
+      font-size: 0.8125rem;
+      font-weight: 400;
+      color: #86868b;
+      margin-top: 4px;
+    }
+    .header-progress {
+      margin-top: 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .progress-bar-bg {
+      flex: 1;
+      height: 3px;
+      background: #e8e8ed;
+      border-radius: 2px;
+      overflow: hidden;
+    }
+    .progress-bar-fill {
+      height: 100%;
+      background: #34c759;
+      border-radius: 2px;
+      width: 0%;
+      transition: width 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .progress-text {
+      font-size: 0.6875rem;
+      font-weight: 500;
+      color: #86868b;
+      white-space: nowrap;
+    }
+
+    /* APROVAR TUDO */
+    .aprovar-tudo-container {
+      padding: 16px 16px 8px;
+    }
+    .btn-aprovar-tudo {
+      width: 100%;
+      padding: 14px;
+      background: #1d1d1f;
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      font-size: 0.9375rem;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .btn-aprovar-tudo:hover { background: #333; }
+    .btn-aprovar-tudo.ativo {
+      background: #34c759;
+    }
+
+    /* SEPARADORES DE SEÇÃO */
+    .secao-separador {
+      padding: 20px 16px 8px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .secao-separador h2 {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 1.0625rem;
+      font-weight: 500;
+      color: #1d1d1f;
+      white-space: nowrap;
+    }
+    .secao-separador.respondidos h2 {
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: #86868b;
+    }
+    .secao-linha {
+      flex: 1;
+      height: 1px;
+      background: #e8e8ed;
+    }
+
+    /* POSTS */
+    .posts-container {
+      padding: 8px 16px 120px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .post-card {
+      background: #fff;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.03), 0 4px 16px rgba(0,0,0,0.04);
+      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      border-left: 4px solid transparent;
+    }
+    .post-card.aprovado {
+      border-left-color: #34c759;
+      opacity: 0.8;
+    }
+    .post-card.ajuste {
+      border-left-color: #ff9f0a;
+    }
+
+    /* Badge de status */
+    .post-status-badge {
+      display: none;
+      font-size: 0.6875rem;
+      font-weight: 600;
+      padding: 3px 10px;
+      border-radius: 20px;
+      letter-spacing: 0.02em;
+    }
+    .post-card.aprovado .post-status-badge {
+      display: inline-block;
+      background: #e6f4ea;
+      color: #1e8e3e;
+    }
+    .post-card.ajuste .post-status-badge {
+      display: inline-block;
+      background: #fef3e2;
+      color: #e65100;
+    }
+
+    .post-header {
+      padding: 16px 16px 12px;
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 8px;
+    }
+    .post-meta {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      flex: 1;
+    }
+    .post-data {
+      font-size: 0.6875rem;
+      font-weight: 600;
+      color: #86868b;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+    .post-titulo {
+      font-size: 0.9375rem;
+      font-weight: 700;
+      color: #1d1d1f;
+      letter-spacing: -0.01em;
+      line-height: 1.3;
+    }
+    .post-header-right {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 6px;
+      flex-shrink: 0;
+    }
+    .post-formato {
+      display: inline-block;
+      font-size: 0.6875rem;
+      font-weight: 600;
+      padding: 3px 8px;
+      border-radius: 6px;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+    .formato-card    { background: #e8f0fe; color: #1a73e8; }
+    .formato-reels   { background: #fce8ef; color: #d93025; }
+    .formato-carrossel { background: #f3e8fd; color: #8430ce; }
+    .formato-video   { background: #e6f4ea; color: #1e8e3e; }
+
+    .post-divider {
+      height: 1px;
+      background: #f5f5f7;
+      margin: 0 16px;
+    }
+
+    .post-conteudo {
+      padding: 12px 16px;
+    }
+    .post-conteudo-label {
+      font-size: 0.625rem;
+      font-weight: 600;
+      color: #86868b;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+    .post-texto {
+      font-size: 0.875rem;
+      color: #6e6e73;
+      line-height: 1.6;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+    .post-legenda {
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px solid #f5f5f7;
+    }
+
+    /* ARTE INLINE */
+    .post-arte {
+      width: 100%;
+      background: #000;
+      overflow: hidden;
+    }
+
+    /* PLAYER YOUTUBE */
+    .youtube-wrapper {
+      position: relative;
+      width: 100%;
+      padding-bottom: 177.78%;
+      height: 0;
+      background: #000;
+    }
+    .youtube-wrapper iframe {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      border: none;
+    }
+    .post-arte > img {
+      width: 100%;
+      aspect-ratio: 3 / 4;
+      object-fit: contain;
+      display: block;
+    }
+
+    /* YOUTUBE FACADE */
+    .youtube-facade {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 9 / 16;
+      background: #000;
+      cursor: pointer;
+      overflow: hidden;
+    }
+    .youtube-facade img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    .yt-play-btn {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+      filter: drop-shadow(0 2px 8px rgba(0,0,0,0.4));
+      transition: transform 0.15s;
+    }
+    .youtube-facade:active .yt-play-btn {
+      transform: translate(-50%, -50%) scale(0.92);
+    }
+
+    /* CARROSSEL */
+    .carrossel-wrapper {
+      position: relative;
+      width: 100%;
+      background: #000;
+      overflow: hidden;
+    }
+    .carrossel-track {
+      display: flex;
+      overflow-x: scroll;
+      scroll-snap-type: x mandatory;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+      scroll-behavior: smooth;
+    }
+    .carrossel-track::-webkit-scrollbar { display: none; }
+    .carrossel-slide {
+      min-width: 100%;
+      scroll-snap-align: start;
+    }
+    .carrossel-slide img {
+      width: 100%;
+      aspect-ratio: 3 / 4;
+      object-fit: contain;
+      display: block;
+      background: #000;
+    }
+    .carrossel-counter {
+      position: absolute;
+      top: 10px;
+      right: 12px;
+      background: rgba(0,0,0,0.55);
+      color: #fff;
+      font-size: 12px;
+      font-weight: 600;
+      padding: 3px 9px;
+      border-radius: 20px;
+      letter-spacing: 0.03em;
+    }
+    .carrossel-prev, .carrossel-next {
+      display: none;
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 36px;
+      height: 36px;
+      background: rgba(0,0,0,0.52);
+      color: #fff;
+      border: none;
+      border-radius: 50%;
+      font-size: 22px;
+      line-height: 1;
+      cursor: pointer;
+      align-items: center;
+      justify-content: center;
+      z-index: 10;
+      transition: background 0.15s;
+    }
+    .carrossel-prev:hover, .carrossel-next:hover { background: rgba(0,0,0,0.78); }
+    .carrossel-prev { left: 10px; }
+    .carrossel-next { right: 10px; }
+    @media (hover: hover) {
+      .carrossel-prev, .carrossel-next { display: flex; }
+    }
+    .carrossel-dots {
+      display: flex;
+      justify-content: center;
+      gap: 6px;
+      padding: 9px 0 5px;
+      background: #FAFAF8;
+    }
+    .carrossel-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #c7c7cc;
+      transition: background 0.2s;
+    }
+    .carrossel-dot.ativa {
+      background: #1d1d1f;
+    }
+
+    /* MEDIA LINK */
+    .post-media {
+      padding: 0 16px 12px;
+    }
+    .btn-ver-midia {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 14px;
+      background: #f5f5f7;
+      border-radius: 10px;
+      text-decoration: none;
+      color: #1d1d1f;
+      font-size: 0.8125rem;
+      font-weight: 600;
+      border: none;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .btn-ver-midia:hover { background: #e8e8ed; }
+    .btn-ver-midia svg { flex-shrink: 0; }
+
+    /* APROVACAO */
+    .post-acoes {
+      display: flex;
+      gap: 8px;
+      padding: 12px 16px 14px;
+    }
+    .btn-aprovar, .btn-ajuste {
+      flex: 1;
+      padding: 12px;
+      border: none;
+      border-radius: 12px;
+      font-size: 0.875rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+    .btn-aprovar {
+      background: #e6f4ea;
+      color: #1e8e3e;
+    }
+    .btn-aprovar:active, .btn-aprovar.ativo {
+      background: #34c759;
+      color: #fff;
+    }
+    .btn-ajuste {
+      background: #fef3e2;
+      color: #e65100;
+    }
+    .btn-ajuste:active, .btn-ajuste.ativo {
+      background: #ff9f0a;
+      color: #fff;
+    }
+
+    /* CAMPO DE AJUSTE */
+    .campo-ajuste {
+      display: none;
+      padding: 0 16px 14px;
+    }
+    .campo-ajuste.visivel { display: block; }
+    .campo-ajuste textarea {
+      width: 100%;
+      padding: 12px;
+      border: 1.5px solid #ff9f0a;
+      border-radius: 12px;
+      font-size: 0.875rem;
+      font-family: inherit;
+      color: #1d1d1f;
+      background: #fffbf5;
+      resize: none;
+      outline: none;
+      min-height: 80px;
+      line-height: 1.5;
+    }
+    .campo-ajuste textarea:focus {
+      border-color: #e65100;
+    }
+    .campo-ajuste textarea::placeholder { color: #c7c7cc; }
+
+    /* Observação salva (exibida ao restaurar estado) */
+    .obs-salva {
+      display: none;
+      padding: 0 16px 14px;
+    }
+    .obs-salva.visivel { display: block; }
+    .obs-salva-inner {
+      background: #FFF8E1;
+      border: 1px solid #FFE082;
+      border-radius: 12px;
+      padding: 12px 14px;
+    }
+    .obs-salva-label {
+      font-size: 0.625rem;
+      font-weight: 600;
+      color: #e65100;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+    .obs-salva-texto {
+      font-size: 0.875rem;
+      color: #5D4037;
+      font-style: italic;
+      line-height: 1.5;
+    }
+
+    .btn-confirmar-obs {
+      display: block;
+      width: 100%;
+      margin-top: 8px;
+      padding: 10px;
+      background: #ff9f0a;
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      font-size: 0.875rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      text-align: center;
+    }
+    .btn-confirmar-obs:active { background: #e65100; }
+    .btn-confirmar-obs.confirmado {
+      background: #34c759;
+    }
+
+    /* RODAPE FLUTUANTE */
+    .rodape {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: 12px 16px 24px;
+      background: linear-gradient(to top, #FAFAF8 70%, transparent);
+    }
+    .btn-enviar {
+      width: 100%;
+      padding: 16px;
+      background: #1d1d1f;
+      color: #fff;
+      border: none;
+      border-radius: 14px;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      letter-spacing: -0.02em;
+    }
+    .btn-enviar:disabled {
+      background: #c7c7cc;
+      cursor: not-allowed;
+    }
+    .btn-enviar:not(:disabled):hover { background: #333; }
+
+    /* JA APROVADA */
+    .tela-ja-aprovada {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: #FAFAF8;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 32px;
+      text-align: center;
+      z-index: 300;
+    }
+    .tela-ja-aprovada.visivel { display: flex; }
+
+    /* CONFIRMACAO */
+    .tela-confirmacao {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: #FAFAF8;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 32px;
+      text-align: center;
+      z-index: 200;
+    }
+    .tela-confirmacao.visivel { display: flex; }
+    .confirmacao-icone {
+      width: 72px;
+      height: 72px;
+      background: #34c759;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 28px;
+    }
+    .confirmacao-titulo {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: #1d1d1f;
+      margin-bottom: 12px;
+      letter-spacing: -0.02em;
+    }
+    .confirmacao-texto {
+      font-size: 0.9375rem;
+      color: #6e6e73;
+      line-height: 1.7;
+    }
+
+    /* SEMANA OCULTA */
+    .semana-bloco { display: none; flex-direction: column; gap: 28px; }
+    .semana-bloco.ativa { display: flex; }
+
+    /* LOADING OVERLAY */
+    .loading-overlay {
+      position: fixed;
+      inset: 0;
+      background: #FAFAF8;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 250;
+      transition: opacity 0.4s ease;
+    }
+    .loading-overlay.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+    .loading-spinner {
+      width: 32px;
+      height: 32px;
+      border: 3px solid #e8e8ed;
+      border-top-color: #1d1d1f;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .loading-text {
+      margin-top: 16px;
+      font-size: 0.8125rem;
+      color: #86868b;
+    }
+
+    @media (min-width: 480px) {
+      .posts-container { max-width: 440px; margin: 0 auto; }
+      .aprovar-tudo-container { max-width: 440px; margin: 0 auto; }
+      .secao-separador { max-width: 440px; margin-left: auto; margin-right: auto; }
+      .rodape { max-width: 440px; left: 50%; transform: translateX(-50%); }
+    }
+
+    /* MODAL MENSAGEM WHATSAPP */
+    .modal-mensagem {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.4);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      z-index: 400;
+      align-items: flex-end;
+      justify-content: center;
+      padding-bottom: 0;
+    }
+    .modal-mensagem.visivel { display: flex; }
+    .modal-mensagem-inner {
+      background: #fff;
+      border-radius: 20px 20px 0 0;
+      padding: 28px 24px 40px;
+      width: 100%;
+      max-width: 540px;
+      max-height: 85vh;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    @keyframes slideUp {
+      from { transform: translateY(60px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+    .modal-mensagem-titulo {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 1.0625rem;
+      font-weight: 600;
+      color: #1d1d1f;
+      text-align: center;
+    }
+    .modal-mensagem-instrucao {
+      font-size: 0.875rem;
+      color: #6e6e73;
+      text-align: center;
+      line-height: 1.5;
+    }
+    .modal-mensagem-texto {
+      background: #f5f5f7;
+      border-radius: 12px;
+      padding: 16px;
+      font-size: 0.875rem;
+      color: #6e6e73;
+      line-height: 1.6;
+      white-space: pre-wrap;
+      font-family: inherit;
+      border: none;
+      resize: none;
+      width: 100%;
+      box-sizing: border-box;
+      min-height: 120px;
+    }
+    .modal-btn-copiar {
+      background: #25D366;
+      color: #fff;
+      border: none;
+      border-radius: 14px;
+      padding: 16px;
+      font-size: 1rem;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      cursor: pointer;
+      width: 100%;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .modal-btn-copiar:active { background: #1ebe5a; }
+    .modal-btn-copiar.copiado { background: #34c759; }
+    .modal-btn-wpp {
+      background: #fff;
+      color: #1d1d1f;
+      border: 1.5px solid #e8e8ed;
+      border-radius: 14px;
+      padding: 14px;
+      font-size: 0.9375rem;
+      font-weight: 600;
+      cursor: pointer;
+      width: 100%;
+      transition: all 0.2s;
+    }
+    .modal-btn-wpp:active { background: #f5f5f7; }
+    .modal-btn-fechar {
+      background: none;
+      border: none;
+      color: #86868b;
+      font-size: 0.875rem;
+      cursor: pointer;
+      text-align: center;
+      padding: 4px;
+    }
+
+    /* FRAMES */
+    .frames-section {
+      padding: 0 16px 40px;
+    }
+    .frames-section h2 {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: #1d1d1f;
+      margin-bottom: 16px;
+    }
+    .frames-grupo-titulo {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: #86868b;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin: 16px 0 8px;
+    }
+    .frames-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+    .frames-grid img {
+      width: 100%;
+      aspect-ratio: 9 / 16;
+      object-fit: cover;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+    .frames-grid img:active { opacity: 0.8; }
+
+    /* LIGHTBOX */
+    .lightbox {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.95);
+      z-index: 500;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    .lightbox.visivel { display: flex; }
+    .lightbox-close {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      background: rgba(255,255,255,0.15);
+      color: #fff;
+      border: none;
+      border-radius: 50%;
+      width: 44px;
+      height: 44px;
+      font-size: 20px;
+      cursor: pointer;
+    }
+    .lightbox img {
+      max-width: 95vw;
+      max-height: 85vh;
+      object-fit: contain;
+    }
+    .lightbox-hint {
+      position: absolute;
+      bottom: 24px;
+      color: rgba(255,255,255,0.5);
+      font-size: 0.75rem;
+    }
+    .lightbox-nav {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      background: rgba(255,255,255,0.15);
+      color: #fff;
+      border: none;
+      border-radius: 50%;
+      width: 44px;
+      height: 44px;
+      font-size: 22px;
+      cursor: pointer;
+    }
+    .lightbox-nav.prev { left: 12px; }
+    .lightbox-nav.next { right: 12px; }
+
+    @media (min-width: 480px) {
+      .frames-section { max-width: 440px; margin: 0 auto; }
+    }
+  </style>
+  <!-- EmailJS SDK -->
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+  <script>emailjs.init({ publicKey: '-xrMYz7vRGvZg8ZOY' });</script>
+</head>
+<body>
+
+<!-- LOADING OVERLAY -->
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="loading-spinner"></div>
+  <div class="loading-text">Carregando aprovações...</div>
+</div>
+
+<!-- CABECALHO -->
+<div class="header">
+  <div class="header-label">Aprovação de conteúdo</div>
+  <div class="header-cliente">Catarata Center</div>
+  <div class="header-periodo">1 a 31 de maio</div>
+  <div class="header-progress">
+    <div class="progress-bar-bg">
+      <div class="progress-bar-fill" id="progressBar"></div>
+    </div>
+    <div class="progress-text" id="progressText">0 de 14 aprovados</div>
+  </div>
+</div>
+
+<!-- APROVAR TUDO -->
+<div class="aprovar-tudo-container">
+  <button class="btn-aprovar-tudo" id="btnAprovarTudo" onclick="aprovarTudo()">
+    Aprovar todos os posts
+  </button>
+</div>
+
+<!-- SEPARADOR PENDENTES -->
+<div class="secao-separador" id="secaoPendentes" style="display:none">
+  <h2>Aguardando sua aprovação</h2>
+  <div class="secao-linha"></div>
+</div>
+
+<!-- POSTS -->
+<div class="posts-container" id="postsContainer">
+  
+  <div class="post-card" id="card-20260501-cuidar-dos-olhos-nao-tem-idade" data-post-id="20260501-cuidar-dos-olhos-nao-tem-idade">
+    <div class="post-header">
+      <div class="post-meta">
+        <div class="post-data">01/05 (sex)</div>
+        <div class="post-titulo">Cuidar dos olhos não tem idade mínima</div>
+      </div>
+      <div class="post-header-right">
+        <span class="post-formato formato-card">Card</span>
+        <span class="post-status-badge"></span>
+      </div>
+    </div>
+    
+    <div class="post-arte">
+      <img
+        src="../artes/01-05.jpg"
+        alt="Arte — Cuidar dos olhos não tem idade mínima"
+        loading="lazy"
+        onerror="this.parentElement.style.display='none'"
+      />
+    </div>
+    <div class="post-divider"></div>
+    
+    <div class="post-conteudo" style="padding-top:0">
+      <div class="post-conteudo-label">Legenda</div>
+      <div class="post-texto">A maioria das pessoas só vai ao oftalmologista quando algo está claramente errado. Mas esperar o sintoma aparecer é esperar demais.<br>Problemas como glaucoma, degeneração macular e retinopatia diabética avançam sem dor e sem sintomas visíveis no início. Quando aparecem os sinais, a perda já aconteceu.<br>O check-up ocular de rotina é o que permite agir antes que o problema se instale. A frequência ideal varia conforme a faixa etária, histórico familiar e condições de saúde, mas a regra geral é simples: consulta anual para adultos saudáveis e avaliação desde o primeiro ano de vida para crianças.<br>Você está com os olhos em dia?<br>Agende sua consulta pelo link na bio.<br>👁 Ver bem é importante. Se sentir seguro também.<br>#checkupocular #saúdeocular #cataratacenter #oftalmologia #novohamburgors<br>---</div>
+    </div>
+    
+    <div class="obs-salva" id="obs-salva-20260501-cuidar-dos-olhos-nao-tem-idade">
+      <div class="obs-salva-inner">
+        <div class="obs-salva-label">Observação do cliente</div>
+        <div class="obs-salva-texto"></div>
+      </div>
+    </div>
+    <div class="post-acoes">
+      <button class="btn-aprovar" id="aprovar-20260501-cuidar-dos-olhos-nao-tem-idade" onclick="marcarPost('20260501-cuidar-dos-olhos-nao-tem-idade', 'aprovado')">
+        Aprovar
+      </button>
+      <button class="btn-ajuste" id="ajuste-20260501-cuidar-dos-olhos-nao-tem-idade" onclick="marcarPost('20260501-cuidar-dos-olhos-nao-tem-idade', 'ajuste')">
+        Pedir ajuste
+      </button>
+    </div>
+    <div class="campo-ajuste" id="campo-20260501-cuidar-dos-olhos-nao-tem-idade">
+      <textarea
+        id="obs-20260501-cuidar-dos-olhos-nao-tem-idade"
+        placeholder="O que você gostaria de ajustar neste post?"
+        oninput="atualizarComentario('20260501-cuidar-dos-olhos-nao-tem-idade', this.value)"
+        rows="3"
+      ></textarea>
+      <button class="btn-confirmar-obs" id="btnobs-20260501-cuidar-dos-olhos-nao-tem-idade" onclick="confirmarObs('20260501-cuidar-dos-olhos-nao-tem-idade')">
+        Registrar observação
+      </button>
+    </div>
+  </div>
+  <div class="post-card" id="card-20260504-uma-novidade-boa-de-contar" data-post-id="20260504-uma-novidade-boa-de-contar">
+    <div class="post-header">
+      <div class="post-meta">
+        <div class="post-data">04/05 (seg)</div>
+        <div class="post-titulo">Uma novidade boa de contar</div>
+      </div>
+      <div class="post-header-right">
+        <span class="post-formato formato-reels">Reels</span>
+        <span class="post-status-badge"></span>
+      </div>
+    </div>
+    
+    <div class="post-divider"></div>
+    
+    <div class="post-conteudo" style="padding-top:0">
+      <div class="post-conteudo-label">Legenda</div>
+      <div class="post-texto">Uma novidade boa de compartilhar com você. 👁️<br>Agora, o Catarata Center é o espaço de oftalmologia premium da Prisma Especialidades, uma clínica que oferece atendimento integral em saúde.<br>Para você, nada muda: mesma equipe, mesmo acolhimento, mesmo cuidado em cada detalhe.<br>Crescemos. E seguimos cuidando da sua visão com a mesma dedicação de sempre.<br>👉 Agende sua consulta pelo link na bio.<br>#CatarataCenter #PrismaEspecialidades #Oftalmologia #SaúdeDosOlhos #Novidade #CuideDaSuaVisão<br>---</div>
+    </div>
+    
+    <div class="obs-salva" id="obs-salva-20260504-uma-novidade-boa-de-contar">
+      <div class="obs-salva-inner">
+        <div class="obs-salva-label">Observação do cliente</div>
+        <div class="obs-salva-texto"></div>
+      </div>
+    </div>
+    <div class="post-acoes">
+      <button class="btn-aprovar" id="aprovar-20260504-uma-novidade-boa-de-contar" onclick="marcarPost('20260504-uma-novidade-boa-de-contar', 'aprovado')">
+        Aprovar
+      </button>
+      <button class="btn-ajuste" id="ajuste-20260504-uma-novidade-boa-de-contar" onclick="marcarPost('20260504-uma-novidade-boa-de-contar', 'ajuste')">
+        Pedir ajuste
+      </button>
+    </div>
+    <div class="campo-ajuste" id="campo-20260504-uma-novidade-boa-de-contar">
+      <textarea
+        id="obs-20260504-uma-novidade-boa-de-contar"
+        placeholder="O que você gostaria de ajustar neste post?"
+        oninput="atualizarComentario('20260504-uma-novidade-boa-de-contar', this.value)"
+        rows="3"
+      ></textarea>
+      <button class="btn-confirmar-obs" id="btnobs-20260504-uma-novidade-boa-de-contar" onclick="confirmarObs('20260504-uma-novidade-boa-de-contar')">
+        Registrar observação
+      </button>
+    </div>
+  </div>
+  <div class="post-card" id="card-20260507-dia-do-oftalmologista" data-post-id="20260507-dia-do-oftalmologista">
+    <div class="post-header">
+      <div class="post-meta">
+        <div class="post-data">07/05 (qui)</div>
+        <div class="post-titulo">Dia do Oftalmologista</div>
+      </div>
+      <div class="post-header-right">
+        <span class="post-formato formato-card">Card</span>
+        <span class="post-status-badge"></span>
+      </div>
+    </div>
+    
+    <div class="post-arte">
+      <img
+        src="../artes/07-05.jpg"
+        alt="Arte — Dia do Oftalmologista"
+        loading="lazy"
+        onerror="this.parentElement.style.display='none'"
+      />
+    </div>
+    <div class="post-divider"></div>
+    
+    <div class="post-conteudo" style="padding-top:0">
+      <div class="post-conteudo-label">Legenda</div>
+      <div class="post-texto">Hoje é o Dia do Oftalmologista, e é um dia que sentimos na pele.<br>Escolhemos essa profissão porque acreditamos que a visão é muito mais do que enxergar. É independência, segurança, conexão com o mundo.<br>Cada consulta é uma oportunidade de mudar algo na vida de alguém. De devolver nitidez para quem estava no escuro. De tirar o medo de quem adiava uma cirurgia há anos. De fazer com que uma criança enxergue o quadro na escola pela primeira vez.<br>Obrigada a cada paciente que confia em nós.<br>O nosso trabalho só faz sentido por vocês.<br>👁 Catarata Center. 10 anos em Novo Hamburgo.<br>#diadoroftalmologista #oftalmologia #cataratacenter #novohamburgors #saúdeocular<br>---</div>
+    </div>
+    
+    <div class="obs-salva" id="obs-salva-20260507-dia-do-oftalmologista">
+      <div class="obs-salva-inner">
+        <div class="obs-salva-label">Observação do cliente</div>
+        <div class="obs-salva-texto"></div>
+      </div>
+    </div>
+    <div class="post-acoes">
+      <button class="btn-aprovar" id="aprovar-20260507-dia-do-oftalmologista" onclick="marcarPost('20260507-dia-do-oftalmologista', 'aprovado')">
+        Aprovar
+      </button>
+      <button class="btn-ajuste" id="ajuste-20260507-dia-do-oftalmologista" onclick="marcarPost('20260507-dia-do-oftalmologista', 'ajuste')">
+        Pedir ajuste
+      </button>
+    </div>
+    <div class="campo-ajuste" id="campo-20260507-dia-do-oftalmologista">
+      <textarea
+        id="obs-20260507-dia-do-oftalmologista"
+        placeholder="O que você gostaria de ajustar neste post?"
+        oninput="atualizarComentario('20260507-dia-do-oftalmologista', this.value)"
+        rows="3"
+      ></textarea>
+      <button class="btn-confirmar-obs" id="btnobs-20260507-dia-do-oftalmologista" onclick="confirmarObs('20260507-dia-do-oftalmologista')">
+        Registrar observação
+      </button>
+    </div>
+  </div>
+  <div class="post-card" id="card-20260508-por-que-fica-dificil-ler-de-pe" data-post-id="20260508-por-que-fica-dificil-ler-de-pe">
+    <div class="post-header">
+      <div class="post-meta">
+        <div class="post-data">08/05 (sex)</div>
+        <div class="post-titulo">Por que fica difícil ler de perto depois dos 40?</div>
+      </div>
+      <div class="post-header-right">
+        <span class="post-formato formato-reels">Reels</span>
+        <span class="post-status-badge"></span>
+      </div>
+    </div>
+    
+    <div class="post-divider"></div>
+    
+    <div class="post-conteudo" style="padding-top:0">
+      <div class="post-conteudo-label">Legenda</div>
+      <div class="post-texto">Forçando a visão pra ler de perto? Isso tem explicação. 📖<br>Depois dos 40, o olho perde a capacidade de focar em objetos próximos: é a presbiopia, uma mudança natural da visão.<br>Os sinais mais comuns são:<br>• precisar afastar o texto para ler<br>• cansaço e dor de cabeça após leitura<br>• dificuldade em ambientes com pouca luz<br>Tem solução e ela começa com uma boa avaliação.<br>👉 Agende sua consulta no Catarata Center.<br>#CatarataCenter #Presbiopia #VistaCansada #SaúdeDosOlhos #Oftalmologia #CuideDaSuaVisão<br>---</div>
+    </div>
+    
+    <div class="obs-salva" id="obs-salva-20260508-por-que-fica-dificil-ler-de-pe">
+      <div class="obs-salva-inner">
+        <div class="obs-salva-label">Observação do cliente</div>
+        <div class="obs-salva-texto"></div>
+      </div>
+    </div>
+    <div class="post-acoes">
+      <button class="btn-aprovar" id="aprovar-20260508-por-que-fica-dificil-ler-de-pe" onclick="marcarPost('20260508-por-que-fica-dificil-ler-de-pe', 'aprovado')">
+        Aprovar
+      </button>
+      <button class="btn-ajuste" id="ajuste-20260508-por-que-fica-dificil-ler-de-pe" onclick="marcarPost('20260508-por-que-fica-dificil-ler-de-pe', 'ajuste')">
+        Pedir ajuste
+      </button>
+    </div>
+    <div class="campo-ajuste" id="campo-20260508-por-que-fica-dificil-ler-de-pe">
+      <textarea
+        id="obs-20260508-por-que-fica-dificil-ler-de-pe"
+        placeholder="O que você gostaria de ajustar neste post?"
+        oninput="atualizarComentario('20260508-por-que-fica-dificil-ler-de-pe', this.value)"
+        rows="3"
+      ></textarea>
+      <button class="btn-confirmar-obs" id="btnobs-20260508-por-que-fica-dificil-ler-de-pe" onclick="confirmarObs('20260508-por-que-fica-dificil-ler-de-pe')">
+        Registrar observação
+      </button>
+    </div>
+  </div>
+  <div class="post-card" id="card-20260510-dia-das-maes" data-post-id="20260510-dia-das-maes">
+    <div class="post-header">
+      <div class="post-meta">
+        <div class="post-data">10/05 (dom)</div>
+        <div class="post-titulo">Dia das Mães</div>
+      </div>
+      <div class="post-header-right">
+        <span class="post-formato formato-card">Card</span>
+        <span class="post-status-badge"></span>
+      </div>
+    </div>
+    
+    <div class="post-arte">
+      <img
+        src="../artes/10-05.jpg"
+        alt="Arte — Dia das Mães"
+        loading="lazy"
+        onerror="this.parentElement.style.display='none'"
+      />
+    </div>
+    <div class="post-divider"></div>
+    
+    <div class="post-conteudo" style="padding-top:0">
+      <div class="post-conteudo-label">Legenda</div>
+      <div class="post-texto">Feliz Dia das Mães.<br>Hoje é um dia para celebrar quem cuida. E cuidar também é garantir que a visão está em dia, porque enxergar bem faz parte de aproveitar cada momento.<br>Se a sua mãe ainda não fez consulta oftalmológica esse ano, que tal marcar uma?<br>Agende pelo link na bio.<br>👁 Ver bem é importante. Se sentir seguro também.<br>#diadasmaes #saúdeocular #cataratacenter #oftalmologia #novohamburgors<br>---</div>
+    </div>
+    
+    <div class="obs-salva" id="obs-salva-20260510-dia-das-maes">
+      <div class="obs-salva-inner">
+        <div class="obs-salva-label">Observação do cliente</div>
+        <div class="obs-salva-texto"></div>
+      </div>
+    </div>
+    <div class="post-acoes">
+      <button class="btn-aprovar" id="aprovar-20260510-dia-das-maes" onclick="marcarPost('20260510-dia-das-maes', 'aprovado')">
+        Aprovar
+      </button>
+      <button class="btn-ajuste" id="ajuste-20260510-dia-das-maes" onclick="marcarPost('20260510-dia-das-maes', 'ajuste')">
+        Pedir ajuste
+      </button>
+    </div>
+    <div class="campo-ajuste" id="campo-20260510-dia-das-maes">
+      <textarea
+        id="obs-20260510-dia-das-maes"
+        placeholder="O que você gostaria de ajustar neste post?"
+        oninput="atualizarComentario('20260510-dia-das-maes', this.value)"
+        rows="3"
+      ></textarea>
+      <button class="btn-confirmar-obs" id="btnobs-20260510-dia-das-maes" onclick="confirmarObs('20260510-dia-das-maes')">
+        Registrar observação
+      </button>
+    </div>
+  </div>
+  <div class="post-card" id="card-20260512-dia-da-enfermagem" data-post-id="20260512-dia-da-enfermagem">
+    <div class="post-header">
+      <div class="post-meta">
+        <div class="post-data">12/05 (ter)</div>
+        <div class="post-titulo">Dia da Enfermagem</div>
+      </div>
+      <div class="post-header-right">
+        <span class="post-formato formato-card">Card</span>
+        <span class="post-status-badge"></span>
+      </div>
+    </div>
+    
+    <div class="post-arte">
+      <img
+        src="../artes/12-05.jpg"
+        alt="Arte — Dia da Enfermagem"
+        loading="lazy"
+        onerror="this.parentElement.style.display='none'"
+      />
+    </div>
+    <div class="post-divider"></div>
+    
+    <div class="post-conteudo" style="padding-top:0">
+      <div class="post-conteudo-label">Legenda</div>
+      <div class="post-texto">A enfermagem está em cada etapa do atendimento aqui no Catarata Center.<br>Na recepção que acolhe. No preparo para o exame. No cuidado antes e depois de cada procedimento. Na voz que explica, acalma e orienta quando o paciente ainda não sabe bem o que vai acontecer.<br>Esse trabalho não aparece nos diplomas emoldurados na parede. Mas aparece no rosto do paciente que entra com medo e sai aliviado.<br>Hoje celebramos cada profissional de enfermagem que faz parte da nossa equipe.<br>Obrigada.<br>👁 Catarata Center.<br>#diadaenfermagem #enfermagem #cataratacenter #novohamburgors #saúdeocular<br>---</div>
+    </div>
+    
+    <div class="obs-salva" id="obs-salva-20260512-dia-da-enfermagem">
+      <div class="obs-salva-inner">
+        <div class="obs-salva-label">Observação do cliente</div>
+        <div class="obs-salva-texto"></div>
+      </div>
+    </div>
+    <div class="post-acoes">
+      <button class="btn-aprovar" id="aprovar-20260512-dia-da-enfermagem" onclick="marcarPost('20260512-dia-da-enfermagem', 'aprovado')">
+        Aprovar
+      </button>
+      <button class="btn-ajuste" id="ajuste-20260512-dia-da-enfermagem" onclick="marcarPost('20260512-dia-da-enfermagem', 'ajuste')">
+        Pedir ajuste
+      </button>
+    </div>
+    <div class="campo-ajuste" id="campo-20260512-dia-da-enfermagem">
+      <textarea
+        id="obs-20260512-dia-da-enfermagem"
+        placeholder="O que você gostaria de ajustar neste post?"
+        oninput="atualizarComentario('20260512-dia-da-enfermagem', this.value)"
+        rows="3"
+      ></textarea>
+      <button class="btn-confirmar-obs" id="btnobs-20260512-dia-da-enfermagem" onclick="confirmarObs('20260512-dia-da-enfermagem')">
+        Registrar observação
+      </button>
+    </div>
+  </div>
+  <div class="post-card" id="card-20260513-capsulotomia-yag-laser" data-post-id="20260513-capsulotomia-yag-laser">
+    <div class="post-header">
+      <div class="post-meta">
+        <div class="post-data">13/05 (qua)</div>
+        <div class="post-titulo">Capsulotomia YAG Laser</div>
+      </div>
+      <div class="post-header-right">
+        <span class="post-formato formato-reels">Reels</span>
+        <span class="post-status-badge"></span>
+      </div>
+    </div>
+    
+    <div class="post-divider"></div>
+    
+    <div class="post-conteudo" style="padding-top:0">
+      <div class="post-conteudo-label">Legenda</div>
+      <div class="post-texto">Operou catarata e a visão voltou a embaçar meses depois? Isso tem nome e tem solução. 👁️<br>Após a cirurgia de catarata, uma membrana atrás da lente implantada pode ficar opaca com o tempo. A condição se chama opacificação da cápsula posterior.<br>A capsulotomia YAG laser resolve isso em minutos: um procedimento rápido, indolor, feito aqui mesmo na clínica, sem necessidade de internação ou nova cirurgia.<br>A catarata não voltou. Mas se a visão embaçou de novo depois da cirurgia, não ignore.<br>Agende uma avaliação no Catarata Center pelo link na bio.<br>👁 Ver bem é importante. Se sentir seguro também.<br>#yaglaser #capsulotomia #cataratacenter #oftalmologia #novohamburgors #cirurgiadecatarata<br>---</div>
+    </div>
+    
+    <div class="obs-salva" id="obs-salva-20260513-capsulotomia-yag-laser">
+      <div class="obs-salva-inner">
+        <div class="obs-salva-label">Observação do cliente</div>
+        <div class="obs-salva-texto"></div>
+      </div>
+    </div>
+    <div class="post-acoes">
+      <button class="btn-aprovar" id="aprovar-20260513-capsulotomia-yag-laser" onclick="marcarPost('20260513-capsulotomia-yag-laser', 'aprovado')">
+        Aprovar
+      </button>
+      <button class="btn-ajuste" id="ajuste-20260513-capsulotomia-yag-laser" onclick="marcarPost('20260513-capsulotomia-yag-laser', 'ajuste')">
+        Pedir ajuste
+      </button>
+    </div>
+    <div class="campo-ajuste" id="campo-20260513-capsulotomia-yag-laser">
+      <textarea
+        id="obs-20260513-capsulotomia-yag-laser"
+        placeholder="O que você gostaria de ajustar neste post?"
+        oninput="atualizarComentario('20260513-capsulotomia-yag-laser', this.value)"
+        rows="3"
+      ></textarea>
+      <button class="btn-confirmar-obs" id="btnobs-20260513-capsulotomia-yag-laser" onclick="confirmarObs('20260513-capsulotomia-yag-laser')">
+        Registrar observação
+      </button>
+    </div>
+  </div>
+  <div class="post-card" id="card-20260515-o-que-acontece-se-a-catarata-n" data-post-id="20260515-o-que-acontece-se-a-catarata-n">
+    <div class="post-header">
+      <div class="post-meta">
+        <div class="post-data">15/05 (sex)</div>
+        <div class="post-titulo">O que acontece se a catarata não for tratada?</div>
+      </div>
+      <div class="post-header-right">
+        <span class="post-formato formato-card">Card</span>
+        <span class="post-status-badge"></span>
+      </div>
+    </div>
+    
+    <div class="post-divider"></div>
+    
+    <div class="post-conteudo">
+      <div class="post-conteudo-label">Texto</div>
+      <div class="post-texto">Ignorar a catarata não resolve.<br>Ela avança. Devagar, mas avança.</div>
+    </div>
+    <div class="post-conteudo" style="padding-top:0">
+      <div class="post-conteudo-label">Legenda</div>
+      <div class="post-texto">A catarata é uma das principais causas de cegueira reversível no mundo. E a boa notícia é que tem tratamento. A má notícia é que muita gente adia sem saber as consequências.<br>Quando não tratada, a visão vai ficando cada vez mais embaçada, como se você enxergasse através de um vidro fosco. Com o tempo, atividades simples como ler, dirigir ou reconhecer rostos ficam difíceis ou impossíveis.<br>Além da perda visual progressiva, uma catarata muito avançada pode endurecer o cristalino e tornar a cirurgia mais complexa do que seria em estágios iniciais. Em casos extremos, pode causar inflamação dentro do olho.<br>A cirurgia de catarata, feita no momento certo, é um dos procedimentos mais seguros e eficazes da medicina. A recuperação é rápida e os resultados, transformadores.<br>Se você ou alguém próximo enxerga com dificuldade, não espere piorar.<br>Agende uma avaliação pelo link na bio.<br>👁 Ver bem é importante. Se sentir seguro também.<br>#catarata #cirurgiadecatarata #saúdeocular #cataratacenter #oftalmologia #novohamburgors<br>---</div>
+    </div>
+    
+    <div class="obs-salva" id="obs-salva-20260515-o-que-acontece-se-a-catarata-n">
+      <div class="obs-salva-inner">
+        <div class="obs-salva-label">Observação do cliente</div>
+        <div class="obs-salva-texto"></div>
+      </div>
+    </div>
+    <div class="post-acoes">
+      <button class="btn-aprovar" id="aprovar-20260515-o-que-acontece-se-a-catarata-n" onclick="marcarPost('20260515-o-que-acontece-se-a-catarata-n', 'aprovado')">
+        Aprovar
+      </button>
+      <button class="btn-ajuste" id="ajuste-20260515-o-que-acontece-se-a-catarata-n" onclick="marcarPost('20260515-o-que-acontece-se-a-catarata-n', 'ajuste')">
+        Pedir ajuste
+      </button>
+    </div>
+    <div class="campo-ajuste" id="campo-20260515-o-que-acontece-se-a-catarata-n">
+      <textarea
+        id="obs-20260515-o-que-acontece-se-a-catarata-n"
+        placeholder="O que você gostaria de ajustar neste post?"
+        oninput="atualizarComentario('20260515-o-que-acontece-se-a-catarata-n', this.value)"
+        rows="3"
+      ></textarea>
+      <button class="btn-confirmar-obs" id="btnobs-20260515-o-que-acontece-se-a-catarata-n" onclick="confirmarObs('20260515-o-que-acontece-se-a-catarata-n')">
+        Registrar observação
+      </button>
+    </div>
+  </div>
+  <div class="post-card" id="card-20260518-aquela-mosca-no-olho-quando-se" data-post-id="20260518-aquela-mosca-no-olho-quando-se">
+    <div class="post-header">
+      <div class="post-meta">
+        <div class="post-data">18/05 (seg)</div>
+        <div class="post-titulo">Aquela mosca no olho: quando se preocupar?</div>
+      </div>
+      <div class="post-header-right">
+        <span class="post-formato formato-reels">Reels</span>
+        <span class="post-status-badge"></span>
+      </div>
+    </div>
+    
+    <div class="post-divider"></div>
+    
+    <div class="post-conteudo" style="padding-top:0">
+      <div class="post-conteudo-label">Legenda</div>
+      <div class="post-texto">Pontinhos ou fios flutuando na visão? Pode ser mosca volante. 👁️<br>Na maioria dos casos, é algo benigno. Mas alguns sinais pedem atenção imediata:<br>🚨 Moscas volantes novas, súbitas e em grande quantidade<br>🚨 Flashes de luz<br>🚨 Sensação de &quot;cortina&quot; na visão<br>Esses podem ser sinais de descolamento de retina, uma emergência oftalmológica.<br>Em caso de dúvida, não espere. Procure seu oftalmologista.<br>👉 Consultas no Catarata Center pelo link na bio.<br>#CatarataCenter #MoscasVolantes #DescolamentoDaRetina #Retina #SaúdeDosOlhos #Oftalmologia<br>---</div>
+    </div>
+    
+    <div class="obs-salva" id="obs-salva-20260518-aquela-mosca-no-olho-quando-se">
+      <div class="obs-salva-inner">
+        <div class="obs-salva-label">Observação do cliente</div>
+        <div class="obs-salva-texto"></div>
+      </div>
+    </div>
+    <div class="post-acoes">
+      <button class="btn-aprovar" id="aprovar-20260518-aquela-mosca-no-olho-quando-se" onclick="marcarPost('20260518-aquela-mosca-no-olho-quando-se', 'aprovado')">
+        Aprovar
+      </button>
+      <button class="btn-ajuste" id="ajuste-20260518-aquela-mosca-no-olho-quando-se" onclick="marcarPost('20260518-aquela-mosca-no-olho-quando-se', 'ajuste')">
+        Pedir ajuste
+      </button>
+    </div>
+    <div class="campo-ajuste" id="campo-20260518-aquela-mosca-no-olho-quando-se">
+      <textarea
+        id="obs-20260518-aquela-mosca-no-olho-quando-se"
+        placeholder="O que você gostaria de ajustar neste post?"
+        oninput="atualizarComentario('20260518-aquela-mosca-no-olho-quando-se', this.value)"
+        rows="3"
+      ></textarea>
+      <button class="btn-confirmar-obs" id="btnobs-20260518-aquela-mosca-no-olho-quando-se" onclick="confirmarObs('20260518-aquela-mosca-no-olho-quando-se')">
+        Registrar observação
+      </button>
+    </div>
+  </div>
+  <div class="post-card" id="card-20260520-oculos-lente-de-contato-ou-cir" data-post-id="20260520-oculos-lente-de-contato-ou-cir">
+    <div class="post-header">
+      <div class="post-meta">
+        <div class="post-data">20/05 (qua)</div>
+        <div class="post-titulo">Óculos, lente de contato ou cirurgia: qual é a diferença?</div>
+      </div>
+      <div class="post-header-right">
+        <span class="post-formato formato-card">Card</span>
+        <span class="post-status-badge"></span>
+      </div>
+    </div>
+    
+    <div class="post-arte">
+      <img
+        src="../artes/20-05.jpg"
+        alt="Arte — Óculos, lente de contato ou cirurgia: qual é a diferença?"
+        loading="lazy"
+        onerror="this.parentElement.style.display='none'"
+      />
+    </div>
+    <div class="post-divider"></div>
+    
+    <div class="post-conteudo" style="padding-top:0">
+      <div class="post-conteudo-label">Legenda</div>
+      <div class="post-texto">Óculos, lentes de contato e cirurgia refrativa corrigem a visão. Mas não são equivalentes.<br>Os óculos são a opção mais simples e segura. Funcionam bem para a maioria dos casos de miopia, hipermetropia, astigmatismo e presbiopia.<br>As lentes de contato oferecem mais liberdade estética e de movimento, mas exigem cuidados rigorosos de higiene e não são indicadas para todos. Ceratocone, olho seco e algumas condições da córnea limitam o uso.<br>A cirurgia refrativa corrige o problema na origem, reduzindo ou eliminando a dependência de correção óptica. Mas tem critérios de elegibilidade: espessura e curvatura da córnea, estabilidade do grau, saúde ocular geral.<br>A escolha certa depende do seu olho, do seu estilo de vida e de uma avaliação completa.<br>Se você tem dúvida sobre qual opção faz mais sentido para você, agende uma consulta.<br>👉 Link na bio.<br>👁 Ver bem é importante. Se sentir seguro também.<br>#correcaodavisao #cirurgiarefrativa #cataratacenter #oftalmologia #novohamburgors<br>---</div>
+    </div>
+    
+    <div class="obs-salva" id="obs-salva-20260520-oculos-lente-de-contato-ou-cir">
+      <div class="obs-salva-inner">
+        <div class="obs-salva-label">Observação do cliente</div>
+        <div class="obs-salva-texto"></div>
+      </div>
+    </div>
+    <div class="post-acoes">
+      <button class="btn-aprovar" id="aprovar-20260520-oculos-lente-de-contato-ou-cir" onclick="marcarPost('20260520-oculos-lente-de-contato-ou-cir', 'aprovado')">
+        Aprovar
+      </button>
+      <button class="btn-ajuste" id="ajuste-20260520-oculos-lente-de-contato-ou-cir" onclick="marcarPost('20260520-oculos-lente-de-contato-ou-cir', 'ajuste')">
+        Pedir ajuste
+      </button>
+    </div>
+    <div class="campo-ajuste" id="campo-20260520-oculos-lente-de-contato-ou-cir">
+      <textarea
+        id="obs-20260520-oculos-lente-de-contato-ou-cir"
+        placeholder="O que você gostaria de ajustar neste post?"
+        oninput="atualizarComentario('20260520-oculos-lente-de-contato-ou-cir', this.value)"
+        rows="3"
+      ></textarea>
+      <button class="btn-confirmar-obs" id="btnobs-20260520-oculos-lente-de-contato-ou-cir" onclick="confirmarObs('20260520-oculos-lente-de-contato-ou-cir')">
+        Registrar observação
+      </button>
+    </div>
+  </div>
+  <div class="post-card" id="card-20260522-urgencia-ou-pode-esperar" data-post-id="20260522-urgencia-ou-pode-esperar">
+    <div class="post-header">
+      <div class="post-meta">
+        <div class="post-data">22/05 (sex)</div>
+        <div class="post-titulo">Urgência ou pode esperar?</div>
+      </div>
+      <div class="post-header-right">
+        <span class="post-formato formato-reels">Reels</span>
+        <span class="post-status-badge"></span>
+      </div>
+    </div>
+    
+    <div class="post-divider"></div>
+    
+    <div class="post-conteudo" style="padding-top:0">
+      <div class="post-conteudo-label">Legenda</div>
+      <div class="post-texto">Seu olho está dando sinais? Saiba o que é urgência e o que pode aguardar. ⚠️<br>Procure atendimento IMEDIATO se:<br>🚨 Perda súbita de visão (mesmo parcial)<br>🚨 Flashes de luz + muitas moscas volantes novas<br>🚨 Dor intensa no olho<br>🚨 Olho vermelho + visão embaçada + náusea<br>🚨 Trauma ocular<br>Pode agendar consulta de rotina para coceira leve, vermelhidão discreta sem dor ou sensação de olho cansado.<br>Na dúvida, sempre consulte um profissional.<br>👉 Catarata Center: agendamentos pelo link na bio.<br>#CatarataCenter #UrgênciaOftalmológica #EmergênciaOcular #SaúdeDosOlhos #Oftalmologia #CuideDaSuaVisão<br>---</div>
+    </div>
+    
+    <div class="obs-salva" id="obs-salva-20260522-urgencia-ou-pode-esperar">
+      <div class="obs-salva-inner">
+        <div class="obs-salva-label">Observação do cliente</div>
+        <div class="obs-salva-texto"></div>
+      </div>
+    </div>
+    <div class="post-acoes">
+      <button class="btn-aprovar" id="aprovar-20260522-urgencia-ou-pode-esperar" onclick="marcarPost('20260522-urgencia-ou-pode-esperar', 'aprovado')">
+        Aprovar
+      </button>
+      <button class="btn-ajuste" id="ajuste-20260522-urgencia-ou-pode-esperar" onclick="marcarPost('20260522-urgencia-ou-pode-esperar', 'ajuste')">
+        Pedir ajuste
+      </button>
+    </div>
+    <div class="campo-ajuste" id="campo-20260522-urgencia-ou-pode-esperar">
+      <textarea
+        id="obs-20260522-urgencia-ou-pode-esperar"
+        placeholder="O que você gostaria de ajustar neste post?"
+        oninput="atualizarComentario('20260522-urgencia-ou-pode-esperar', this.value)"
+        rows="3"
+      ></textarea>
+      <button class="btn-confirmar-obs" id="btnobs-20260522-urgencia-ou-pode-esperar" onclick="confirmarObs('20260522-urgencia-ou-pode-esperar')">
+        Registrar observação
+      </button>
+    </div>
+  </div>
+  <div class="post-card" id="card-20260526-dia-nacional-de-combate-ao-gla" data-post-id="20260526-dia-nacional-de-combate-ao-gla">
+    <div class="post-header">
+      <div class="post-meta">
+        <div class="post-data">26/05 (ter)</div>
+        <div class="post-titulo">Dia Nacional de Combate ao Glaucoma e à Catarata</div>
+      </div>
+      <div class="post-header-right">
+        <span class="post-formato formato-card">Card</span>
+        <span class="post-status-badge"></span>
+      </div>
+    </div>
+    
+    <div class="post-arte">
+      <img
+        src="../artes/26-05.jpg"
+        alt="Arte — Dia Nacional de Combate ao Glaucoma e à Catarata"
+        loading="lazy"
+        onerror="this.parentElement.style.display='none'"
+      />
+    </div>
+    <div class="post-divider"></div>
+    
+    <div class="post-conteudo" style="padding-top:0">
+      <div class="post-conteudo-label">Legenda</div>
+      <div class="post-texto">26 de maio. Dia Nacional de Combate ao Glaucoma e à Catarata.<br>Essas são duas das principais causas de deficiência visual no Brasil. E têm uma coisa em comum: com diagnóstico precoce, é possível tratar.<br>A catarata opacifica o cristalino e embaça a visão progressivamente. A cirurgia, rápida e segura, devolve a nitidez que a pessoa às vezes nem lembrava mais que existia.<br>O glaucoma destrói o nervo óptico de forma silenciosa. Não dói, não embaça no início, e a perda visual que causa é irreversível. Mas com tratamento adequado, a progressão pode ser controlada.<br>Os dois precisam de diagnóstico feito por oftalmologista, com exames específicos.<br>Se você ainda não fez uma avaliação ocular completa este ano, hoje é um bom dia para agendar.<br>👉 Link na bio.<br>👁 Ver bem é importante. Se sentir seguro também.<br>#glaucoma #catarata #saúdeocular #cataratacenter #oftalmologia #novohamburgors #combateaoglaucoma<br>---</div>
+    </div>
+    
+    <div class="obs-salva" id="obs-salva-20260526-dia-nacional-de-combate-ao-gla">
+      <div class="obs-salva-inner">
+        <div class="obs-salva-label">Observação do cliente</div>
+        <div class="obs-salva-texto"></div>
+      </div>
+    </div>
+    <div class="post-acoes">
+      <button class="btn-aprovar" id="aprovar-20260526-dia-nacional-de-combate-ao-gla" onclick="marcarPost('20260526-dia-nacional-de-combate-ao-gla', 'aprovado')">
+        Aprovar
+      </button>
+      <button class="btn-ajuste" id="ajuste-20260526-dia-nacional-de-combate-ao-gla" onclick="marcarPost('20260526-dia-nacional-de-combate-ao-gla', 'ajuste')">
+        Pedir ajuste
+      </button>
+    </div>
+    <div class="campo-ajuste" id="campo-20260526-dia-nacional-de-combate-ao-gla">
+      <textarea
+        id="obs-20260526-dia-nacional-de-combate-ao-gla"
+        placeholder="O que você gostaria de ajustar neste post?"
+        oninput="atualizarComentario('20260526-dia-nacional-de-combate-ao-gla', this.value)"
+        rows="3"
+      ></textarea>
+      <button class="btn-confirmar-obs" id="btnobs-20260526-dia-nacional-de-combate-ao-gla" onclick="confirmarObs('20260526-dia-nacional-de-combate-ao-gla')">
+        Registrar observação
+      </button>
+    </div>
+  </div>
+  <div class="post-card" id="card-20260527-campimetria" data-post-id="20260527-campimetria">
+    <div class="post-header">
+      <div class="post-meta">
+        <div class="post-data">27/05 (qua)</div>
+        <div class="post-titulo">Campimetria</div>
+      </div>
+      <div class="post-header-right">
+        <span class="post-formato formato-reels">Reels</span>
+        <span class="post-status-badge"></span>
+      </div>
+    </div>
+    
+    <div class="post-divider"></div>
+    
+    <div class="post-conteudo" style="padding-top:0">
+      <div class="post-conteudo-label">Legenda</div>
+      <div class="post-texto">A campimetria mapeia o campo visual, tudo o que você consegue enxergar sem mover os olhos. 👁️<br>É o exame que detecta perdas no campo visual causadas por glaucoma, doenças neurológicas e outras condições que muitas vezes não dão sintomas no início.<br>Simples, indolor e com muita informação dentro dele. Em alguns casos, ele é o único exame que revela que algo está acontecendo.<br>Agende seus exames pelo link na bio.<br>👁 Ver bem é importante. Se sentir seguro também.<br>#campimetria #campovisual #cataratacenter #oftalmologia #glaucoma #novohamburgors<br>---</div>
+    </div>
+    
+    <div class="obs-salva" id="obs-salva-20260527-campimetria">
+      <div class="obs-salva-inner">
+        <div class="obs-salva-label">Observação do cliente</div>
+        <div class="obs-salva-texto"></div>
+      </div>
+    </div>
+    <div class="post-acoes">
+      <button class="btn-aprovar" id="aprovar-20260527-campimetria" onclick="marcarPost('20260527-campimetria', 'aprovado')">
+        Aprovar
+      </button>
+      <button class="btn-ajuste" id="ajuste-20260527-campimetria" onclick="marcarPost('20260527-campimetria', 'ajuste')">
+        Pedir ajuste
+      </button>
+    </div>
+    <div class="campo-ajuste" id="campo-20260527-campimetria">
+      <textarea
+        id="obs-20260527-campimetria"
+        placeholder="O que você gostaria de ajustar neste post?"
+        oninput="atualizarComentario('20260527-campimetria', this.value)"
+        rows="3"
+      ></textarea>
+      <button class="btn-confirmar-obs" id="btnobs-20260527-campimetria" onclick="confirmarObs('20260527-campimetria')">
+        Registrar observação
+      </button>
+    </div>
+  </div>
+  <div class="post-card" id="card-20260529-alimentacao-e-saude-ocular-mit" data-post-id="20260529-alimentacao-e-saude-ocular-mit">
+    <div class="post-header">
+      <div class="post-meta">
+        <div class="post-data">29/05 (sex)</div>
+        <div class="post-titulo">Alimentação e saúde ocular: mito ou verdade?</div>
+      </div>
+      <div class="post-header-right">
+        <span class="post-formato formato-card">Card</span>
+        <span class="post-status-badge"></span>
+      </div>
+    </div>
+    
+    <div class="post-arte">
+      <img
+        src="../artes/29-05.jpg"
+        alt="Arte — Alimentação e saúde ocular: mito ou verdade?"
+        loading="lazy"
+        onerror="this.parentElement.style.display='none'"
+      />
+    </div>
+    <div class="post-divider"></div>
+    
+    <div class="post-conteudo" style="padding-top:0">
+      <div class="post-conteudo-label">Legenda</div>
+      <div class="post-texto">Faz sim. Mas não é tão simples quanto parece.<br>A cenoura é rica em betacaroteno, que o organismo converte em vitamina A, nutriente essencial para a visão noturna e para a saúde da córnea. Mas ela não corrige miopia, não trata catarata nem evita glaucoma por si só.<br>O que a alimentação faz é contribuir para a saúde ocular de forma geral. Alguns nutrientes têm evidências sólidas:<br>Luteína e zeaxantina (presentes em folhas escuras, milho e ovos) protegem a retina contra danos causados pela luz.<br>Ômega-3 (encontrado em peixes como salmão e sardinha) ajuda na função lacrimal e pode reduzir sintomas do olho seco.<br>Vitaminas C e E têm ação antioxidante e estão associadas à redução do risco de catarata.<br>Nenhum alimento substitui o acompanhamento médico. Mas uma alimentação variada é parte do cuidado com os olhos também.<br>👁 Ver bem é importante. Se sentir seguro também.<br>#saúdeocular #alimentacaosaudavel #cataratacenter #oftalmologia #novohamburgors</div>
+    </div>
+    
+    <div class="obs-salva" id="obs-salva-20260529-alimentacao-e-saude-ocular-mit">
+      <div class="obs-salva-inner">
+        <div class="obs-salva-label">Observação do cliente</div>
+        <div class="obs-salva-texto"></div>
+      </div>
+    </div>
+    <div class="post-acoes">
+      <button class="btn-aprovar" id="aprovar-20260529-alimentacao-e-saude-ocular-mit" onclick="marcarPost('20260529-alimentacao-e-saude-ocular-mit', 'aprovado')">
+        Aprovar
+      </button>
+      <button class="btn-ajuste" id="ajuste-20260529-alimentacao-e-saude-ocular-mit" onclick="marcarPost('20260529-alimentacao-e-saude-ocular-mit', 'ajuste')">
+        Pedir ajuste
+      </button>
+    </div>
+    <div class="campo-ajuste" id="campo-20260529-alimentacao-e-saude-ocular-mit">
+      <textarea
+        id="obs-20260529-alimentacao-e-saude-ocular-mit"
+        placeholder="O que você gostaria de ajustar neste post?"
+        oninput="atualizarComentario('20260529-alimentacao-e-saude-ocular-mit', this.value)"
+        rows="3"
+      ></textarea>
+      <button class="btn-confirmar-obs" id="btnobs-20260529-alimentacao-e-saude-ocular-mit" onclick="confirmarObs('20260529-alimentacao-e-saude-ocular-mit')">
+        Registrar observação
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- SEPARADOR RESPONDIDOS (inserido por JS) -->
+
+
+
+<!-- RODAPE FIXO -->
+<div class="rodape">
+  <button class="btn-enviar" id="btnEnviar" onclick="enviarAprovacao()" disabled>
+    Enviar aprovações
+  </button>
+</div>
+
+<!-- TELA JA APROVADA -->
+<div class="tela-ja-aprovada" id="telaJaAprovada">
+  <div class="confirmacao-icone" style="background:#1A1A1A">
+    <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+      <polyline points="20 6 9 17 4 12"></polyline>
+    </svg>
+  </div>
+  <div class="confirmacao-titulo">Tudo certo por aqui!</div>
+  <div class="confirmacao-texto">
+    Você já enviou suas aprovações.<br>
+    Quando houver novos conteúdos para revisar,<br>
+    a Silvana vai te enviar um novo link.
+  </div>
+</div>
+
+<!-- TELA DE CONFIRMACAO -->
+<div class="tela-confirmacao" id="telaConfirmacao">
+  <div class="confirmacao-icone">
+    <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+      <polyline points="20 6 9 17 4 12"></polyline>
+    </svg>
+  </div>
+  <div class="confirmacao-titulo">Aprovações enviadas!</div>
+  <div class="confirmacao-texto">
+    A Silvana já recebeu suas respostas.<br>
+    Qualquer dúvida, é só chamar no WhatsApp.
+  </div>
+</div>
+
+<script>
+  // Verifica se já aprovou antes (persiste entre refreshes)
+  (function() {
+    try {
+      if (localStorage.getItem('aprovacao:' + location.pathname) === '1') {
+        document.addEventListener('DOMContentLoaded', function() {
+          var t = document.getElementById('telaJaAprovada');
+          if (t) t.classList.add('visivel');
+        });
+      }
+    } catch(e) {}
+  })();
+
+  const totalPosts = 14;
+  const nomeCliente = "Catarata Center";
+  const periodo = "1 a 31 de maio";
+  const whatsappNumero = '5551980603512';
+  const whatsappGrupo = 'https://chat.whatsapp.com/IaRIEEaIpynDy8NURSxGTW?mode=gi_t';
+  const postsMeta = {"20260501-cuidar-dos-olhos-nao-tem-idade": {"data": "01/05", "titulo": "Cuidar dos olhos não tem idade mínima"}, "20260504-uma-novidade-boa-de-contar": {"data": "04/05", "titulo": "Uma novidade boa de contar"}, "20260507-dia-do-oftalmologista": {"data": "07/05", "titulo": "Dia do Oftalmologista"}, "20260508-por-que-fica-dificil-ler-de-pe": {"data": "08/05", "titulo": "Por que fica difícil ler de perto depois dos 40?"}, "20260510-dia-das-maes": {"data": "10/05", "titulo": "Dia das Mães"}, "20260512-dia-da-enfermagem": {"data": "12/05", "titulo": "Dia da Enfermagem"}, "20260513-capsulotomia-yag-laser": {"data": "13/05", "titulo": "Capsulotomia YAG Laser"}, "20260515-o-que-acontece-se-a-catarata-n": {"data": "15/05", "titulo": "O que acontece se a catarata não for tratada?"}, "20260518-aquela-mosca-no-olho-quando-se": {"data": "18/05", "titulo": "Aquela mosca no olho: quando se preocupar?"}, "20260520-oculos-lente-de-contato-ou-cir": {"data": "20/05", "titulo": "Óculos, lente de contato ou cirurgia: qual é a diferença?"}, "20260522-urgencia-ou-pode-esperar": {"data": "22/05", "titulo": "Urgência ou pode esperar?"}, "20260526-dia-nacional-de-combate-ao-gla": {"data": "26/05", "titulo": "Dia Nacional de Combate ao Glaucoma e à Catarata"}, "20260527-campimetria": {"data": "27/05", "titulo": "Campimetria"}, "20260529-alimentacao-e-saude-ocular-mit": {"data": "29/05", "titulo": "Alimentação e saúde ocular: mito ou verdade?"}};
+  const postsOrdem = ["20260501-cuidar-dos-olhos-nao-tem-idade", "20260504-uma-novidade-boa-de-contar", "20260507-dia-do-oftalmologista", "20260508-por-que-fica-dificil-ler-de-pe", "20260510-dia-das-maes", "20260512-dia-da-enfermagem", "20260513-capsulotomia-yag-laser", "20260515-o-que-acontece-se-a-catarata-n", "20260518-aquela-mosca-no-olho-quando-se", "20260520-oculos-lente-de-contato-ou-cir", "20260522-urgencia-ou-pode-esperar", "20260526-dia-nacional-de-combate-ao-gla", "20260527-campimetria", "20260529-alimentacao-e-saude-ocular-mit"];
+
+  // ── ESTADO VIA GITHUB API ──────────────────────────────────────
+  const _tk = ['github', '_pat_', '11A4XFG6Q0V9ee2TfDGWKP_Z1vH306NmDFc07G2UHTHWyTJQRYkc4ClwFZGa1j9LThUODYITL6dNhDr6Kn'].join('');
+  const _ghOwner = 'oiforster';
+  const _ghRepo  = 'forster-aprovacoes';
+  const _estadoPath = 'catarata/estado-2026-05.json';
+
+  let _salvarFila = Promise.resolve();
+
+  // Novo formato de estado: { "post-id": { "status": "aprovado", "obs": "..." } }
+  // Retrocompat: aceita string pura (formato antigo)
+  function _parseEstadoItem(val) {
+    if (typeof val === 'string') return { status: val, obs: '' };
+    if (val && typeof val === 'object') return { status: val.status || 'pendente', obs: val.obs || '' };
+    return { status: 'pendente', obs: '' };
+  }
+
+  async function _salvarEstado(postId, status, obs) {
+    _salvarFila = _salvarFila.then(async () => {
+      try {
+        const url = 'https://api.github.com/repos/' + _ghOwner + '/' + _ghRepo + '/contents/' + _estadoPath;
+        const getResp = await fetch(url, { headers: { Authorization: 'token ' + _tk } });
+        if (!getResp.ok) return;
+        const getData = await getResp.json();
+        const sha     = getData.sha;
+        const estado  = JSON.parse(atob(getData.content.replace(/\n/g, '')));
+        const item = { status: status };
+        if (obs) item.obs = obs;
+        estado[postId] = item;
+        const novoConteudo = btoa(unescape(encodeURIComponent(JSON.stringify(estado, null, 2))));
+        await fetch(url, {
+          method: 'PUT',
+          headers: { Authorization: 'token ' + _tk, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ message: 'estado: ' + postId, content: novoConteudo, sha: sha })
+        });
+      } catch(e) {}
+    });
+  }
+
+  async function _salvarEstadoMultiplos(mapa) {
+    _salvarFila = _salvarFila.then(async () => {
+      try {
+        const url = 'https://api.github.com/repos/' + _ghOwner + '/' + _ghRepo + '/contents/' + _estadoPath;
+        const getResp = await fetch(url, { headers: { Authorization: 'token ' + _tk } });
+        if (!getResp.ok) return;
+        const getData = await getResp.json();
+        const sha    = getData.sha;
+        const estado = JSON.parse(atob(getData.content.replace(/\n/g, '')));
+        for (const [k, v] of Object.entries(mapa)) {
+          estado[k] = v;
+        }
+        const novoConteudo = btoa(unescape(encodeURIComponent(JSON.stringify(estado, null, 2))));
+        await fetch(url, {
+          method: 'PUT',
+          headers: { Authorization: 'token ' + _tk, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ message: 'estado: lote', content: novoConteudo, sha: sha })
+        });
+      } catch(e) {}
+    });
+  }
+
+  // ── CARREGAR ESTADO DO GITHUB ──────────────────────────────────
+  async function _carregarEstado() {
+    try {
+      const url = 'https://api.github.com/repos/' + _ghOwner + '/' + _ghRepo + '/contents/' + _estadoPath;
+      const resp = await fetch(url, { headers: { Authorization: 'token ' + _tk } });
+      if (!resp.ok) return null;
+      const data = await resp.json();
+      const raw = atob(data.content.replace(/\n/g, ''));
+      // Decode UTF-8 corretamente (atob retorna Latin-1, precisamos de UTF-8)
+      const texto = decodeURIComponent(escape(raw));
+      return JSON.parse(texto);
+    } catch(e) {
+      return null;
+    }
+  }
+
+  function _aplicarEstado(estado) {
+    if (!estado) return;
+
+    for (const [postId, val] of Object.entries(estado)) {
+      const parsed = _parseEstadoItem(val);
+      if (parsed.status === 'pendente') continue;
+
+      const card = document.getElementById('card-' + postId);
+      if (!card) continue;
+
+      statusPosts[postId] = parsed.status;
+
+      if (parsed.status === 'aprovado') {
+        card.classList.add('aprovado');
+        const ba = document.getElementById('aprovar-' + postId);
+        if (ba) ba.classList.add('ativo');
+        // Mostra badge
+        const badge = card.querySelector('.post-status-badge');
+        if (badge) { badge.textContent = '\u2713 Aprovado'; }
+      } else if (parsed.status === 'ajuste') {
+        card.classList.add('ajuste');
+        const baj = document.getElementById('ajuste-' + postId);
+        if (baj) baj.classList.add('ativo');
+        const badge = card.querySelector('.post-status-badge');
+        if (badge) { badge.textContent = 'Ajuste solicitado'; }
+
+        // Mostrar observação salva (só a caixa amarela, sem a textarea)
+        if (parsed.obs) {
+          comentariosPosts[postId] = parsed.obs;
+          const obsSalva = document.getElementById('obs-salva-' + postId);
+          if (obsSalva) {
+            obsSalva.querySelector('.obs-salva-texto').textContent = parsed.obs;
+            obsSalva.classList.add('visivel');
+          }
+          // Esconde o campo-ajuste (textarea) — a caixa amarela já mostra a obs
+          // O campo só reaparece se o cliente desmarcar e remarcar "Pedir ajuste"
+        }
+      }
+    }
+
+    atualizarProgresso();
+    _reordenarPosts();
+  }
+
+  function _reordenarPosts() {
+    const container = document.getElementById('postsContainer');
+    const cards = Array.from(container.querySelectorAll('.post-card'));
+
+    const pendentes = [];
+    const ajustes = [];
+    const aprovados = [];
+
+    cards.forEach(card => {
+      const id = card.dataset.postId;
+      const s = statusPosts[id];
+      if (s === 'aprovado') aprovados.push(card);
+      else if (s === 'ajuste') ajustes.push(card);
+      else pendentes.push(card);
+    });
+
+    // Limpar container
+    cards.forEach(c => c.remove());
+
+    // Remove separadores antigos
+    document.querySelectorAll('.secao-separador-dinamico').forEach(e => e.remove());
+
+    const secaoPendentes = document.getElementById('secaoPendentes');
+    const haRespondidos = aprovados.length > 0 || ajustes.length > 0;
+    const haPendentes = pendentes.length > 0;
+
+    // Mostra separador pendentes
+    if (haPendentes && haRespondidos) {
+      secaoPendentes.style.display = 'flex';
+    }
+
+    // Insere pendentes primeiro
+    pendentes.forEach(c => container.appendChild(c));
+
+    // Cria separador de respondidos se necessario
+    if (haRespondidos) {
+      const sep = document.createElement('div');
+      sep.className = 'secao-separador respondidos secao-separador-dinamico';
+      sep.innerHTML = '<h2>Já respondidos</h2><div class="secao-linha"></div>';
+      container.appendChild(sep);
+    }
+
+    // Insere ajustes depois aprovados
+    ajustes.forEach(c => container.appendChild(c));
+    aprovados.forEach(c => container.appendChild(c));
+  }
+
+  function enviarEmailSilencioso(mensagem) {
+    try {
+      emailjs.send('service_a00b37r', 'template_lyk4lff', {
+        title: 'Aprovações — ' + nomeCliente + ' — ' + periodo,
+        name: nomeCliente,
+        message: mensagem,
+        email: ''
+      });
+    } catch(e) {}
+  }
+
+  const statusPosts = {};
+  const comentariosPosts = {};
+
+  function marcarPost(id, acao) {
+    const card = document.getElementById('card-' + id);
+    const btnAprovar = document.getElementById('aprovar-' + id);
+    const btnAjuste = document.getElementById('ajuste-' + id);
+    const campoAjuste = document.getElementById('campo-' + id);
+    const obsSalva = document.getElementById('obs-salva-' + id);
+
+    // Toggle: clicar novamente desmarca
+    if (statusPosts[id] === acao) {
+      statusPosts[id] = null;
+      card.classList.remove('aprovado', 'ajuste');
+      btnAprovar.classList.remove('ativo');
+      btnAjuste.classList.remove('ativo');
+      if (campoAjuste) campoAjuste.classList.remove('visivel');
+      if (obsSalva) obsSalva.classList.remove('visivel');
+      card.querySelector('.post-status-badge').style.display = 'none';
+      _salvarEstado(id, 'pendente');
+    } else {
+      statusPosts[id] = acao;
+      card.classList.remove('aprovado', 'ajuste');
+      btnAprovar.classList.remove('ativo');
+      btnAjuste.classList.remove('ativo');
+
+      if (acao === 'aprovado') {
+        card.classList.add('aprovado');
+        btnAprovar.classList.add('ativo');
+        if (campoAjuste) campoAjuste.classList.remove('visivel');
+        if (obsSalva) obsSalva.classList.remove('visivel');
+        _salvarEstado(id, 'aprovado');
+      } else {
+        card.classList.add('ajuste');
+        btnAjuste.classList.add('ativo');
+        if (campoAjuste) campoAjuste.classList.add('visivel');
+        // Obs sera salva ao confirmar
+      }
+    }
+
+    atualizarProgresso();
+  }
+
+  function atualizarComentario(id, valor) {
+    comentariosPosts[id] = valor;
+  }
+
+  function confirmarObs(id) {
+    var ta = document.getElementById('obs-' + id);
+    var btn = document.getElementById('btnobs-' + id);
+    if (!ta || !ta.value.trim()) {
+      ta.focus();
+      ta.placeholder = 'Por favor escreva a observação antes de confirmar.';
+      return;
+    }
+    var obs = ta.value.trim();
+    comentariosPosts[id] = obs;
+    ta.disabled = true;
+    btn.textContent = '\u2713 Observação registrada';
+    btn.classList.add('confirmado');
+    btn.disabled = true;
+
+    // Salva estado com observação
+    _salvarEstado(id, 'ajuste', obs);
+
+    // Mostra caixa de obs salva
+    var obsSalva = document.getElementById('obs-salva-' + id);
+    if (obsSalva) {
+      obsSalva.querySelector('.obs-salva-texto').textContent = obs;
+      obsSalva.classList.add('visivel');
+    }
+  }
+
+  function atualizarProgresso() {
+    const aprovados = Object.values(statusPosts).filter(s => s === 'aprovado').length;
+    const respondidos = Object.values(statusPosts).filter(s => s !== null && s !== undefined).length;
+    const pct = totalPosts > 0 ? (respondidos / totalPosts * 100) : 0;
+
+    document.getElementById('progressBar').style.width = pct + '%';
+    document.getElementById('progressText').textContent = aprovados + ' de ' + totalPosts + ' aprovados';
+
+    const btnEnviar = document.getElementById('btnEnviar');
+    btnEnviar.disabled = respondidos < totalPosts;
+    if (respondidos === totalPosts) {
+      btnEnviar.textContent = 'Enviar aprovações \u2713';
+    }
+  }
+
+  function aprovarTudo() {
+    const btn = document.getElementById('btnAprovarTudo');
+    const todosAprovados = Object.values(statusPosts).filter(s => s === 'aprovado').length === totalPosts;
+
+    if (todosAprovados) return;
+
+    const mapaEstado = {};
+    document.querySelectorAll('[data-post-id]').forEach(card => {
+      const id = card.dataset.postId;
+      statusPosts[id] = 'aprovado';
+      mapaEstado[id]  = { status: 'aprovado' };
+      card.classList.add('aprovado');
+      card.classList.remove('ajuste');
+      const ba = document.getElementById('aprovar-' + id);
+      const baj = document.getElementById('ajuste-' + id);
+      const ca = document.getElementById('campo-' + id);
+      if (ba) ba.classList.add('ativo');
+      if (baj) baj.classList.remove('ativo');
+      if (ca) ca.classList.remove('visivel');
+    });
+    _salvarEstadoMultiplos(mapaEstado);
+
+    btn.classList.add('ativo');
+    btn.textContent = '\u2713 Todos os posts aprovados';
+    atualizarProgresso();
+  }
+
+  function mudarSemana(semanaId) {
+    document.querySelectorAll('.semana-bloco').forEach(b => b.classList.remove('ativa'));
+    document.querySelectorAll('.tab-semana').forEach(t => t.classList.remove('ativa'));
+    const bloco = document.getElementById('semana-' + semanaId);
+    const tab = document.getElementById('tab-' + semanaId);
+    if (bloco) bloco.classList.add('ativa');
+    if (tab) tab.classList.add('ativa');
+  }
+
+  function enviarAprovacao() {
+    const linhas = ['*Aprovações — ' + nomeCliente + ' — ' + periodo + '*', ''];
+
+    for (const id of postsOrdem) {
+      const status = statusPosts[id];
+      const meta = postsMeta[id];
+      if (!meta || !status) continue;
+      if (status === 'aprovado') {
+        linhas.push('\u2705 ' + meta.data + ' — ' + meta.titulo + ' — Aprovado');
+      } else {
+        const obs = (comentariosPosts[id] || '').trim();
+        linhas.push('\u26A0\uFE0F ' + meta.data + ' — ' + meta.titulo + ' — Ajuste' + (obs ? ': "' + obs + '"' : ''));
+      }
+    }
+
+    const mensagem = linhas.join('\n');
+    enviarEmailSilencioso(mensagem);
+
+    if (whatsappGrupo) {
+      _mensagemParaEnviar = mensagem;
+      document.getElementById('modalMensagemTexto').value = mensagem;
+      document.getElementById('btnCopiarMensagem').textContent = 'Copiar mensagem';
+      document.getElementById('btnCopiarMensagem').classList.remove('copiado');
+      document.getElementById('modalMensagem').classList.add('visivel');
+    } else {
+      window.open('https://wa.me/' + whatsappNumero + '?text=' + encodeURIComponent(mensagem), '_blank');
+      try { localStorage.setItem('aprovacao:' + location.pathname, '1'); } catch(e) {}
+      document.getElementById('telaConfirmacao').classList.add('visivel');
+    }
+  }
+
+  var _mensagemParaEnviar = '';
+
+  function copiarMensagemModal() {
+    var texto = document.getElementById('modalMensagemTexto').value;
+    var btn = document.getElementById('btnCopiarMensagem');
+    navigator.clipboard.writeText(texto).then(function() {
+      btn.textContent = 'Copiado! \u2713';
+      btn.classList.add('copiado');
+    }).catch(function() {
+      document.getElementById('modalMensagemTexto').select();
+      document.execCommand('copy');
+      btn.textContent = 'Copiado! \u2713';
+      btn.classList.add('copiado');
+    });
+  }
+
+  function abrirWhatsAppModal() {
+    window.open(whatsappGrupo, '_blank');
+    fecharModalMensagem();
+    try { localStorage.setItem('aprovacao:' + location.pathname, '1'); } catch(e) {}
+    document.getElementById('telaConfirmacao').classList.add('visivel');
+  }
+
+  function fecharModalMensagem() {
+    document.getElementById('modalMensagem').classList.remove('visivel');
+  }
+
+  // ── LIGHTBOX PARA FRAMES ──────────────────────────────────────
+  var _lbFrames = [];
+  var _lbIdx = 0;
+
+  function abrirLightbox(grupo, idx) {
+    var imgs = document.querySelectorAll('.frames-grupo[data-grupo="' + grupo + '"] img');
+    _lbFrames = Array.from(imgs).map(function(img) { return img.dataset.full || img.src; });
+    _lbIdx = idx;
+    var lb = document.getElementById('lightbox');
+    lb.querySelector('img').src = _lbFrames[_lbIdx];
+    lb.classList.add('visivel');
+  }
+
+  function fecharLightbox() {
+    document.getElementById('lightbox').classList.remove('visivel');
+  }
+
+  function navLightbox(dir) {
+    _lbIdx = (_lbIdx + dir + _lbFrames.length) % _lbFrames.length;
+    document.getElementById('lightbox').querySelector('img').src = _lbFrames[_lbIdx];
+  }
+
+  // Swipe no lightbox
+  (function() {
+    var lb = document.getElementById('lightbox');
+    if (!lb) return;
+    var startX = 0;
+    lb.addEventListener('touchstart', function(e) { startX = e.touches[0].clientX; });
+    lb.addEventListener('touchend', function(e) {
+      var diff = e.changedTouches[0].clientX - startX;
+      if (Math.abs(diff) > 50) navLightbox(diff > 0 ? -1 : 1);
+    });
+  })();
+
+  // ── INIT: CARREGAR ESTADO ──────────────────────────────────────
+  document.addEventListener('DOMContentLoaded', async function() {
+    const estado = await _carregarEstado();
+    _aplicarEstado(estado);
+    // Remove loading overlay
+    var overlay = document.getElementById('loadingOverlay');
+    if (overlay) overlay.classList.add('hidden');
+  });
+
+</script>
+
+<!-- Modal: mensagem WhatsApp -->
+<div class="modal-mensagem" id="modalMensagem">
+  <div class="modal-mensagem-inner">
+    <div class="modal-mensagem-titulo">Enviar aprovações</div>
+    <div class="modal-mensagem-instrucao">Copie a mensagem abaixo e cole no WhatsApp do grupo.</div>
+    <textarea class="modal-mensagem-texto" id="modalMensagemTexto" readonly></textarea>
+    <button class="modal-btn-copiar" id="btnCopiarMensagem" onclick="copiarMensagemModal()">
+      Copiar mensagem
+    </button>
+    <button class="modal-btn-wpp" id="btnAbrirWpp" onclick="abrirWhatsAppModal()">
+      Abrir WhatsApp
+    </button>
+    <button class="modal-btn-fechar" onclick="fecharModalMensagem()">Fechar</button>
+  </div>
+</div>
+<script>
+  document.getElementById('modalMensagem').addEventListener('click', function(e) {
+    if (e.target === this) fecharModalMensagem();
+  });
+</script>
+
+<!-- Lightbox -->
+<div class="lightbox" id="lightbox">
+  <button class="lightbox-close" onclick="fecharLightbox()">&times;</button>
+  <button class="lightbox-nav prev" onclick="navLightbox(-1)">&#8249;</button>
+  <img src="" alt="Frame" />
+  <button class="lightbox-nav next" onclick="navLightbox(1)">&#8250;</button>
+  <div class="lightbox-hint">Segure o dedo sobre a imagem para salvar na galeria</div>
+</div>
+
+</body>
+</html>
