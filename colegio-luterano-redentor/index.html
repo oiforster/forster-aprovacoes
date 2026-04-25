@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Aprovações — Colégio Luterano Redentor</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #FAFAF8;
+      color: #1d1d1f;
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+    }
+    .container {
+      max-width: 440px;
+      margin: 0 auto;
+      padding: 40px 16px 60px;
+    }
+    .page-label {
+      font-size: 0.6875rem;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #86868b;
+      margin-bottom: 8px;
+    }
+    .page-title {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 1.625rem;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      color: #1d1d1f;
+      margin-bottom: 32px;
+    }
+    .mes-card {
+      display: block;
+      text-decoration: none;
+      background: #fff;
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 12px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.03), 0 4px 16px rgba(0,0,0,0.04);
+      transition: box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .mes-card:hover {
+      box-shadow: 0 2px 6px rgba(0,0,0,0.06), 0 8px 24px rgba(0,0,0,0.06);
+    }
+    .mes-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+    .mes-card-titulo {
+      font-size: 1.0625rem;
+      font-weight: 600;
+      color: #1d1d1f;
+    }
+    .mes-card-status {
+      font-size: 0.8125rem;
+      font-weight: 600;
+      color: #86868b;
+    }
+    .mes-card-status.completo {
+      color: #34c759;
+    }
+    .mes-card-progress-bg {
+      height: 3px;
+      background: #e8e8ed;
+      border-radius: 2px;
+      overflow: hidden;
+    }
+    .mes-card-progress-fill {
+      height: 100%;
+      background: #34c759;
+      border-radius: 2px;
+      transition: width 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .footer-text {
+      margin-top: 32px;
+      text-align: center;
+      font-size: 0.75rem;
+      color: #c7c7cc;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="page-label">Aprovação de conteúdo</div>
+    <div class="page-title">Colégio Luterano Redentor</div>
+    
+    <a class="mes-card" href="2026-05/">
+      <div class="mes-card-header">
+        <div class="mes-card-titulo">Maio de 2026</div>
+        <div class="mes-card-status">0/11</div>
+      </div>
+      <div class="mes-card-progress-bg">
+        <div class="mes-card-progress-fill" style="width:0%"></div>
+      </div>
+    </a>
+    <div class="footer-text">Forster Filmes</div>
+  </div>
+</body>
+</html>

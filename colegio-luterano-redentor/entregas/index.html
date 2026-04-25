@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Biblioteca — Colégio Luterano Redentor</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #F5F5F0; color: #1A1A1A; min-height: 100vh;
+    }
+    .header {
+      background: #1A1A1A; color: #fff;
+      padding: 20px 20px 20px; position: sticky; top: 0; z-index: 100;
+    }
+    .header-label { font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: #999; margin-bottom: 4px; }
+    .header-cliente { font-size: 20px; font-weight: 700; letter-spacing: -0.02em; }
+    .content { padding: 16px 16px 48px; display: flex; flex-direction: column; gap: 10px; max-width: 480px; margin: 0 auto; }
+    .mes-card {
+      background: #fff; border-radius: 14px; padding: 18px 16px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.07);
+      display: flex; align-items: center; gap: 8px;
+      text-decoration: none; color: #1A1A1A;
+      transition: box-shadow 0.15s;
+    }
+    .mes-card:hover { box-shadow: 0 2px 8px rgba(0,0,0,0.12); }
+    .mes-label { font-size: 16px; font-weight: 700; flex: 1; }
+    .mes-total { font-size: 13px; color: #888; white-space: nowrap; }
+    .mes-seta { font-size: 18px; color: #bbb; margin-left: 4px; }
+  </style>
+</head>
+<body>
+<div class="header">
+  <div class="header-label">Biblioteca de conteúdo</div>
+  <div class="header-cliente">Colégio Luterano Redentor</div>
+</div>
+<div class="content">
+  
+<a class="mes-card" href="maio-2026/">
+  <div class="mes-label">Maio de 2026</div>
+  <div class="mes-total">6 vídeos</div>
+  <div class="mes-seta">→</div>
+</a>
+</div>
+</body>
+</html>
